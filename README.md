@@ -12,7 +12,7 @@
 2. In the project directory, you can run: `npm run package`. The application should be packaged by electron-forge. The output of the application will be available in a folder called `out/`
 
 # Contribution Rule
-1. Never push your rule directly into main. Get a branch, push your code and wait for Github Action to pass and others to approve your code.
+1. Never push your rule directly into main. Get a branch, push your code, open a pull request and wait for Github Action to pass and others to approve your code.
 2. Always set `const debug` to `false` when push your code change to the repository.
 
 # Coding Style

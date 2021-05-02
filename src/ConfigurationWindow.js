@@ -1,6 +1,6 @@
 import React from 'react';
 import './css/App.css';
-import { Container, Button, Row, Col, Form } from 'react-bootstrap';
+import { Container, Row, Col, Form } from 'react-bootstrap';
 import { Folder2Open } from 'react-bootstrap-icons';
 import { ThemeProvider } from "styled-components";
 import { MainBody } from "./components/GlobalStyles";

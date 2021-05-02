@@ -1,4 +1,4 @@
-import logo from './logo.svg';
+// import logo from './logo.svg';
 import React from 'react';
 // import { Main } from 'electron';
 import MainWindow from './MainWindow.js'
@@ -10,8 +10,7 @@ import {
   BrowserRouter,
   HashRouter,
   Switch,
-  Route,
-  Link
+  Route
 } from "react-router-dom";
 
 
@@ -54,7 +53,6 @@ export default class App extends React.Component {
 
 
   render() {
-    const debug = true;
     console.log(this.state.theme);
     if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
       console.log("DEV")

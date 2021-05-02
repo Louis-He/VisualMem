@@ -1,6 +1,6 @@
 import React from 'react';
 import './css/App.css';
-import { Container, Button, Row, Col } from 'react-bootstrap';
+import { Container, Button } from 'react-bootstrap';
 import { ThemeProvider } from "styled-components";
 import { MainBody } from "./components/GlobalStyles";
 
@@ -11,11 +11,6 @@ function renderRequestOpenConfig() {
 }
 
 export default class MainWindow extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
-  
   render() {
     return (
       <ThemeProvider theme={this.props.theme}>

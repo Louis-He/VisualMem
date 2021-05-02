@@ -1,3 +1,6 @@
+# Project Basic Build Test Status
+[![](https://github.com/Louis-He/VisualMem/actions/workflows/windows_build.yml/badge.svg)]() [![](https://github.com/Louis-He/VisualMem/actions/workflows/mac_build.yml/badge.svg)]() [![](https://github.com/Louis-He/VisualMem/actions/workflows/linux_build.yml/badge.svg)]()
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

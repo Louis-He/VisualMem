@@ -1,10 +1,11 @@
 import logo from './logo.svg';
-import './App.css';
 import React from 'react';
 // import { Main } from 'electron';
 import MainWindow from './MainWindow.js'
 import ConfigurationWindow from './ConfigurationWindow.js'
-import { Col, Row } from "react-bootstrap";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { lightTheme, darkTheme } from "./components/Themes"
+
 import {
   BrowserRouter,
   HashRouter,
@@ -16,47 +17,79 @@ import {
 
 const ipcRenderer = window.require("electron").ipcRenderer;
 
-
-ipcRenderer.on('asynchronous-message', function (evt, message) {
-    console.log(message); // Returns: {'SAVED': 'File Saved'}
-});
-
 export default class App extends React.Component {
   constructor(props) {
     super(props);
     
+    this.state = {
+      theme: 'light'
+    }
+    this.themeSwitchHandler = this.themeSwitchHandler.bind(this)
   }
+
+  themeSwitchHandler(_theme) {
+    // this.setState({
+    //   theme: _theme
+    // })
+    if (_theme) {
+      this.setState({
+        theme: 'dark'
+      })
+    } else {
+      this.setState({
+        theme: 'light'
+      })
+    }
+  }
+
+  componentDidMount() {
+    console.log("Mount")
+    var that = this;
+    ipcRenderer.on('distributeSwitchMode', function (evt, message) {
+      that.setState({
+        theme: message.theme ? "dark" : "light"
+      })
+    });
+  }
+
+
   render() {
     const debug = true;
-
-    // return (
-    //   <div className="mainwindow">
-    //     {/* <header>
-    //       <div className="App-header"></div>
-    //     </header> */}
-    //     <button onClick={checkGDBPath}>TEST button</button>
-    //     <footer>ddd</footer>
-    //   </div>
-    // );
-
+    console.log(this.state.theme);
     if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
       console.log("DEV")
-        return (
-            <BrowserRouter>
-                <Switch>
-                    <Route exact path = "/" component = {MainWindow} />
-                    <Route exact path = "/Configuration" component = {ConfigurationWindow} />
-                </Switch>
-            </BrowserRouter>)
+      return (
+        <BrowserRouter>
+          <Switch>
+            <Route exact path="/" render={() =>
+              <MainWindow
+                theme={this.state.theme === 'light' ? lightTheme : darkTheme}
+              />}
+            />
+            <Route exact path="/Configuration" render={() =>
+              <ConfigurationWindow
+                theme={this.state.theme === 'light' ? lightTheme : darkTheme}
+                themeSwitchHandler={this.themeSwitchHandler} />}
+            />
+          </Switch>
+        </BrowserRouter>)
     } else {
       console.log("PRODUCTION")
-        return (
-            <HashRouter>
-                <Switch>
-                    <Route exact path = "/" component = {MainWindow} />
-                    <Route exact path = "/Configuration" component = {ConfigurationWindow} />
-                </Switch>
-            </HashRouter>)
+      return (
+        <HashRouter>
+          <Switch>
+            <Route exact path="/" render={() =>
+              <MainWindow
+                theme={this.state.theme === 'light' ? lightTheme : darkTheme}
+              />}
+            />
+            <Route exact path="/Configuration" render={() =>
+              <ConfigurationWindow
+                theme={this.state.theme === 'light' ? lightTheme : darkTheme}
+                themeSwitchHandler={this.themeSwitchHandler} />}
+            />
+          </Switch>
+        </HashRouter>)
     }
   }
 }

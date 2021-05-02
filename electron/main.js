@@ -3,9 +3,10 @@ const path = require('path')
 const fs = require('fs')
 const root = fs.readdirSync('/')
 
-const debug = true;
+const debug = false;
 
 var mainWindow = null;
+var configWindow = null;
 
 function createWindow () {
   const win = new BrowserWindow({
@@ -17,17 +18,21 @@ function createWindow () {
       preload: path.join(__dirname, 'preload.js')
     }
   })
+  win.on('close', function() { //   <---- Catch close event
+    console.log("Main window closed")
+    mainWindow = null
+  });
 
   mainWindow = win
 
   // win.loadFile('index.html')
   if (debug) {
     win.loadURL('http://localhost:3000/')
+    // win.loadURL('http://localhost:3000/Configuration')
+    win.webContents.openDevTools();
   } else {
     win.loadURL(`file://${path.join(__dirname, '../build/index.html')}`)
   }
-
-  win.webContents.openDevTools();
 }
 
 app.whenReady().then(() => {
@@ -47,14 +52,18 @@ app.on('window-all-closed', () => {
 })
 
 // In the Main process
-ipcMain.handle('perform-action', (event, ...args) => {
+ipcMain.handle('requestOpenConfig', (event, ...args) => {
   let rawdata = fs.readFileSync(`${path.join(__dirname, '../config/gdb.json')}`);
   let gdbSetting = JSON.parse(rawdata);
   console.log(gdbSetting);
-  mainWindow.webContents.send('asynchronous-message', { 'SAVED': 'File Saved' });
   
-  const win = new BrowserWindow({
-    width: 500,
+  if (configWindow != null) {
+    configWindow.focus()
+    return
+  }
+
+  configWindow = new BrowserWindow({
+    width: 600,
     height: 250,
     webPreferences: {
       nodeIntegration: true,
@@ -62,13 +71,21 @@ ipcMain.handle('perform-action', (event, ...args) => {
       show: true,
     }
   })
-  win.on('close', function() { //   <---- Catch close event
+  configWindow.on('close', function() { //   <---- Catch close event
     console.log("config window closed")
+    configWindow = null
   });
   
   if (debug) {
-    win.loadURL('http://localhost:3000/Configuration')
+    configWindow.loadURL('http://localhost:3000/Configuration')
+    configWindow.webContents.openDevTools();
   } else {
-    win.loadURL(`file://${path.join(__dirname, '../build/index.html#Configuration')}`)
+    configWindow.loadURL(`file://${path.join(__dirname, '../build/index.html#Configuration')}`)
+  }
+})
+
+ipcMain.handle('requestSwitchMode', (event, ...args) => {
+  if (mainWindow != null) {
+    mainWindow.webContents.send('distributeSwitchMode', { 'theme': args[0] });
   }
 })

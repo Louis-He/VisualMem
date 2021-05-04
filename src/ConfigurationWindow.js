@@ -5,13 +5,16 @@ import { Folder2Open } from 'react-bootstrap-icons';
 import { ThemeProvider } from "styled-components";
 import { MainBody } from "./components/GlobalStyles";
 
-// const electron = window.require("electron");
 const ipcRenderer = window.require("electron").ipcRenderer;
 
+// ==== renderer -> main functions ====
 function renderRequestSwitchMode(theme) {
   ipcRenderer.invoke('requestSwitchMode', theme)
 }
 
+// ==== renderer <- main functions ====
+
+// ==== renderer class ====
 export default class ConfigurationWindow extends React.Component {
   constructor(props) {
     super(props);

@@ -6,10 +6,14 @@ import { MainBody } from "./components/GlobalStyles";
 
 const ipcRenderer = window.require("electron").ipcRenderer;
 
+// ==== renderer -> main functions ====
 function renderRequestOpenConfig() {
   ipcRenderer.invoke('requestOpenConfig',)
 }
 
+// ==== renderer <- main functions ====
+
+// ==== renderer class ====
 export default class MainWindow extends React.Component {
   render() {
     return (

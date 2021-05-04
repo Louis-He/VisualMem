@@ -45,8 +45,6 @@ export default class App extends React.Component {
     console.log("Mount")
     var that = this;
     ipcRenderer.on('distributeSwitchMode', function (evt, message) {
-      console.log("TT")
-
       that.setState({
         theme: message.theme ? "dark" : "light"
       })

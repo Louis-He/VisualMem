@@ -19,7 +19,7 @@ function createWindow () {
   })
   win.on('close', function () { //   <---- Catch close event
     if (windowsManager.isDebugMode()) {
-      console.log("Main window closed")
+      windowsManager.debugLog("Main window closed")
     }
     windowsManager.setMainWindow(null)
   });

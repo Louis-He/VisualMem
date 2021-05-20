@@ -10,6 +10,10 @@ exports.isDebugMode = function() {
   return l_debug;
 };
 
+exports.debugLog = function (msg) {
+  if (l_debug) { console.log(msg) }
+}
+ 
 exports.getMainWindows = function() {
   return l_mainWindow;
 };

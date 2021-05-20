@@ -11,6 +11,14 @@ function renderRequestOpenConfig() {
   ipcRenderer.invoke('requestOpenConfig',)
 }
 
+function renderRequestStartGDB() {
+  ipcRenderer.invoke('requestStartGDB',)
+}
+
+function renderRequestStopGDB() {
+  ipcRenderer.invoke('requestStopGDB',)
+}
+
 // ==== renderer <- main functions ====
 
 // ==== renderer class ====
@@ -26,6 +34,8 @@ export default class MainWindow extends React.Component {
             <Container>
               <div className="container_ext">
                 <Button onClick={renderRequestOpenConfig}>TEST button</Button>
+                <Button onClick={renderRequestStartGDB}>Start GDB</Button>
+                <Button onClick={renderRequestStopGDB}>Stop GDB</Button>
               </div>
             </Container>
             

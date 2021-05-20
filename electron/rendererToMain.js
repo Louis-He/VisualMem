@@ -2,6 +2,8 @@
  */
 const path = require('path')
 const fs = require('fs')
+var GDBManager = require('./gdbEntry.js');
+
 var windowsManager = require('./windowsManager.js');
 
 global.share.ipcMain.handle('requestOpenConfig', (event, ...args) => {
@@ -48,4 +50,12 @@ global.share.ipcMain.handle('requestSwitchMode', (event, ...args) => {
   if (mainWindow != null) {
     mainWindow.webContents.send('distributeSwitchMode', { 'theme': args[0] });
   }
+})
+
+global.share.ipcMain.handle('requestStartGDB', (event, ...args) => {
+  GDBManager.startGDB();
+})
+
+global.share.ipcMain.handle('requestStopGDB', (event, ...args) => {
+  GDBManager.stopGDB();
 })

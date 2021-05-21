@@ -59,3 +59,7 @@ global.share.ipcMain.handle('requestStartGDB', (event, ...args) => {
 global.share.ipcMain.handle('requestStopGDB', (event, ...args) => {
   GDBManager.stopGDB();
 })
+
+global.share.ipcMain.handle('sendMsgToGDB', (event, ...args) => {
+  GDBManager.sendCommand(args[0]);
+})

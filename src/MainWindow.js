@@ -49,7 +49,7 @@ export default class MainWindow extends React.Component {
   }
 
   onGDBCommandEnterPress(e) {
-    if(e.keyCode == 13 && e.shiftKey == false) {
+    if(e.keyCode === 13 && e.shiftKey === false) {
       e.preventDefault();
       this.sendGDBCommandButton();
     }

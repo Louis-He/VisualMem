@@ -40,3 +40,12 @@ exports.stopGDB = function () {
     windowsManager.debugLog("Stop GDB instance")
   }
 }
+
+
+exports.sendCommand = function (message) {
+  if (l_gdb_instance === null) {
+    throw "GDB Instance not started"
+  }
+
+  l_gdb_instance.stdin.write(message + '\n')
+}

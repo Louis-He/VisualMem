@@ -47,7 +47,7 @@ global.share.ipcMain.handle('requestOpenConfig', (event, ...args) => {
 
 global.share.ipcMain.handle('requestSwitchMode', (event, ...args) => {
   const mainWindow = windowsManager.getMainWindows()
-  if (mainWindow != null) {
+  if (mainWindow !== null) {
     mainWindow.webContents.send('distributeSwitchMode', { 'theme': args[0] });
   }
 })
@@ -62,4 +62,22 @@ global.share.ipcMain.handle('requestStopGDB', (event, ...args) => {
 
 global.share.ipcMain.handle('sendMsgToGDB', (event, ...args) => {
   GDBManager.sendCommand(args[0]);
+})
+
+global.share.ipcMain.handle('requestSelectProjectFolder', async (event, ...args) => {
+  const result = await global.share.dialog.showOpenDialog(windowsManager.getMainWindows(), {
+    properties: ['openDirectory']
+  })
+
+  let projectFolder = "";
+  if (result.filePaths.length !== 0) {
+    projectFolder = result.filePaths[0]
+  }
+
+  windowsManager.setProjectFolder(projectFolder)
+
+  const mainWindow = windowsManager.getMainWindows()
+  if (mainWindow !== null) {
+    mainWindow.webContents.send('distributeSelectedFolderRes', { 'projectFolder': projectFolder });
+  }
 })

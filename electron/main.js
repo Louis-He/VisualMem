@@ -1,10 +1,10 @@
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow, dialog, ipcMain } = require('electron')
 const path = require('path')
 var windowsManager = require('./windowsManager.js');
 
 // set global variables here
 global.share = {
-  BrowserWindow, ipcMain
+  BrowserWindow, dialog, ipcMain
 };
 
 function createWindow () {

@@ -4,7 +4,7 @@
 
 var l_mainWindow = null;
 var l_configWindow = null;
-var l_debug = true;
+var l_debug = false;
 var l_project_folder = "";
 
 exports.isDebugMode = function() {

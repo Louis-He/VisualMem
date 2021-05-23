@@ -1,6 +1,7 @@
 import React from 'react';
 import './css/App.css';
 import { Container, Button, Form } from 'react-bootstrap';
+import { Folder2Open } from 'react-bootstrap-icons';
 import { ThemeProvider } from "styled-components";
 import { MainBody } from "./components/GlobalStyles";
 
@@ -25,12 +26,14 @@ function renderRequestsendMsgToGDB(msg) {
 
 // ==== renderer <- main functions ====
 
+
 // ==== renderer class ====
 export default class MainWindow extends React.Component {
   constructor(props) {
     super(props)
 
     this.state = {
+      projectFolder: "",
       GDBCommand: "> "
     }
   }
@@ -54,6 +57,20 @@ export default class MainWindow extends React.Component {
       this.sendGDBCommandButton();
     }
   }
+
+  selectProjectFolder(e) {
+    e.preventDefault();
+    ipcRenderer.invoke('requestSelectProjectFolder',)
+  }
+
+  componentDidMount() {
+    var that = this
+    ipcRenderer.on('distributeSelectedFolderRes', function (evt, response) {
+      that.setState({
+        projectFolder: response.projectFolder,
+      })
+    });
+  }
   
   render() {
     return (
@@ -69,6 +86,27 @@ export default class MainWindow extends React.Component {
                 <Button onClick={renderRequestStartGDB}>Start GDB</Button>
                 <Button onClick={renderRequestStopGDB}>Stop GDB</Button>
               </div>
+              <div>
+                <label>Select Project Folder
+                  <span
+                    htmlFor="files"
+                    className="btn btn-primary btn-sm"
+                    style={{ fontSize: "18px", lineHeight: "1" }}>
+                    <Folder2Open style={{ verticalAlign: 'baseline' }} />
+                  </span>
+                  <input id="files"
+                    webkitdirectory = ""
+                    style={{ visibility: "hidden", width: "0px" }}
+                    type="file"
+                    onClick={(e) => this.selectProjectFolder(e)}
+                  />
+                </label>
+              </div>
+
+              <div>
+                <p>Current Selected Folder: {this.state.projectFolder}</p>
+              </div>
+
               <div>
                 <Form>
                   <Form.Group controlId="exampleForm.ControlTextarea1">

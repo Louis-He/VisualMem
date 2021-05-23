@@ -5,6 +5,7 @@
 var l_mainWindow = null;
 var l_configWindow = null;
 var l_debug = false;
+var l_project_folder = "";
 
 exports.isDebugMode = function() {
   return l_debug;
@@ -19,7 +20,6 @@ exports.getMainWindows = function() {
 };
 
 exports.setMainWindow = function(win) {
-  //validate the name...
   l_mainWindow = win;
 };
 
@@ -28,6 +28,13 @@ exports.getConfigWindow = function() {
 };
 
 exports.setConfigWindow = function(win) {
-  //validate the name...
   l_configWindow = win;
+};
+
+exports.getProjectFolder = function() {
+  return l_project_folder;
+};
+
+exports.setProjectFolder = function(projectFolder) {
+  l_project_folder = projectFolder;
 };

@@ -33,7 +33,6 @@ export default class MainWindow extends React.Component {
     super(props)
 
     this.state = {
-      projectFolder: "",
       GDBCommand: "> "
     }
   }
@@ -63,13 +62,9 @@ export default class MainWindow extends React.Component {
     ipcRenderer.invoke('requestSelectProjectFolder',)
   }
 
-  componentDidMount() {
-    var that = this
-    ipcRenderer.on('distributeSelectedFolderRes', function (evt, response) {
-      that.setState({
-        projectFolder: response.projectFolder,
-      })
-    });
+  selectExecutable(e) {
+    e.preventDefault();
+    ipcRenderer.invoke('requestSelectExecutable', this.props.projectFolder)
   }
   
   render() {
@@ -104,7 +99,7 @@ export default class MainWindow extends React.Component {
               </div>
 
               <div>
-                <p>Current Selected Folder: {this.state.projectFolder}</p>
+                <p>Current Selected Folder: {this.props.projectFolder}</p>
               </div>
 
               <div>
@@ -121,6 +116,22 @@ export default class MainWindow extends React.Component {
                     Send
                   </Button>
                 </Form>
+              </div>
+
+              <div>
+                <label>Select Executable
+                  <span
+                    htmlFor="files"
+                    className="btn btn-primary btn-sm"
+                    style={{ fontSize: "18px", lineHeight: "1" }}>
+                    <Folder2Open style={{ verticalAlign: 'baseline' }} />
+                  </span>
+                  <input id="files"
+                    style={{ visibility: "hidden", width: "0px" }}
+                    type="file"
+                    onClick={(e) => this.selectExecutable(e)}
+                  />
+                </label>
               </div>
             </Container>
             

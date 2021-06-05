@@ -21,15 +21,13 @@ export default class App extends React.Component {
     super(props);
     
     this.state = {
-      theme: 'light'
+      theme: 'light',
+      projectFolder: ''
     }
     this.themeSwitchHandler = this.themeSwitchHandler.bind(this)
   }
 
   themeSwitchHandler(_theme) {
-    // this.setState({
-    //   theme: _theme
-    // })
     if (_theme) {
       this.setState({
         theme: 'dark'
@@ -41,7 +39,7 @@ export default class App extends React.Component {
     }
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     console.log("Mount")
     var that = this;
     ipcRenderer.on('distributeSwitchMode', function (evt, message) {
@@ -49,6 +47,17 @@ export default class App extends React.Component {
         theme: message.theme ? "dark" : "light"
       })
     });
+
+    ipcRenderer.on('distributeSelectedFolderRes', function (evt, response) {
+      that.setState({
+        projectFolder: response.projectFolder,
+      })
+    });
+
+    let setting = await ipcRenderer.invoke('requestInitialSetting')
+    this.setState({
+      projectFolder: setting.project_path
+    })
   }
 
 
@@ -62,6 +71,7 @@ export default class App extends React.Component {
             <Route exact path="/" render={() =>
               <MainWindow
                 theme={this.state.theme === 'light' ? lightTheme : darkTheme}
+                projectFolder={this.state.projectFolder}
               />}
             />
             <Route exact path="/Configuration" render={() =>

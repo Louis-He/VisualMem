@@ -65,7 +65,7 @@ async function l_waitUntilCommandDone (callBack) {
   while (l_stdout_buffer.indexOf("(gdb)") == -1) {
     await sleep(100);  
   };
-  callBack();
+  return callBack();
 }
 
 exports.startRunAndStop = function () {
@@ -111,12 +111,15 @@ var getStackCallbackFunc = function l_getStackCallback() {
     }
   }
   
-  windowsManager.debugLog(stackInfo)
+  return {"stackInfo": stackInfo}
 }
 
-exports.getStack = function () {
+exports.getStack = async function () {
   this.clearBufferAndExecGdbCommand("info stack")
-  l_waitUntilCommandDone(getStackCallbackFunc)
+  let stackInfo = await l_waitUntilCommandDone(getStackCallbackFunc)
+  windowsManager.debugLog(stackInfo)
+
+  return stackInfo
 }
 
 
@@ -154,13 +157,18 @@ var getSourceFilesCallbackFunc = function l_getStackCallback() {
     }
   }
 
-  windowsManager.debugLog(beenReadFiles)
-  windowsManager.debugLog(onDemandFiles)
+  return {
+    "beenReadFiles": beenReadFiles,
+    "onDemandFiles": onDemandFiles
+  }
 }
 
-exports.getSourceFiles = function () {
+exports.getSourceFiles = async function () {
   this.clearBufferAndExecGdbCommand("info sources")
-  l_waitUntilCommandDone(getSourceFilesCallbackFunc)
+  let sourceFiles = await l_waitUntilCommandDone(getSourceFilesCallbackFunc)
+  windowsManager.debugLog(sourceFiles)
+
+  return sourceFiles
 }
 
 

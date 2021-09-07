@@ -33,7 +33,8 @@ export default class MainWindow extends React.Component {
     super(props)
 
     this.state = {
-      GDBCommand: "> "
+      GDBCommand: "> ",
+      fileData: ""
     }
   }
 
@@ -65,6 +66,14 @@ export default class MainWindow extends React.Component {
   selectExecutable(e) {
     e.preventDefault();
     ipcRenderer.invoke('requestSelectExecutable', this.props.projectFolder)
+  }
+
+  showFile(e) {
+    e.preventDefault();
+    let file_content = ipcRenderer.invoke('showFile', this.props.executablePath)
+    this.setState({
+      fileData: file_content
+    })
   }
   
   render() {
@@ -133,6 +142,19 @@ export default class MainWindow extends React.Component {
                   />
                 </label>
               </div>
+
+              <div>
+                <p>Current Executable Path: {this.props.executablePath}</p>
+              </div>
+
+              <Button variant="primary" onClick={(e) => this.showFile(e)}>
+                Display File Content
+              </Button>
+
+              <div>
+                <p> File Data: {this.props.fileData} </p>
+              </div>
+              
             </Container>
             
             <footer>aba</footer>

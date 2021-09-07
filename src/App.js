@@ -22,7 +22,9 @@ export default class App extends React.Component {
     
     this.state = {
       theme: 'light',
-      projectFolder: ''
+      projectFolder: '',
+      executablePath: '',
+      fileData: ''
     }
     this.themeSwitchHandler = this.themeSwitchHandler.bind(this)
   }
@@ -54,9 +56,22 @@ export default class App extends React.Component {
       })
     });
 
+    ipcRenderer.on('distributeSelectedExecutable', function (evt, response) {
+      that.setState({
+        executablePath: response.executablePath,
+      })
+    });
+
+    ipcRenderer.on('distributeFileData', function (evt, response) {
+      that.setState({
+        fileData: response.fileData,
+      })
+    });
+
     let setting = await ipcRenderer.invoke('requestInitialSetting')
     this.setState({
-      projectFolder: setting.project_path
+      projectFolder: setting.project_path,
+      executablePath: setting.execFile
     })
   }
 
@@ -72,6 +87,7 @@ export default class App extends React.Component {
               <MainWindow
                 theme={this.state.theme === 'light' ? lightTheme : darkTheme}
                 projectFolder={this.state.projectFolder}
+                executablePath={this.state.executablePath}
               />}
             />
             <Route exact path="/Configuration" render={() =>

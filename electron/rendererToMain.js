@@ -104,5 +104,36 @@ global.share.ipcMain.handle('requestSelectExecutable', async (event, ...args) =>
     return
   } else {
     windowsManager.setExecFile(result.filePaths[0])
+
+    const mainWindow = windowsManager.getMainWindows()
+    if (mainWindow !== null) {
+      mainWindow.webContents.send('distributeSelectedExecutable', { 'executablePath': result.filePaths[0] });
+    }
   }
+})
+
+global.share.ipcMain.handle('showFile', async (event, ...args) => {
+
+  const data = fs.readFileSync(args[0], {encoding:'utf-8', flag:'r'});
+  console.log(data);
+  
+  const mainWindow = windowsManager.getMainWindows()
+  if (mainWindow !== null) {
+    mainWindow.webContents.send('distributeFileData', { 'fileData': data });
+  }
+
+  // fs.readFileSync(args[0], 'utf-8', (err, data) => {
+  //     if(err){
+  //         alert("An error ocurred reading the file :" + err.message);
+  //         return;
+  //     }
+
+  //     console.log("The file content is : " + data);
+
+  //     // const mainWindow = windowsManager.getMainWindows()
+  //     // if (mainWindow !== null) {
+  //     //   mainWindow.webContents.send('distributeFileData', { 'fileData': data });
+  //     // }
+  //     return data
+  //   });
 })

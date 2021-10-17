@@ -70,10 +70,13 @@ export default class MainWindow extends React.Component {
 
   showFile(e) {
     e.preventDefault();
-    let file_content = ipcRenderer.invoke('showFile', this.props.executablePath)
-    this.setState({
-      fileData: file_content
-    })
+    ipcRenderer.invoke('showFile', this.props.executablePath)
+    var that = this;
+    ipcRenderer.on('distributeFileData', function (evt, response) {
+      that.setState({
+        fileData: response.fileData
+      })
+    });
   }
   
   render() {
@@ -152,7 +155,7 @@ export default class MainWindow extends React.Component {
               </Button>
 
               <div>
-                <p> File Data: {this.props.fileData} </p>
+                <p> File Data: {this.state.fileData} </p>
               </div>
               
             </Container>

@@ -23,8 +23,7 @@ export default class App extends React.Component {
     this.state = {
       theme: 'light',
       projectFolder: '',
-      executablePath: '',
-      fileData: ''
+      executablePath: ''
     }
     this.themeSwitchHandler = this.themeSwitchHandler.bind(this)
   }
@@ -59,12 +58,6 @@ export default class App extends React.Component {
     ipcRenderer.on('distributeSelectedExecutable', function (evt, response) {
       that.setState({
         executablePath: response.executablePath,
-      })
-    });
-
-    ipcRenderer.on('distributeFileData', function (evt, response) {
-      that.setState({
-        fileData: response.fileData,
       })
     });
 

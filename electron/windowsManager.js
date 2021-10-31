@@ -73,5 +73,22 @@ exports.getExecFile = function () {
 }
 
 exports.setExecFile = function (execFile) {
-  l_exec_file = execFile
+  l_exec_file = execFile;
+
+  const settingFilePath = `${path.join(__dirname, '../config/gdb.json')}`
+  let rawdata = fs.readFileSync(settingFilePath);
+  let setting = JSON.parse(rawdata);
+  setting.execFile = execFile;
+
+  // convert JSON object to a string
+  const data = JSON.stringify(setting);
+
+  // write file to disk
+  fs.writeFile(settingFilePath, data, 'utf8', (err) => {
+    if (err) {
+      console.log(`Error writing file: ${err}`);
+    } else {
+      console.log(`executablePath: ${execFile}`);
+    }
+  });
 }

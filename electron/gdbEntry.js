@@ -1,5 +1,6 @@
 var windowsManager = require('./windowsManager.js');
 var child_process = require('child_process');
+const { isCompositeComponent } = require('react-dom/test-utils');
 
 var l_gdb_instance = null;
 var l_stdout_buffer = "";
@@ -169,6 +170,197 @@ exports.getSourceFiles = async function () {
   windowsManager.debugLog(sourceFiles)
 
   return sourceFiles
+}
+
+
+function decodeGDBSingleVarStmt(varStmt) {
+  while (varStmt[0] === " ") {
+    varStmt = varStmt.substring(1)
+  }
+
+  if (varStmt === "") { return {} }
+
+  let equalIdx = varStmt.indexOf('=')
+  if (equalIdx !== -1) {
+    // handle case: varName = 
+    if (equalIdx + 2 >= varStmt.length) {
+      return {
+        "name": varStmt.substring(0, equalIdx - 1)
+      }
+    }
+
+    // handle case: varName = varVal
+    return {
+      "name": varStmt.substring(0, equalIdx - 1),
+      "value": varStmt.substring(equalIdx + 2)
+    }
+  } else {
+    // handle case: varVal
+    return {
+      "value": varStmt
+    }
+  }
+}
+
+
+// include left, but not right
+function decodeGDBVarOutput(segmentLine) {
+  if (segmentLine[0] === ',') {
+    segmentLine = segmentLine.substring(1)
+  }
+  let variableArr = []
+
+  var commaIdx
+  while ( (commaIdx = segmentLine.indexOf(',')) !== -1 ) {
+    let varRes = decodeGDBSingleVarStmt(segmentLine.substring(0, commaIdx))
+    if (varRes.name !== undefined && varRes.value !== undefined) {
+      variableArr.push(varRes)
+    } else if (varRes.name !== undefined && varRes.value === undefined) {
+      variableArr.push(varRes)
+    } else if (varRes.name === undefined && varRes.value !== undefined) {
+      if (variableArr.length === 0) {
+        variableArr = [{"value": [varRes.value]}]
+      } else {
+        variableArr[0].value.push(varRes.value)
+      }
+    }
+
+    segmentLine = segmentLine.substring(commaIdx + 2)
+  }
+
+  let varRes = decodeGDBSingleVarStmt(segmentLine)
+  if (varRes.name !== undefined && varRes.value !== undefined) {
+    variableArr.push(varRes)
+  } else if (varRes.name !== undefined && varRes.value === undefined) {
+    variableArr.push(varRes)
+  }
+  
+  return variableArr
+}
+
+
+function l_printBracketInfo(variableLine, bracketInfo) {
+  var variableDict = []
+  
+  var currentLeft = bracketInfo.left + 1
+  var currentRight = bracketInfo.right
+
+  let hasChildren = false
+  for (var i = 0; i < bracketInfo.children.length; i++) {
+    currentRight = bracketInfo.children[i].left
+    var variableArr = decodeGDBVarOutput(variableLine.substring(currentLeft, currentRight))
+    // console.log(variableLine.substring(currentLeft, currentRight))
+    // console.log(variableArr)
+    
+    if (variableArr.length >= 0 && variableArr[variableArr.length - 1].value === undefined) {
+      let retDict = l_printBracketInfo(variableLine, bracketInfo.children[i])
+      variableArr[variableArr.length - 1].value = retDict
+    }
+
+    variableDict = variableDict.concat(variableArr)
+    hasChildren = true
+    currentLeft = bracketInfo.children[i].right + 1
+  }
+
+  currentRight = bracketInfo.right
+  var variableArr = decodeGDBVarOutput(variableLine.substring(currentLeft, currentRight))
+  // console.log(variableLine.substring(currentLeft, currentRight))
+  // console.log(variableArr)
+  variableDict = variableDict.concat(variableArr)
+  // console.log(variableDict)
+  return variableDict
+}
+
+function l_printVariableDict(variableDict) {
+  variableDict.forEach(element => {
+    if (typeof element.value === 'object') {
+      if (element.name !== undefined) {
+        console.log(element.name + ": ")
+      }
+      l_printVariableDict(element.value)
+    } else {
+      if (element.value === undefined) {
+        console.log(element)
+      } else {
+        console.log(element.name + ': ' + element.value)
+      }
+    }
+  });
+}
+
+function l_parseVarVal(variableLine) {
+  while (variableLine[0] == " ") {
+    variableLine = variableLine.substring(1, variableLine.length)
+  }
+
+  console.log(variableLine)
+
+  var currentDepth = 0
+  var bracketInfo = {"left": -1, "right": variableLine.length, "children": []}
+  for (var i = 0; i < variableLine.length; i++) {
+    if (variableLine[i] === '{') {      
+      let targetedJson = bracketInfo
+      for (var level = 0; level < currentDepth; level++) {
+        targetedJson = targetedJson.children[targetedJson.children.length - 1]
+      }
+
+      targetedJson.children.push({ "left": i, "right": -1, children: [] })
+      
+      currentDepth++
+    } else if (variableLine[i] === '}') {
+      let targetedJson = bracketInfo
+      for (var level = 0; level < currentDepth; level++) {
+        targetedJson = targetedJson.children[targetedJson.children.length - 1]
+      }
+
+      targetedJson["right"] = i
+      currentDepth--
+    }
+  }
+
+  variableDict = l_printBracketInfo(variableLine, bracketInfo)
+  l_printVariableDict(variableDict)
+  return variableDict
+}
+
+function l_parseLocals(locals_stdout_buffer) {
+  var lines = locals_stdout_buffer.split('\n')
+  var localVars = []
+
+  let line = ""
+  for (var i = 0; i < lines.length; i++) {
+    lines[i] = lines[i].replace("\r", "")
+    if (lines[i][0] == ' ') {
+      line += lines[i]
+      continue
+    } else {
+      if (line != "") {
+        // var variableName = line.substring(0, line.indexOf("="))
+        // variableName = variableName.replace(" ", "")
+        // var variableVal = line.substring(line.indexOf("=") + 1, line.length)
+        
+        // console.log(variableName)
+        // localVars.push(variableName)
+        localVars.append(l_parseVarVal(line))
+      }
+      line = lines[i]
+    }
+  }
+
+  return localVars
+}
+
+var getLocalsCallbackFunc = function l_getLocalsCallback() {
+  windowsManager.debugLog("getLocals Ready")
+
+  return l_parseLocals(l_stdout_buffer)
+}
+
+exports.getLocals = async function () {
+  this.clearBufferAndExecGdbCommand("info locals")
+  let localVars = await l_waitUntilCommandDone(getLocalsCallbackFunc)
+
+  return localVars
 }
 
 

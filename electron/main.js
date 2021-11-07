@@ -25,6 +25,9 @@ function createWindow () {
   });
 
   if (windowsManager.isDebugMode()) {
+    if (windowsManager.isDebugMode()) {
+      windowsManager.debugLog("Main window start")
+    }
     win.loadURL('http://localhost:3000/')
     win.webContents.openDevTools();
   } else {

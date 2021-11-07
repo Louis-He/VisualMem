@@ -1,9 +1,19 @@
 import React from 'react';
 import './css/App.css';
+import './../node_modules/react-reflex/styles.css';
+import './../node_modules/react-grid-layout/css/styles.css';
+import './../node_modules/react-resizable/css/styles.css';
 import { Container, Button, Form } from 'react-bootstrap';
 import { Folder2Open } from 'react-bootstrap-icons';
 import { ThemeProvider } from "styled-components";
 import { MainBody } from "./components/GlobalStyles";
+import GridLayout from 'react-grid-layout';
+import {
+  ReflexContainer,
+  ReflexSplitter,
+  ReflexElement
+} from 'react-reflex'
+
 
 const ipcRenderer = window.require("electron").ipcRenderer;
 
@@ -80,14 +90,56 @@ export default class MainWindow extends React.Component {
   }
   
   render() {
+
+    const layout = [
+      {i: 'a', x: 0, y: 0, w: 1, h: 2, isDraggable: false, isResizable: true},
+      {i: 'b', x: 1, y: 0, w: 3, h: 2, minW: 2, maxW: 4},
+      {i: 'c', x: 4, y: 0, w: 1, h: 2}
+    ];
+
     return (
       <ThemeProvider theme={this.props.theme}>
         <>
           <MainBody>
+            
             {/* <header>
               <div className="App-header"></div>
             </header> */}
             <Container>
+            
+              <div style={{ height: "200px" }}>
+              <ReflexContainer orientation="vertical">
+
+                <ReflexElement>
+                  <div className="pane-content">
+                    <label>
+                      Left Pane (resizable)
+                    </label>
+                  </div>
+                </ReflexElement>
+
+                <ReflexSplitter/>
+
+                <ReflexElement
+                  minSize="200"
+                  maxSize="800">
+                  <div className="pane-content">
+                    <label>
+                      Right Pane (resizable)
+                      <br/>
+                      <br/>
+                      minSize = 200px
+                      <br/>
+                      maxSize = 800px
+                    </label>
+                  </div>
+                </ReflexElement>
+
+                </ReflexContainer>
+              </div>
+            
+            
+              
               <div className="container_ext">
                 <Button onClick={renderRequestOpenConfig}>TEST button</Button>
                 <Button onClick={renderRequestStartGDB}>Start GDB</Button>
@@ -157,6 +209,13 @@ export default class MainWindow extends React.Component {
               <div>
                 <p> File Data: {this.state.fileData} </p>
               </div>
+
+              
+              <GridLayout className="layout" layout={layout} cols={12} rowHeight={30} width={1200}>
+                <div key="a">a</div>
+                <div key="b">b</div>
+                <div key="c">c</div>
+              </GridLayout>
               
             </Container>
             

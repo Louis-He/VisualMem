@@ -136,115 +136,117 @@ export default class MainWindow extends React.Component {
                   </div>
                   <div className="resize-box-right">
                     <div id="one" className="tab-pane active">
-                      <div style={{ height: "200px" }}>
-                      <ReflexContainer orientation="vertical">
+                      <container>
+                        <div style={{ height: "200px" }}>
+                        <ReflexContainer orientation="vertical">
 
-                        <ReflexElement>
-                          <div className="pane-content">
-                            <label>
-                              Left Pane (resizable)
-                            </label>
-                          </div>
-                        </ReflexElement>
+                          <ReflexElement>
+                            <div className="pane-content">
+                              <label>
+                                Left Pane (resizable)
+                              </label>
+                            </div>
+                          </ReflexElement>
 
-                        <ReflexSplitter/>
+                          <ReflexSplitter/>
 
-                        <ReflexElement
-                          minSize="200"
-                          maxSize="800">
-                          <div className="pane-content">
-                            <label>
-                              Right Pane (resizable)
-                              <br/>
-                              <br/>
-                              minSize = 200px
-                              <br/>
-                              maxSize = 800px
-                            </label>
-                          </div>
-                        </ReflexElement>
+                          <ReflexElement
+                            minSize="200"
+                            maxSize="800">
+                            <div className="pane-content">
+                              <label>
+                                Right Pane (resizable)
+                                <br/>
+                                <br/>
+                                minSize = 200px
+                                <br/>
+                                maxSize = 800px
+                              </label>
+                            </div>
+                          </ReflexElement>
 
-                        </ReflexContainer>
-                      </div>
-                    
-                    
+                          </ReflexContainer>
+                        </div>
                       
-                      <div className="container_ext">
-                        <Button onClick={renderRequestOpenConfig}>TEST button</Button>
-                        <Button onClick={renderRequestStartGDB}>Start GDB</Button>
-                        <Button onClick={renderRequestStopGDB}>Stop GDB</Button>
-                      </div>
-                      <div>
-                        <label>Select Project Folder
-                          <span
-                            htmlFor="files"
-                            className="btn btn-primary btn-sm"
-                            style={{ fontSize: "18px", lineHeight: "1" }}>
-                            <Folder2Open style={{ verticalAlign: 'baseline' }} />
-                          </span>
-                          <input id="files"
-                            webkitdirectory = ""
-                            style={{ visibility: "hidden", width: "0px" }}
-                            type="file"
-                            onClick={(e) => this.selectProjectFolder(e)}
-                          />
-                        </label>
-                      </div>
-
-                      <div>
-                        <p>Current Selected Folder: {this.props.projectFolder}</p>
-                      </div>
-
-                      <div>
-                        <Form>
-                          <Form.Group controlId="exampleForm.ControlTextarea1">
-                            <Form.Label>Command Sent to GDB</Form.Label>
-                            <Form.Control as="textarea" rows={3}
-                              value={this.state.GDBCommand}
-                              onKeyDown={(e) => this.onGDBCommandEnterPress(e)}
-                              onChange={(e) => this.GDBCommandLineOnChangeHandler(e)} />
-                          </Form.Group>
-
-                          <Button variant="primary" onClick={(e) => this.sendGDBCommandButton()}>
-                            Send
-                          </Button>
-                        </Form>
-                      </div>
-
-                      <div>
-                        <label>Select Executable
-                          <span
-                            htmlFor="files"
-                            className="btn btn-primary btn-sm"
-                            style={{ fontSize: "18px", lineHeight: "1" }}>
-                            <Folder2Open style={{ verticalAlign: 'baseline' }} />
-                          </span>
-                          <input id="files"
-                            style={{ visibility: "hidden", width: "0px" }}
-                            type="file"
-                            onClick={(e) => this.selectExecutable(e)}
-                          />
-                        </label>
-                      </div>
-
-                      <div>
-                        <p>Current Executable Path: {this.props.executablePath}</p>
-                      </div>
-
-                      <Button variant="primary" onClick={(e) => this.showFile(e)}>
-                        Display File Content
-                      </Button>
-
-                      <div>
-                        <p> File Data: {this.state.fileData} </p>
-                      </div>
-
                       
-                      <GridLayout className="layout" layout={layout} cols={12} rowHeight={30} width={1200}>
-                        <div key="a">a</div>
-                        <div key="b">b</div>
-                        <div key="c">c</div>
-                      </GridLayout>
+                        
+                        <div className="container_ext">
+                          <Button onClick={renderRequestOpenConfig}>TEST button</Button>
+                          <Button onClick={renderRequestStartGDB}>Start GDB</Button>
+                          <Button onClick={renderRequestStopGDB}>Stop GDB</Button>
+                        </div>
+                        <div>
+                          <label>Select Project Folder
+                            <span
+                              htmlFor="files"
+                              className="btn btn-primary btn-sm"
+                              style={{ fontSize: "18px", lineHeight: "1" }}>
+                              <Folder2Open style={{ verticalAlign: 'baseline' }} />
+                            </span>
+                            <input id="files"
+                              webkitdirectory = ""
+                              style={{ visibility: "hidden", width: "0px" }}
+                              type="file"
+                              onClick={(e) => this.selectProjectFolder(e)}
+                            />
+                          </label>
+                        </div>
+
+                        <div>
+                          <p>Current Selected Folder: {this.props.projectFolder}</p>
+                        </div>
+
+                        <div>
+                          <Form>
+                            <Form.Group controlId="exampleForm.ControlTextarea1">
+                              <Form.Label>Command Sent to GDB</Form.Label>
+                              <Form.Control as="textarea" rows={3}
+                                value={this.state.GDBCommand}
+                                onKeyDown={(e) => this.onGDBCommandEnterPress(e)}
+                                onChange={(e) => this.GDBCommandLineOnChangeHandler(e)} />
+                            </Form.Group>
+
+                            <Button variant="primary" onClick={(e) => this.sendGDBCommandButton()}>
+                              Send
+                            </Button>
+                          </Form>
+                        </div>
+
+                        <div>
+                          <label>Select Executable
+                            <span
+                              htmlFor="files"
+                              className="btn btn-primary btn-sm"
+                              style={{ fontSize: "18px", lineHeight: "1" }}>
+                              <Folder2Open style={{ verticalAlign: 'baseline' }} />
+                            </span>
+                            <input id="files"
+                              style={{ visibility: "hidden", width: "0px" }}
+                              type="file"
+                              onClick={(e) => this.selectExecutable(e)}
+                            />
+                          </label>
+                        </div>
+
+                        <div>
+                          <p>Current Executable Path: {this.props.executablePath}</p>
+                        </div>
+
+                        <Button variant="primary" onClick={(e) => this.showFile(e)}>
+                          Display File Content
+                        </Button>
+
+                        <div>
+                          <p> File Data: {this.state.fileData} </p>
+                        </div>
+
+                        
+                        <GridLayout className="layout" layout={layout} cols={12} rowHeight={30} width={1200}>
+                          <div key="a">a</div>
+                          <div key="b">b</div>
+                          <div key="c">c</div>
+                        </GridLayout>
+                      </container>
                     </div>
                     <div id="two" className="tab-pane">
                         <span>

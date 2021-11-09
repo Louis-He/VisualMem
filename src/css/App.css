@@ -69,3 +69,174 @@ div.noMargin {
     margin-left: 0;
     margin-right: 0;
 }
+
+
+.wrap {
+  min-width: 100%;
+  position: absolute;
+  background: #eff3f6 bottom;
+  min-height: 100%;
+  overflow: hidden;
+}
+.left{
+margin-left:0px;
+  position: absolute;
+  box-sizing: border-box;
+  width: 500px;
+  height: 100%;
+  background: #4d5e70 bottom;
+}
+.logoDiv{
+  padding-top: 20px;
+  padding-bottom: 20px;
+  height: 70px;
+  background-color: #354457;
+  font-size: 17px;
+  color: #fff;
+  vertical-align: bottom;    
+}
+.logoTitle{
+  margin-left:15px;
+  line-height: 1.7;
+}
+.menu-title {
+  margin-left:15px;
+  color: #828e9a;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 14px;
+  font-weight: bold;
+}
+.menu-item {
+  padding-left:15px;
+  line-height: 40px;
+  height: 40px;
+  color: #aab1b7;
+  cursor: pointer;
+}
+.menu-item-active {
+  background-color: #3d4e60;
+  border-right: 4px solid #647f9d;
+  color: #fff;
+}
+.right{
+  box-sizing: border-box;
+  float: left;
+  box-sizing: border-box;
+  padding-left: 200px;
+  overflow-y: overlay;
+  overflow-x: hidden;
+  clear: both;
+  color: #717592;
+  min-width: 100%;
+  min-height: 500px;
+}
+
+body {
+  margin: 0;
+}
+h3 {
+  padding: 20px 0 0 20px;
+  margin: 0;
+}
+.fl {
+  float: left;
+}
+.resize-box {
+  overflow: hidden;
+  background: #f5f5f5;
+}
+.resize-box-left {
+  height: 800px;
+  position: relative;
+}
+.resize-box-vertical {
+  position: relative;
+}
+.l-container {
+  background: #fff;
+  height: 100%;
+  width: 100%;
+}
+.resize-box-right {
+  height: 750px;
+  padding: 20px;
+  overflow: hidden;
+}
+.r-container {
+  background: #fff;
+  height: 100%;
+  width: 100%;
+}
+.resize-real-box {
+  position: absolute;
+  top: 0px; 
+  left: 0px;
+  bottom: 0px;
+  right: 20px;
+  overflow-x: hidden;
+}
+.textarea-box {
+  padding: 20px;
+  overflow: hidden;
+}
+.textarea-box textarea {
+  max-width: 200px;
+  max-height: 200px;
+}
+.resize-bar {
+  width: 100%; 
+  height: inherit;
+  opacity: 0;
+  overflow: scroll;
+}
+.horizontal {
+  resize: horizontal;
+  cursor: col-resize;
+}
+.vertical {
+  resize: vertical;
+  cursor: row-resize;
+}
+.limit-horizontal {
+  min-width: 200px;
+  max-width: 400px;
+}
+.limit-vertical {
+  min-height: 100px;
+  max-height: 300px;
+}
+.dividing-line-horizontal {
+  position: absolute;
+  right: 0; 
+  top: 0px; 
+  bottom: 0px;
+  border-left: 1px solid #ddd;
+  pointer-events: none;
+}
+.horizontal:hover ~ .dividing-line-horizontal,
+.horizontal:active ~ .dividing-line-horizontal {
+  border-left: 1px dashed skyblue;
+}
+.horizontal::-webkit-scrollbar {
+  width: 20px; 
+  height: inherit;
+}
+
+.dividing-line-vertical {
+  position: absolute;
+  left: 0; 
+  right: 0;
+  bottom: 10px; 
+  border-bottom: 1px solid #ddd;
+  pointer-events: none;
+}
+
+.vertical:hover ~ .dividing-line-vertical,
+.vertical:active ~ .dividing-line-vertical {
+  border-bottom: 1px dashed skyblue;
+}
+.vertical::-webkit-scrollbar {
+  width: 100%; 
+  height: 20px;
+}

@@ -147,7 +147,7 @@ h3 {
   background: #f5f5f5;
 }
 .resize-box-left {
-  height: 800px;
+  height: 781px;
   position: relative;
 }
 .resize-box-vertical {
@@ -173,7 +173,7 @@ h3 {
   top: 0px; 
   left: 0px;
   bottom: 0px;
-  right: 20px;
+  right: 10px;
   overflow-x: hidden;
 }
 .textarea-box {

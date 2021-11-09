@@ -136,7 +136,7 @@ export default class MainWindow extends React.Component {
                   </div>
                   <div className="resize-box-right">
                     <div id="one" className="tab-pane active">
-                      <container>
+                      <Container>
                         <div style={{ height: "200px" }}>
                         <ReflexContainer orientation="vertical">
 
@@ -246,7 +246,7 @@ export default class MainWindow extends React.Component {
                           <div key="b">b</div>
                           <div key="c">c</div>
                         </GridLayout>
-                      </container>
+                      </Container>
                     </div>
                     <div id="two" className="tab-pane">
                         <span>

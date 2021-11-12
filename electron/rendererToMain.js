@@ -70,6 +70,8 @@ global.share.ipcMain.handle('sendMsgToGDB', (event, ...args) => {
     GDBManager.getSourceFiles()
   } else if (args[0] == "getLocals") {
     GDBManager.getLocals()
+  } else if (args[0] == "getDetailedLocals") {
+    GDBManager.getDetailedLocals()
   } else {
     GDBManager.execGdbCommand(args[0]);
   }

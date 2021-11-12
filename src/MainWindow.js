@@ -35,7 +35,9 @@ function renderRequestsendMsgToGDB(msg) {
 }
 
 // ==== renderer <- main functions ====
-
+ipcRenderer.on('distributeDetailedLocals', function (evt, locals) {
+  console.log(locals)
+});
 
 // ==== renderer class ====
 export default class MainWindow extends React.Component {

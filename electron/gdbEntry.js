@@ -293,7 +293,7 @@ function l_parseVarVal(variableLine) {
     variableLine = variableLine.substring(1, variableLine.length)
   }
 
-  console.log(variableLine)
+  // console.log(variableLine)
 
   var currentDepth = 0
   var bracketInfo = {"left": -1, "right": variableLine.length, "children": []}
@@ -319,7 +319,7 @@ function l_parseVarVal(variableLine) {
   }
 
   variableDict = l_printBracketInfo(variableLine, bracketInfo)
-  l_printVariableDict(variableDict)
+  // l_printVariableDict(variableDict)
   return variableDict
 }
 
@@ -341,7 +341,7 @@ function l_parseLocals(locals_stdout_buffer) {
         
         // console.log(variableName)
         // localVars.push(variableName)
-        localVars.append(l_parseVarVal(line))
+        localVars.push(l_parseVarVal(line))
       }
       line = lines[i]
     }
@@ -363,6 +363,15 @@ exports.getLocals = async function () {
   return localVars
 }
 
+
+exports.getDetailedLocals = async function () {
+  this.clearBufferAndExecGdbCommand("info locals")
+  let localVars = await l_waitUntilCommandDone(getLocalsCallbackFunc)
+  console.log(localVars)
+
+  const mainWindow = windowsManager.getMainWindows()
+  mainWindow.webContents.send('distributeDetailedLocals', { 'locals': localVars });
+}
 
 exports.stopGDB = function () {
   if (l_gdb_instance === null) {

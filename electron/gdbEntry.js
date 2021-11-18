@@ -70,6 +70,7 @@ async function l_waitUntilCommandDone (callBack) {
 }
 
 exports.startRunAndStop = function () {
+  this.execGdbCommand("set startup-with-shell off")
   this.execGdbCommand("b main")
   this.execGdbCommand("r")
 }

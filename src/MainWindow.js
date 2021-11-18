@@ -14,6 +14,8 @@ import {
   ReflexElement
 } from 'react-reflex'
 
+import ReactFlow, { Handle } from 'react-flow-renderer';
+
 
 const ipcRenderer = window.require("electron").ipcRenderer;
 
@@ -34,10 +36,61 @@ function renderRequestsendMsgToGDB(msg) {
   ipcRenderer.invoke('sendMsgToGDB', msg)
 }
 
+
+const elementsCreator = function ({locals}) {
+
+  const elementList = [];
+
+  let ID = 1;
+  let X = 100;
+  const Y = 100;
+
+  // /console.log(locals.length)
+  for (let i = 0; i < 2; i++) {
+    const element = { id: ID,  type: 'special', position: {x:X, y:Y}, data: { text: "name: " + locals[i][0].name + " value: " + locals[i][0].value}};
+    ID = ID + 1;
+    elementList.push(element);
+  }
+
+  console.log(elementList)
+
+  return elementList
+}
+
+
 // ==== renderer <- main functions ====
-ipcRenderer.on('distributeDetailedLocals', function (evt, locals) {
-  console.log(locals)
-});
+// ipcRenderer.on('distributeDetailedLocals', function (evt, locals) {
+//   console.log(locals)
+//   console.log(elementsCreator(locals))
+// });
+
+
+const customNodeStyles = {
+  background: '#9CA8B3',
+  color: '#FFF',
+  padding: 10,
+};
+
+const CustomNodeComponent = ({ data }) => {
+  return (
+    <div style={customNodeStyles}>
+      <Handle type="target" position="left" style={{ borderRadius: 0 }} />
+      <div>{data.text}</div>
+      <Handle
+        type="source"
+        position="right"
+        id="b"
+        style={{ top: '70%', borderRadius: 0 }}
+      />
+    </div>
+  );
+};
+
+
+const nodeTypes = {
+  special: CustomNodeComponent,
+};
+
 
 // ==== renderer class ====
 export default class MainWindow extends React.Component {
@@ -46,8 +99,19 @@ export default class MainWindow extends React.Component {
 
     this.state = {
       GDBCommand: "> ",
-      fileData: ""
+      fileData: "",
+      elements: []
     }
+  }
+
+  componentDidMount() {
+    var that = this;
+    ipcRenderer.on('distributeDetailedLocals', function (evt, locals) {
+      const elementTemp = elementsCreator(locals)
+      that.setState( {
+        elements: elementTemp
+      })
+    });
   }
 
   GDBCommandLineOnChangeHandler(e) {
@@ -146,6 +210,11 @@ export default class MainWindow extends React.Component {
                             <div className="pane-content">
                               <label>
                                 Left Pane (resizable)
+
+                                <div style={{ height: 300 }}>
+                                  <ReactFlow elements={this.state.elements} nodeTypes={nodeTypes} />
+                                </div>
+
                               </label>
                             </div>
                           </ReflexElement>
@@ -241,6 +310,8 @@ export default class MainWindow extends React.Component {
                         <div>
                           <p> File Data: {this.state.fileData} </p>
                         </div>
+
+                        
 
                         
                         <GridLayout className="layout" layout={layout} cols={12} rowHeight={30} width={1200}>

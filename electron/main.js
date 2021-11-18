@@ -11,10 +11,12 @@ function createWindow () {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
+    title: "VisualMem",
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js'),
+      enableRemoteModule: true,
     }
   })
   win.on('close', function () { //   <---- Catch close event

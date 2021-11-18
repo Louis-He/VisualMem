@@ -3,8 +3,11 @@
 const path = require('path')
 const fs = require('fs')
 var GDBManager = require('./gdbEntry.js');
-
 var windowsManager = require('./windowsManager.js');
+
+global.share.ipcMain.handle('electronLog', (event, ...args) => {
+  console.log(args)
+})
 
 global.share.ipcMain.handle('requestOpenConfig', (event, ...args) => {
   let rawdata = fs.readFileSync(`${path.join(__dirname, '../config/gdb.json')}`);
@@ -53,7 +56,7 @@ global.share.ipcMain.handle('requestSwitchMode', (event, ...args) => {
 })
 
 global.share.ipcMain.handle('requestStartGDB', (event, ...args) => {
-  GDBManager.startGDB();
+  GDBManager.startGDB.startGDB();
   GDBManager.startRunAndStop();
 })
 

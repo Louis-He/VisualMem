@@ -1,6 +1,6 @@
 var windowsManager = require('./windowsManager.js');
 var child_process = require('child_process');
-const { isCompositeComponent } = require('react-dom/test-utils');
+// const { isCompositeComponent } = require('react-dom/test-utils');
 
 var l_gdb_instance = null;
 var l_stdout_buffer = "";
@@ -23,9 +23,12 @@ exports.clearBufferAndExecGdbCommand = function (inputCommand) {
   this.execGdbCommand(inputCommand);
 }
 
+exports.gdbLog = function (logMessage) {
+  console.log(logMessage);
+}
 
 exports.startGDB = function () {
-  windowsManager.debugLog("startGDB")
+  this.gdbLog("startGDB")
   if (windowsManager.getExecFile() === "") {
     windowsManager.debugLog("Exec File Not Set Properly.")
     return

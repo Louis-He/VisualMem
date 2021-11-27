@@ -56,7 +56,7 @@ global.share.ipcMain.handle('requestSwitchMode', (event, ...args) => {
 })
 
 global.share.ipcMain.handle('requestStartGDB', (event, ...args) => {
-  GDBManager.startGDB.startGDB();
+  GDBManager.startGDB();
   GDBManager.startRunAndStop();
 })
 

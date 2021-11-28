@@ -4,15 +4,16 @@ import './../node_modules/react-reflex/styles.css';
 import './../node_modules/react-grid-layout/css/styles.css';
 import './../node_modules/react-resizable/css/styles.css';
 import { Container, Button, Form } from 'react-bootstrap';
-import { Folder2Open } from 'react-bootstrap-icons';
+import ReactTooltip from "react-tooltip";
+import { Folder2Open, CaretRightSquare, XSquare } from 'react-bootstrap-icons';
 import { ThemeProvider } from "styled-components";
 import { MainBody } from "./components/GlobalStyles";
 import GridLayout from 'react-grid-layout';
-import {
-  ReflexContainer,
-  ReflexSplitter,
-  ReflexElement
-} from 'react-reflex'
+// import {
+//   ReflexContainer,
+//   ReflexSplitter,
+//   ReflexElement
+// } from 'react-reflex'
 
 import ReactFlow, { Handle } from 'react-flow-renderer';
 
@@ -20,9 +21,9 @@ import ReactFlow, { Handle } from 'react-flow-renderer';
 const ipcRenderer = window.require("electron").ipcRenderer;
 
 // ==== renderer -> main functions ====
-function renderRequestOpenConfig() {
-  ipcRenderer.invoke('requestOpenConfig',)
-}
+// function renderRequestOpenConfig() {
+//   ipcRenderer.invoke('requestOpenConfig',)
+// }
 
 function renderRequestStartGDB() {
   ipcRenderer.invoke('requestStartGDB',)
@@ -203,7 +204,7 @@ export default class MainWindow extends React.Component {
                   <div className="resize-box-right">
                     <div id="one" className="tab-pane active">
                       <Container>
-                        <div style={{ height: "200px" }}>
+                        {/* <div style={{ height: "200px" }}>
                         <ReflexContainer orientation="vertical">
 
                           <ReflexElement>
@@ -237,14 +238,37 @@ export default class MainWindow extends React.Component {
                           </ReflexElement>
 
                           </ReflexContainer>
-                        </div>
+                        </div> */}
                       
                       
                         
                         <div className="container_ext">
-                          <Button onClick={renderRequestOpenConfig}>TEST button</Button>
+                          {/* <Button onClick={renderRequestOpenConfig}>TEST button</Button>
                           <Button onClick={renderRequestStartGDB}>Start GDB</Button>
-                          <Button onClick={renderRequestStopGDB}>Stop GDB</Button>
+                          <Button onClick={renderRequestStopGDB}>Stop GDB</Button> */}
+                          <Button
+                              onClick={renderRequestStartGDB}
+                              data-tip data-for="startGDBTip"
+                              className="btn btn-success btn-sm"
+                              style={{ fontSize: "18px", lineHeight: "1", padding: "5px" }}>
+                              <CaretRightSquare style={{ verticalAlign: 'baseline' }} />
+                          </Button>
+
+                          <ReactTooltip id="startGDBTip" place="top" effect="solid">
+                            Start GDB and pause at main function
+                          </ReactTooltip>
+
+                          <Button
+                              onClick={renderRequestStopGDB}
+                              data-tip data-for="stopGDBTip"
+                              className="btn btn-danger btn-sm"
+                              style={{ fontSize: "18px", lineHeight: "1", padding: "5px", marginLeft: "10px" }}>
+                                <XSquare style={{ verticalAlign: 'baseline' }} />
+                          </Button>
+
+                          <ReactTooltip id="stopGDBTip" place="top" effect="solid">
+                            Stop GDB
+                          </ReactTooltip>
                         </div>
                         <div>
                           <label>Select Project Folder
@@ -268,22 +292,6 @@ export default class MainWindow extends React.Component {
                         </div>
 
                         <div>
-                          <Form>
-                            <Form.Group controlId="exampleForm.ControlTextarea1">
-                              <Form.Label>Command Sent to GDB</Form.Label>
-                              <Form.Control as="textarea" rows={3}
-                                value={this.state.GDBCommand}
-                                onKeyDown={(e) => this.onGDBCommandEnterPress(e)}
-                                onChange={(e) => this.GDBCommandLineOnChangeHandler(e)} />
-                            </Form.Group>
-
-                            <Button variant="primary" onClick={(e) => this.sendGDBCommandButton()}>
-                              Send
-                            </Button>
-                          </Form>
-                        </div>
-
-                        <div>
                           <label>Select Executable
                             <span
                               htmlFor="files"
@@ -302,6 +310,28 @@ export default class MainWindow extends React.Component {
                         <div>
                           <p>Current Executable Path: {this.props.executablePath}</p>
                         </div>
+
+                        <div style={{ height: 300 }}>
+                          <ReactFlow elements={this.state.elements} nodeTypes={nodeTypes} />
+                        </div>
+
+                        <div>
+                          <Form>
+                            <Form.Group controlId="exampleForm.ControlTextarea1">
+                              <Form.Label>Command Sent to GDB</Form.Label>
+                              <Form.Control as="textarea" rows={3}
+                                value={this.state.GDBCommand}
+                                onKeyDown={(e) => this.onGDBCommandEnterPress(e)}
+                                onChange={(e) => this.GDBCommandLineOnChangeHandler(e)} />
+                            </Form.Group>
+
+                            <Button variant="primary" onClick={(e) => this.sendGDBCommandButton()}>
+                              Send
+                            </Button>
+                          </Form>
+                        </div>
+
+                        
 
                         <Button variant="primary" onClick={(e) => this.showFile(e)}>
                           Display File Content

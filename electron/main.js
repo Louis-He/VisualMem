@@ -37,6 +37,7 @@ function createWindow () {
   }
 
   windowsManager.setMainWindow(win)
+  windowsManager.initialize()
 }
 
 app.whenReady().then(() => {

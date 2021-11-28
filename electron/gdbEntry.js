@@ -377,6 +377,30 @@ exports.getDetailedLocals = async function () {
   mainWindow.webContents.send('distributeDetailedLocals', { 'locals': localVars });
 }
 
+var getDisassemblyCallbackFunc = function l_getStackCallback() {
+  windowsManager.debugLog("getDisassemblyCallbackFunc Ready")
+
+  var lines = l_stdout_buffer.split('\n')
+  
+  for (var i = 0; i < lines.length; i++) {
+    
+  }
+
+  return {
+    "beenReadFiles": beenReadFiles,
+    "onDemandFiles": onDemandFiles
+  }
+}
+
+exports.getDisassemble = async function () {
+  this.clearBufferAndExecGdbCommand("disas /m $pc-20, $pc+20")
+  let disas = await l_waitUntilCommandDone(getDisassemblyCallbackFunc)
+  console.log(disas)
+
+  // const mainWindow = windowsManager.getMainWindows()
+  // mainWindow.webContents.send('distributeDetailedLocals', { 'locals': localVars });
+}
+
 exports.stopGDB = function () {
   if (l_gdb_instance === null) {
     windowsManager.debugLog("No GDB instance running")

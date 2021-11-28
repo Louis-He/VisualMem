@@ -6,7 +6,7 @@ const fs = require('fs')
 
 var l_mainWindow = null;
 var l_configWindow = null;
-var l_debug = false;
+var l_debug = true;
 var l_project_folder = "";
 var l_exec_file = "";
 
@@ -45,6 +45,15 @@ exports.getSettingInitial = function () {
 
   this.setProjectFolder(setting.project_path)
   return setting
+}
+
+exports.initialize = function () {
+  const settingFilePath = `${path.join(__dirname, '../config/gdb.json')}`
+  let rawdata = fs.readFileSync(settingFilePath);
+  let setting = JSON.parse(rawdata);
+  
+  l_exec_file = setting.execFile;
+  l_project_folder = setting.project_path;
 }
 
 exports.setProjectFolder = function (projectFolder) {

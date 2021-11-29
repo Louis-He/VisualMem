@@ -88,12 +88,22 @@ exports.startRunAndStop = function () {
   this.execGdbCommand("r")
 }
 
+
+notifyMainWindow = function () {
+  if (l_gdb_instance !== null) {
+    const mainWindow = windowsManager.getMainWindows()
+    mainWindow.webContents.send('distributeGDBUpdate', {});
+  }
+}
+
 exports.nextLineExecute = function () {
-  this.execGdbCommand("n")
+  this.clearBufferAndExecGdbCommand("n")
+  l_waitUntilCommandDone(notifyMainWindow)
 }
 
 exports.continueExecute = function () {
-  this.execGdbCommand("c")
+  this.clearBufferAndExecGdbCommand("c")
+  l_waitUntilCommandDone(notifyMainWindow)
 }
 
 var getStackCallbackFunc = function l_getStackCallback() {

@@ -5,7 +5,7 @@ import './../node_modules/react-grid-layout/css/styles.css';
 import './../node_modules/react-resizable/css/styles.css';
 import { Container, Button, Form } from 'react-bootstrap';
 import ReactTooltip from "react-tooltip";
-import { Folder2Open, CaretRightSquare, XSquare, SkipEndCircle, ArrowRightCircle } from 'react-bootstrap-icons';
+import { Folder2Open, CaretRightSquare, XSquare, SkipEndCircle, ArrowRightCircle, Eye, EyeSlash } from 'react-bootstrap-icons';
 import { ThemeProvider } from "styled-components";
 import { MainBody } from "./components/GlobalStyles";
 import GridLayout from 'react-grid-layout';
@@ -43,6 +43,9 @@ const elementsCreator = function ({locals}) {
   let Y = 50;
 
   // /console.log(locals.length)
+  if (locals.length < 2) {
+    return []
+  }
   for (let i = 0; i < 2; i++) {
     const element = { id: ID,  type: 'special', position: {x:X, y:Y}, data: { text: "name: " + locals[i][0].name + ", value: " + locals[i][0].value}, style: {opacity: 1}};
     ID = ID + 1;
@@ -106,11 +109,20 @@ export default class MainWindow extends React.Component {
       })
     });
 
-    ipcRenderer.on('distributeUserProgramExited', function (evt, locals) {
+    ipcRenderer.on('distributeUserProgramExited', function (evt) {
       if (that.state.GDBAttached) {
         that.setState( {
-          GDBAttached: false
+          GDBAttached: false,
+          elements: []
         })
+      }
+    });
+
+    ipcRenderer.on('distributeGDBUpdate', function (evt) {
+      console.log("Update happened in the GDB backend")
+
+      if (that.state.displayEle) {
+        that.displayVar()
       }
     });
   }
@@ -140,6 +152,12 @@ export default class MainWindow extends React.Component {
         GDBAttached: false
       })
     }
+  }
+
+  updateProgramVis() {
+    this.setState({
+      displayEle: !this.state.displayEle
+    })
   }
 
   GDBCommandLineOnChangeHandler(e) {
@@ -190,9 +208,12 @@ export default class MainWindow extends React.Component {
   
   render() {
     let startGDBButton = <div></div>
+    let eyeGDBButton = <div></div>
+    let eyeSlashGDBButton = <div></div>
     let nextLineGDBButton = <div></div>
     let continueGDBButton = <div></div>
     let stopGDBButton = <div></div>
+
     if (!this.state.GDBAttached) {
       startGDBButton = [
         <Button
@@ -247,6 +268,36 @@ export default class MainWindow extends React.Component {
           Stop GDB
         </ReactTooltip>
       ]
+
+      if (!this.state.displayEle) {
+        eyeGDBButton = [
+          <Button
+            onClick={() => this.updateProgramVis()}
+            data-tip data-for="showVisGDBTip"
+            className="btn btn-success btn-sm"
+            style={{ fontSize: "18px", lineHeight: "1", padding: "5px", marginLeft: "10px" }}
+            key="showVisGDBButton">
+              <Eye style={{ verticalAlign: 'baseline' }} />
+          </Button>,
+          <ReactTooltip id="showVisGDBTip" place="top" effect="solid"  key="showVisGDBTip">
+            Show Program Visualization
+          </ReactTooltip>
+        ]
+      } else {
+        eyeSlashGDBButton = [
+          <Button
+            onClick={() => this.updateProgramVis()}
+            data-tip data-for="hideVisGDBTip"
+            className="btn btn-second btn-sm"
+            style={{ fontSize: "18px", lineHeight: "1", padding: "5px", marginLeft: "10px" }}
+            key="hideVisGDBButton">
+              <EyeSlash style={{ verticalAlign: 'baseline' }} />
+          </Button>,
+          <ReactTooltip id="hideVisGDBTip" place="top" effect="solid"  key="hideVisGDBTip">
+            Hide Program Visualization
+          </ReactTooltip>
+        ]
+      }
     }
 
     const layout = [
@@ -341,6 +392,8 @@ export default class MainWindow extends React.Component {
                           {nextLineGDBButton}
                           {continueGDBButton}
                           {stopGDBButton}
+                          {eyeGDBButton}
+                          {eyeSlashGDBButton}
                         </div>
                         <div>
                           <label>Select Project Folder

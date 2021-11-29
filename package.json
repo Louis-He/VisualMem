@@ -28,7 +28,9 @@
     "react-tooltip": "^4.2.21",
     "spectron": "^14.0.0",
     "styled-components": "^5.2.3",
-    "web-vitals": "^1.1.1"
+    "web-vitals": "^1.1.1",
+    "immer": ">=9.0.6",
+    "trim-newlines": ">=3.0.1"
   },
   "scripts": {
     "start": "electron-forge start",

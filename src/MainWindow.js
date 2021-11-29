@@ -5,7 +5,7 @@ import './../node_modules/react-grid-layout/css/styles.css';
 import './../node_modules/react-resizable/css/styles.css';
 import { Container, Button, Form } from 'react-bootstrap';
 import ReactTooltip from "react-tooltip";
-import { Folder2Open, CaretRightSquare, XSquare } from 'react-bootstrap-icons';
+import { Folder2Open, CaretRightSquare, XSquare, SkipEndCircle, ArrowRightCircle, Eye, EyeSlash } from 'react-bootstrap-icons';
 import { ThemeProvider } from "styled-components";
 import { MainBody } from "./components/GlobalStyles";
 import GridLayout from 'react-grid-layout';
@@ -15,7 +15,7 @@ import GridLayout from 'react-grid-layout';
 //   ReflexElement
 // } from 'react-reflex'
 
-import ReactFlow, {removeElements} from 'react-flow-renderer';
+import ReactFlow from 'react-flow-renderer';
 
 
 const ipcRenderer = window.require("electron").ipcRenderer;
@@ -25,13 +25,9 @@ const ipcRenderer = window.require("electron").ipcRenderer;
 //   ipcRenderer.invoke('requestOpenConfig',)
 // }
 
-function renderRequestStartGDB() {
-  ipcRenderer.invoke('requestStartGDB',)
-}
 
-function renderRequestStopGDB() {
-  ipcRenderer.invoke('requestStopGDB',)
-}
+
+
 
 function renderRequestsendMsgToGDB(msg) {
   ipcRenderer.invoke('sendMsgToGDB', msg)
@@ -47,6 +43,9 @@ const elementsCreator = function ({locals}) {
   let Y = 50;
 
   // /console.log(locals.length)
+  if (locals.length < 2) {
+    return []
+  }
   for (let i = 0; i < 2; i++) {
     const element = { id: ID,  type: 'special', position: {x:X, y:Y}, data: { text: "name: " + locals[i][0].name + ", value: " + locals[i][0].value}, style: {opacity: 1}};
     ID = ID + 1;
@@ -92,21 +91,74 @@ export default class MainWindow extends React.Component {
     super(props)
 
     this.state = {
+      GDBAttached: false,
+      displayEle: false,
+
       GDBCommand: "> ",
       fileData: "",
       elements: []
     }
   }
 
-  // componentDidMount() {
-  //   var that = this;
-  //   ipcRenderer.on('distributeDetailedLocals', function (evt, locals) {
-  //     const elementTemp = elementsCreator(locals)
-  //     that.setState( {
-  //       elements: elementTemp
-  //     })
-  //   });
-  // }
+  componentDidMount() {
+    var that = this;
+    ipcRenderer.on('distributeDetailedLocals', function (evt, locals) {
+      const elementTemp = elementsCreator(locals)
+      that.setState( {
+        elements: elementTemp
+      })
+    });
+
+    ipcRenderer.on('distributeUserProgramExited', function (evt) {
+      if (that.state.GDBAttached) {
+        that.setState( {
+          GDBAttached: false,
+          elements: []
+        })
+      }
+    });
+
+    ipcRenderer.on('distributeGDBUpdate', function (evt) {
+      console.log("Update happened in the GDB backend")
+
+      if (that.state.displayEle) {
+        that.displayVar()
+      }
+    });
+  }
+
+  async renderRequestStartGDB() {
+    const ifStartGDB = await ipcRenderer.invoke('requestStartGDB',)
+
+    if (ifStartGDB) {
+      this.setState({
+        GDBAttached: true
+      })
+    }
+  }
+
+  renderRequestNextLineExecution() {
+    ipcRenderer.invoke('requestNextLineGDB', 1, )
+  }
+
+  renderRequestContinueExecution() {
+    ipcRenderer.invoke('requestContinueGDB',)
+  }
+
+  renderRequestStopGDB() {
+    ipcRenderer.invoke('requestStopGDB',)
+    if (this.state.GDBAttached) {
+      this.setState({
+        GDBAttached: false
+      })
+    }
+  }
+
+  updateProgramVis() {
+    this.setState({
+      displayEle: !this.state.displayEle
+    })
+  }
 
   GDBCommandLineOnChangeHandler(e) {
     this.setState({
@@ -123,15 +175,6 @@ export default class MainWindow extends React.Component {
 
   displayVar() {
     renderRequestsendMsgToGDB('getDetailedLocals')
-    var that = this;
-
-    ipcRenderer.on('distributeDetailedLocals', function (evt, locals) {
-      that.state.elements = removeElements(that.state.elements, that.state.elements)
-      const elementTemp = elementsCreator(locals)
-      that.setState( {
-        elements: elementTemp
-      })
-    });
   }
 
 
@@ -164,6 +207,98 @@ export default class MainWindow extends React.Component {
   }
   
   render() {
+    let startGDBButton = <div></div>
+    let eyeGDBButton = <div></div>
+    let eyeSlashGDBButton = <div></div>
+    let nextLineGDBButton = <div></div>
+    let continueGDBButton = <div></div>
+    let stopGDBButton = <div></div>
+
+    if (!this.state.GDBAttached) {
+      startGDBButton = [
+        <Button
+          onClick={() => this.renderRequestStartGDB()}
+          data-tip data-for="startGDBTip"
+          className="btn btn-success btn-sm"
+          style={{ fontSize: "18px", lineHeight: "1", padding: "5px" }}
+          key="startButton">
+          <CaretRightSquare style={{ verticalAlign: 'baseline' }} />
+        </Button>,
+        <ReactTooltip id="startGDBTip" place="top" effect="solid" key="startButtonTip">
+          Start GDB and pause at main function
+        </ReactTooltip>
+      ]
+    } else {
+      nextLineGDBButton = [
+        <Button
+          onClick={() => this.renderRequestNextLineExecution()}
+          data-tip data-for="nextLineTip"
+          className="btn btn-primary btn-sm"
+          style={{ fontSize: "18px", lineHeight: "1", padding: "5px", marginLeft: "10px" }}
+          key="nextLineButton">
+            <ArrowRightCircle style={{ verticalAlign: 'baseline' }} />
+        </Button>,
+        <ReactTooltip id="nextLineTip" place="top" effect="solid"  key="nextLineTip">
+          Execute One Line
+        </ReactTooltip>
+      ]
+      continueGDBButton = [
+        <Button
+          onClick={() => this.renderRequestContinueExecution()}
+          data-tip data-for="continueTip"
+          className="btn btn-primary btn-sm"
+          style={{ fontSize: "18px", lineHeight: "1", padding: "5px", marginLeft: "10px" }}
+          key="continueButton">
+            <SkipEndCircle style={{ verticalAlign: 'baseline' }} />
+        </Button>,
+        <ReactTooltip id="continueTip" place="top" effect="solid"  key="continueTip">
+          Continue Execution until next breakpoint
+        </ReactTooltip>
+      ]
+      stopGDBButton = [
+        <Button
+          onClick={() => this.renderRequestStopGDB()}
+          data-tip data-for="stopGDBTip"
+          className="btn btn-danger btn-sm"
+          style={{ fontSize: "18px", lineHeight: "1", padding: "5px", marginLeft: "10px" }}
+          key="stopButton">
+            <XSquare style={{ verticalAlign: 'baseline' }} />
+        </Button>,
+        <ReactTooltip id="stopGDBTip" place="top" effect="solid"  key="stopButtonTip">
+          Stop GDB
+        </ReactTooltip>
+      ]
+
+      if (!this.state.displayEle) {
+        eyeGDBButton = [
+          <Button
+            onClick={() => this.updateProgramVis()}
+            data-tip data-for="showVisGDBTip"
+            className="btn btn-success btn-sm"
+            style={{ fontSize: "18px", lineHeight: "1", padding: "5px", marginLeft: "10px" }}
+            key="showVisGDBButton">
+              <Eye style={{ verticalAlign: 'baseline' }} />
+          </Button>,
+          <ReactTooltip id="showVisGDBTip" place="top" effect="solid"  key="showVisGDBTip">
+            Show Program Visualization
+          </ReactTooltip>
+        ]
+      } else {
+        eyeSlashGDBButton = [
+          <Button
+            onClick={() => this.updateProgramVis()}
+            data-tip data-for="hideVisGDBTip"
+            className="btn btn-second btn-sm"
+            style={{ fontSize: "18px", lineHeight: "1", padding: "5px", marginLeft: "10px" }}
+            key="hideVisGDBButton">
+              <EyeSlash style={{ verticalAlign: 'baseline' }} />
+          </Button>,
+          <ReactTooltip id="hideVisGDBTip" place="top" effect="solid"  key="hideVisGDBTip">
+            Hide Program Visualization
+          </ReactTooltip>
+        ]
+      }
+    }
 
     const layout = [
       {i: 'a', x: 0, y: 0, w: 1, h: 2, isDraggable: false, isResizable: true},
@@ -253,29 +388,12 @@ export default class MainWindow extends React.Component {
                           {/* <Button onClick={renderRequestOpenConfig}>TEST button</Button>
                           <Button onClick={renderRequestStartGDB}>Start GDB</Button>
                           <Button onClick={renderRequestStopGDB}>Stop GDB</Button> */}
-                          <Button
-                              onClick={renderRequestStartGDB}
-                              data-tip data-for="startGDBTip"
-                              className="btn btn-success btn-sm"
-                              style={{ fontSize: "18px", lineHeight: "1", padding: "5px" }}>
-                              <CaretRightSquare style={{ verticalAlign: 'baseline' }} />
-                          </Button>
-
-                          <ReactTooltip id="startGDBTip" place="top" effect="solid">
-                            Start GDB and pause at main function
-                          </ReactTooltip>
-
-                          <Button
-                              onClick={renderRequestStopGDB}
-                              data-tip data-for="stopGDBTip"
-                              className="btn btn-danger btn-sm"
-                              style={{ fontSize: "18px", lineHeight: "1", padding: "5px", marginLeft: "10px" }}>
-                                <XSquare style={{ verticalAlign: 'baseline' }} />
-                          </Button>
-
-                          <ReactTooltip id="stopGDBTip" place="top" effect="solid">
-                            Stop GDB
-                          </ReactTooltip>
+                          {startGDBButton}
+                          {nextLineGDBButton}
+                          {continueGDBButton}
+                          {stopGDBButton}
+                          {eyeGDBButton}
+                          {eyeSlashGDBButton}
                         </div>
                         <div>
                           <label>Select Project Folder

@@ -15,7 +15,7 @@ import GridLayout from 'react-grid-layout';
 //   ReflexElement
 // } from 'react-reflex'
 
-import ReactFlow from 'react-flow-renderer';
+import ReactFlow, {removeElements} from 'react-flow-renderer';
 
 
 const ipcRenderer = window.require("electron").ipcRenderer;
@@ -48,13 +48,11 @@ const elementsCreator = function ({locals}) {
 
   // /console.log(locals.length)
   for (let i = 0; i < 2; i++) {
-    const element = { id: ID,  type: 'special', position: {x:X, y:Y}, data: { text: "name: " + locals[i][0].name + ", value: " + locals[i][0].value}};
+    const element = { id: ID,  type: 'special', position: {x:X, y:Y}, data: { text: "name: " + locals[i][0].name + ", value: " + locals[i][0].value}, style: {opacity: 1}};
     ID = ID + 1;
     Y = Y + 50;
     elementList.push(element);
   }
-
-  console.log(elementList)
 
   return elementList
 }
@@ -71,6 +69,7 @@ const customNodeStyles = {
   background: '#9CA8B3',
   color: '#FFF',
   padding: 10,
+  opacity: 1,
 };
 
 const CustomNodeComponent = ({ data }) => {
@@ -99,15 +98,15 @@ export default class MainWindow extends React.Component {
     }
   }
 
-  componentDidMount() {
-    var that = this;
-    ipcRenderer.on('distributeDetailedLocals', function (evt, locals) {
-      const elementTemp = elementsCreator(locals)
-      that.setState( {
-        elements: elementTemp
-      })
-    });
-  }
+  // componentDidMount() {
+  //   var that = this;
+  //   ipcRenderer.on('distributeDetailedLocals', function (evt, locals) {
+  //     const elementTemp = elementsCreator(locals)
+  //     that.setState( {
+  //       elements: elementTemp
+  //     })
+  //   });
+  // }
 
   GDBCommandLineOnChangeHandler(e) {
     this.setState({
@@ -121,6 +120,20 @@ export default class MainWindow extends React.Component {
       GDBCommand: "> "
     })
   }
+
+  displayVar() {
+    renderRequestsendMsgToGDB('getDetailedLocals')
+    var that = this;
+
+    ipcRenderer.on('distributeDetailedLocals', function (evt, locals) {
+      that.state.elements = removeElements(that.state.elements, that.state.elements)
+      const elementTemp = elementsCreator(locals)
+      that.setState( {
+        elements: elementTemp
+      })
+    });
+  }
+
 
   onGDBCommandEnterPress(e) {
     if(e.keyCode === 13 && e.shiftKey === false) {
@@ -305,7 +318,7 @@ export default class MainWindow extends React.Component {
                           <p>Current Executable Path: {this.props.executablePath}</p>
                         </div>
 
-                        <div style={{ height: 300 }}>
+                        <div style={{ height: 300, width: 500 }}>
                           <ReactFlow elements={this.state.elements} nodeTypes={nodeTypes} />
                         </div>
 
@@ -322,22 +335,23 @@ export default class MainWindow extends React.Component {
                             <Button variant="primary" onClick={(e) => this.sendGDBCommandButton()}>
                               Send
                             </Button>
+
                           </Form>
                         </div>
 
-                        
-
-                        <Button variant="primary" onClick={(e) => this.showFile(e)}>
-                          Display File Content
+                        <Button variant="primary" onClick={(e) => this.displayVar()}>
+                          Display Variables
                         </Button>
+                        
+                        {/* <Button variant="primary" onClick={(e) => this.showFile(e)}>
+                          Display File Content
+                        </Button> */}
 
-                        <div>
+                        {/* <div>
                           <p> File Data: {this.state.fileData} </p>
-                        </div>
+                        </div> */}
 
-                        
-
-                        
+                                    
                         <GridLayout className="layout" layout={layout} cols={12} rowHeight={30} width={1200}>
                           <div key="a">a</div>
                           <div key="b">b</div>

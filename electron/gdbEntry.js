@@ -27,11 +27,13 @@ exports.gdbLog = function (logMessage) {
   console.log(logMessage);
 }
 
+// Return true if new GDB session attached
 exports.startGDB = function () {
+  var that = this
   this.gdbLog("startGDB")
   if (windowsManager.getExecFile() === "") {
     windowsManager.debugLog("Exec File Not Set Properly.")
-    return
+    return false
   }
 
   if (l_gdb_instance === null) {
@@ -42,7 +44,13 @@ exports.startGDB = function () {
 
     l_gdb_instance.stdout.on('data', function (data) {
       windowsManager.debugLog('stdout: ' + data);
+
       l_stdout_buffer += data
+      if (l_stdout_buffer.includes(" exited with code ")) {
+        that.stopGDB()
+        const mainWindow = windowsManager.getMainWindows()
+        mainWindow.webContents.send('distributeUserProgramExited', {});
+      }
     });
 
     l_gdb_instance.stderr.on('data', function (data) {
@@ -53,11 +61,13 @@ exports.startGDB = function () {
     l_gdb_instance.on('close', function (code) {
       windowsManager.debugLog('GDB instance exited with code ' + code)
       l_gdb_instance = null
+      l_stdout_buffer = ""
+      l_stderr_buffer = ""
     });
-    
+    return true
   } else {
     windowsManager.debugLog("GDB instance is running")
-    return
+    return false
   }
 }
 
@@ -76,6 +86,14 @@ exports.startRunAndStop = function () {
   this.execGdbCommand("set startup-with-shell off")
   this.execGdbCommand("b main")
   this.execGdbCommand("r")
+}
+
+exports.nextLineExecute = function () {
+  this.execGdbCommand("n")
+}
+
+exports.continueExecute = function () {
+  this.execGdbCommand("c")
 }
 
 var getStackCallbackFunc = function l_getStackCallback() {

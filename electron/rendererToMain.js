@@ -56,8 +56,24 @@ global.share.ipcMain.handle('requestSwitchMode', (event, ...args) => {
 })
 
 global.share.ipcMain.handle('requestStartGDB', (event, ...args) => {
-  GDBManager.startGDB();
-  GDBManager.startRunAndStop();
+  let ifStartGDB = GDBManager.startGDB();
+
+  if (ifStartGDB) {
+    GDBManager.startRunAndStop();
+  }
+  
+  // return ifStartGDB
+  return Promise.resolve(ifStartGDB);
+})
+
+global.share.ipcMain.handle('requestNextLineGDB', (event, ...args) => {
+  let executionLine = args[0]
+
+  GDBManager.nextLineExecute();
+})
+
+global.share.ipcMain.handle('requestContinueGDB', (event, ...args) => {
+  GDBManager.continueExecute();
 })
 
 global.share.ipcMain.handle('requestStopGDB', (event, ...args) => {

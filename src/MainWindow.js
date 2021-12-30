@@ -310,42 +310,9 @@ export default class MainWindow extends React.Component {
       <ThemeProvider theme={this.props.theme}>
         <>
           <MainBody>
+          
             
-            {/* <header>
-              <div className="App-header"></div>
-            </header> */}
-              <div className="wrap">
-                <div className="resize-box">
-                  <div className="resize-box-left fl">
-                      <div className="resize-bar horizontal limit-horizontal"></div>
-                      <div className="dividing-line-horizontal"></div>
-                      <div className="resize-real-box">
-                      <div id="left" className="left">
-                        <div id="logoDiv" className="logoDiv">
-                            <p id="logoTitle" className="logoTitle">
-                                <span>Debugger Visualizer</span>
-                            </p>
-                        </div>
-                        <div className="menu-title">Menu 1</div>
-                        <div className="menu-item" href="#one" data-toggle="tab">
-                            －functionality 1
-                        </div>
-                        <div className="menu-item" href="#two" data-toggle="tab">
-                            －functionality 2
-                        </div>
-                        <div className="menu-title">Menu 2</div>
-                        <div className="menu-item" href="#three" data-toggle="tab">
-                            －functionality 1
-                        </div>
-                        <div className="menu-item" href="#four" data-toggle="tab">
-                            －functionality 2
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="resize-box-right">
-                    <div id="one" className="tab-pane active">
-                      <Container>
+          <Container>
                         {/* <div style={{ height: "200px" }}>
                         <ReflexContainer orientation="vertical">
 
@@ -476,21 +443,6 @@ export default class MainWindow extends React.Component {
                           <div key="c">c</div>
                         </GridLayout>
                       </Container>
-                    </div>
-                    <div id="two" className="tab-pane">
-                        <span>
-                              Content 2
-                        </span>
-                    </div>
-                    <div id="three" className="tab-pane">
-                        <span>
-                              Content 3
-                        </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            
           </MainBody>
         </>
       </ThemeProvider>

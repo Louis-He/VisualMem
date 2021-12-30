@@ -5,6 +5,10 @@ import MainWindow from './MainWindow.js'
 import ConfigurationWindow from './ConfigurationWindow.js'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { lightTheme, darkTheme } from "./components/Themes"
+import Aside from "./components/Aside/Aside"
+import "./components/Aside/AsideStyle.css"
+import "react-pro-sidebar/dist/css/styles.css";
+
 
 import {
   BrowserRouter,
@@ -75,6 +79,8 @@ export default class App extends React.Component {
       console.log("DEV")
       return (
         <BrowserRouter>
+        <Aside />
+        <div style={{height:"100%",width:"100%", overflow:"scroll"}}>
           <Switch>
             <Route exact path="/" render={() =>
               <MainWindow
@@ -89,6 +95,7 @@ export default class App extends React.Component {
                 themeSwitchHandler={this.themeSwitchHandler} />}
             />
           </Switch>
+          </div>
         </BrowserRouter>)
     } else {
       console.log("PRODUCTION")

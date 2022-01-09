@@ -1,5 +1,6 @@
 var windowsManager = require('./windowsManager.js');
 var child_process = require('child_process');
+var pygdbController = require('./pygdbController.js')
 // const { isCompositeComponent } = require('react-dom/test-utils');
 
 var l_gdb_instance = null;
@@ -29,46 +30,48 @@ exports.gdbLog = function (logMessage) {
 
 // Return true if new GDB session attached
 exports.startGDB = function () {
-  var that = this
-  this.gdbLog("startGDB")
-  if (windowsManager.getExecFile() === "") {
-    windowsManager.debugLog("Exec File Not Set Properly.")
-    return false
-  }
+  return pygdbController.startController();
 
-  if (l_gdb_instance === null) {
-    windowsManager.debugLog("create new GDB instance")
-    l_gdb_instance = child_process.spawn('gdb', [windowsManager.getExecFile()], {
-      shell: true,
-    });
+  // var that = this
+  // this.gdbLog("startGDB")
+  // if (windowsManager.getExecFile() === "") {
+  //   windowsManager.debugLog("Exec File Not Set Properly.")
+  //   return false
+  // }
 
-    l_gdb_instance.stdout.on('data', function (data) {
-      windowsManager.debugLog('stdout: ' + data);
+  // if (l_gdb_instance === null) {
+  //   windowsManager.debugLog("create new GDB instance")
+  //   l_gdb_instance = child_process.spawn('gdb', [windowsManager.getExecFile()], {
+  //     shell: true,
+  //   });
 
-      l_stdout_buffer += data
-      if (l_stdout_buffer.includes(" exited with code ")) {
-        that.stopGDB()
-        const mainWindow = windowsManager.getMainWindows()
-        mainWindow.webContents.send('distributeUserProgramExited', {});
-      }
-    });
+  //   l_gdb_instance.stdout.on('data', function (data) {
+  //     windowsManager.debugLog('stdout: ' + data);
 
-    l_gdb_instance.stderr.on('data', function (data) {
-      windowsManager.debugLog('stderr: ' + data);
-      l_stderr_buffer += data
-    });
+  //     l_stdout_buffer += data
+  //     if (l_stdout_buffer.includes(" exited with code ")) {
+  //       that.stopGDB()
+  //       const mainWindow = windowsManager.getMainWindows()
+  //       mainWindow.webContents.send('distributeUserProgramExited', {});
+  //     }
+  //   });
 
-    l_gdb_instance.on('close', function (code) {
-      windowsManager.debugLog('GDB instance exited with code ' + code)
-      l_gdb_instance = null
-      l_stdout_buffer = ""
-      l_stderr_buffer = ""
-    });
-    return true
-  } else {
-    windowsManager.debugLog("GDB instance is running")
-    return false
-  }
+  //   l_gdb_instance.stderr.on('data', function (data) {
+  //     windowsManager.debugLog('stderr: ' + data);
+  //     l_stderr_buffer += data
+  //   });
+
+  //   l_gdb_instance.on('close', function (code) {
+  //     windowsManager.debugLog('GDB instance exited with code ' + code)
+  //     l_gdb_instance = null
+  //     l_stdout_buffer = ""
+  //     l_stderr_buffer = ""
+  //   });
+  //   return true
+  // } else {
+  //   windowsManager.debugLog("GDB instance is running")
+  //   return false
+  // }
 }
 
 function sleep(milliseconds) {  
@@ -97,13 +100,17 @@ notifyMainWindow = function () {
 }
 
 exports.nextLineExecute = function () {
-  this.clearBufferAndExecGdbCommand("n")
-  l_waitUntilCommandDone(notifyMainWindow)
+  pygdbController.pygdbNextLine();
+
+  // this.clearBufferAndExecGdbCommand("n")
+  // l_waitUntilCommandDone(notifyMainWindow)
 }
 
 exports.continueExecute = function () {
-  this.clearBufferAndExecGdbCommand("c")
-  l_waitUntilCommandDone(notifyMainWindow)
+  pygdbController.pygdbContinue();
+
+  // this.clearBufferAndExecGdbCommand("c")
+  // l_waitUntilCommandDone(notifyMainWindow)
 }
 
 var getStackCallbackFunc = function l_getStackCallback() {
@@ -389,10 +396,12 @@ var getLocalsCallbackFunc = function l_getLocalsCallback() {
 }
 
 exports.getLocals = async function () {
-  this.clearBufferAndExecGdbCommand("info locals")
-  let localVars = await l_waitUntilCommandDone(getLocalsCallbackFunc)
+  pygdbController.pygdbGetLocal()
 
-  return localVars
+  // this.clearBufferAndExecGdbCommand("info locals")
+  // let localVars = await l_waitUntilCommandDone(getLocalsCallbackFunc)
+
+  // return localVars
 }
 
 
@@ -430,11 +439,13 @@ exports.getDisassemble = async function () {
 }
 
 exports.stopGDB = function () {
-  if (l_gdb_instance === null) {
-    windowsManager.debugLog("No GDB instance running")
-  } else {
-    l_gdb_instance.stdin.write('q\n')
+  pygdbController.pygdbFIN();
 
-    windowsManager.debugLog("Stop GDB instance")
-  }
+  // if (l_gdb_instance === null) {
+  //   windowsManager.debugLog("No GDB instance running")
+  // } else {
+  //   l_gdb_instance.stdin.write('q\n')
+
+  //   windowsManager.debugLog("Stop GDB instance")
+  // }
 }

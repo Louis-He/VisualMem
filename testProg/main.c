@@ -1,36 +1,28 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-struct test2 {
-    double a;
-    double b;
+struct node {
+    int val;
+    struct node* next;
 };
 
-struct test {
-    int a;
-    struct test2 t;
-    double b;
-    struct test2 t2;
-};
+typedef struct node Node;
 
-void level1() {
-    int b = 0;
-    return;
-}
 
 int main() {
     int a, b = 1;
     a = 2;
     b = 3;
+    
+    Node* head = malloc(sizeof(Node));
+    Node* tail = malloc(sizeof(Node));
 
-    // struct test c = {1, {0.6, -0.2}, 0.5, {0.6, -0.2}};
-    // int d[100];
-    // struct test e;
-    // struct test2 f = {0.0, 0.4};
-    // e.a = 2;
-    // d[0] = 2;
+    Node ins = {1, NULL};
 
-    // level1();
-    // printf("Hello World, %d\n", e.a);
+    head->val = 0;
+    tail->val = 1;
+    head->next = tail;
+    tail->next = NULL;
 
     return 0;
 }

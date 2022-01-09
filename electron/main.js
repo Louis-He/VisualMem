@@ -1,6 +1,8 @@
 const { app, BrowserWindow, dialog, ipcMain } = require('electron')
 const path = require('path')
 var windowsManager = require('./windowsManager.js');
+var pygdbController = require('./pygdbController.js')
+
 
 // set global variables here
 global.share = {
@@ -38,6 +40,8 @@ function createWindow () {
 
   windowsManager.setMainWindow(win)
   windowsManager.initialize()
+
+  pygdbController.startPygdbSession()
 }
 
 app.whenReady().then(() => {

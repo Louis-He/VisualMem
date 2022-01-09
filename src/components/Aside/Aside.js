@@ -24,7 +24,8 @@ export default class Aside extends React.Component{
 
   changePage(inputID){
     this.setState({
-      count: this.state.pageID = inputID
+      //count: this.state.pageID = inputID
+      pageID: inputID
     })
     console.log(this.state.pageID)
   }

@@ -6,7 +6,7 @@ import ConfigurationWindow from './ConfigurationWindow.js'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { lightTheme, darkTheme } from "./components/Themes"
 import Aside from "./components/Aside/Aside"
-import Page1 from "./components/RightPanel/Page1.js"
+//import Page1 from "./components/RightPanel/Page1.js"
 import "./components/Aside/AsideStyle.css"
 import "react-pro-sidebar/dist/css/styles.css";
 

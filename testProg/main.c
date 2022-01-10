@@ -13,6 +13,14 @@ int main() {
     int a, b = 1;
     a = 2;
     b = 3;
+
+    int *c;
+    int **d;
+    int ***e;
+
+    e = &d;
+    d = &c;
+    c = &b;
     
     Node* head = malloc(sizeof(Node));
     Node* tail = malloc(sizeof(Node));

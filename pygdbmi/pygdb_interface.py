@@ -20,19 +20,61 @@ class varSnapshot:
         if varAddr is None:
             response = gdbcontroller.write('-data-evaluate-expression "&(' + varName + ')"')
             response = response[0]
-            print(response)
+            # print(response)
             varAddr = response['payload']['value']
 
         if varAddr not in self.varDict:
             self.varDict[varAddr] = variable
+        elif self.varDict[varAddr]['name'].count("*") != 0:
+            self.varDict[varAddr] = variable
+            print("[Warning] Overload Variable")
+        else:
+            print("[Error] ADDVAR ERROR")
 
     def processPointer(self, gdbcontroller, variable):
-        varType = variable['type']
-        asteriskCount = varType.count("*")
+        curName = variable['name']
+        curType = variable['type']
+        curValue = variable['value']
+        curDict = {"name": variable['name'], "type": variable['type'], "value": variable['value'], 'ptrTarget': True}
+
+        asteriskCount = variable['type'].count("*")
+        curAddr = None
 
         for _ in range(asteriskCount):
             print("process pointer")
-        print("Ptr")
+
+            if curAddr is None:
+                self.addVariable(gdbcontroller, curDict, curAddr)
+                curName = "(" + curName + ")"
+            else:
+                response = gdbcontroller.write('-data-evaluate-expression "(' + curType + ')(' + curAddr + ')"')
+                response = response[0]
+                # print(response)
+                if response['message'] == 'error':
+                    curDict["ptrTarget"] = False
+                    return
+
+                curValue = response['payload']['value']
+                curDict = {"name": curName, "type": curType, "value": curValue, 'ptrTarget': True}
+                self.addVariable(gdbcontroller, curDict, curAddr)
+
+            curAddr = curValue
+            curName = "*" + curName
+            curType = curType[:-1].strip()
+        
+        response = gdbcontroller.write('-data-evaluate-expression "(' + curType + ')(' + curAddr + ')"')
+        response = response[0]
+        print(response)
+        # if response['message'] == 'error':
+        #     curDict["ptrTarget"] = False
+        #     return
+
+        # curValue = response['payload']['value']
+        # curDict = {"name": curName, "type": curType, "value": curValue, 'ptrTarget': True}
+        # self.addVariable(gdbcontroller, curDict, curAddr)
+
+            
+        # print("Ptr")
 
     def processVariable(self, gdbcontroller, variable):
         pprint(variable)

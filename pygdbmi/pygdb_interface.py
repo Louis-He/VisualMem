@@ -23,6 +23,8 @@ class varSnapshot:
             # print(response)
             varAddr = response['payload']['value']
 
+        print("try to add variable", variable)
+
         if varAddr not in self.varDict:
             self.varDict[varAddr] = variable
         elif self.varDict[varAddr]['name'].count("*") != 0:
@@ -30,6 +32,82 @@ class varSnapshot:
             print("[Warning] Overload Variable")
         else:
             print("[Error] ADDVAR ERROR")
+
+    def tryAddType(self, gdbcontroller, variable):
+        surfaceType = variable["type"]
+        typeName = surfaceType
+        
+        if surfaceType not in self.typeDict:
+            # If not already exist add one
+            response = gdbcontroller.write('ptype (' + variable['name'] + ')')
+            response = response[1:-1]
+
+            aliasList = [surfaceType]
+
+            typeStr = ""
+            for line in response:
+                typeStr += line["payload"]
+
+            typeStrArr = typeStr.split("\\n")
+
+            typeNameLine = typeStrArr[0]
+            typeName = typeNameLine[typeNameLine.find("=") + 1:typeNameLine.find("{")].strip()
+            
+            if typeName not in self.varDict:
+                # The underlining type also does not exist
+                if typeName not in aliasList:
+                    aliasList.append(typeName)
+
+                typeStrArr = typeStrArr[1:-2]
+                typeMemberDict = {}
+                for memberLine in typeStrArr:
+                    memberLine = memberLine.strip()
+                    memberLine = memberLine.replace(";", "")
+
+                    lastSpace = memberLine.rfind(" ")
+                    lastAsterisk = memberLine.rfind("*")
+                    lastRightBracket = memberLine.rfind("]")
+
+                    lastTypeCharacter = max(lastSpace, lastAsterisk, lastRightBracket)
+
+                    memberType = memberLine[:lastTypeCharacter+1].strip()
+                    memberName = memberLine[lastTypeCharacter+1:].strip()
+
+                    typeMemberDict[memberName] = memberType
+
+                self.typeDict[surfaceType] = {"aliasList": aliasList, "memberDict": typeMemberDict}
+                self.typeDict[typeName] = {"aliasList": aliasList, "memberDict": typeMemberDict}
+            else:
+                # Seems like the underlining type is already there
+                # Let's add the new typename to the alias list
+                underliningTypeDict = self.typeDict[typeName]
+                underliningTypeDict["aliasList"].append(surfaceType)
+
+                self.typeDict[surfaceType] = underliningTypeDict
+
+        return typeName
+
+    def processStruct(self, gdbcontroller, variable, structAddr = None):
+        print("process Struct")
+        structTypeName = self.tryAddType(gdbcontroller, variable)
+
+        memberDict = {}
+
+        curType = variable['type']
+        curName = variable['name']
+        # loop all the members and try to get each member value
+        for member, memberType in self.typeDict[structTypeName]["memberDict"].items():
+            response = gdbcontroller.write('-data-evaluate-expression "(' + curName + "." + member + ')"')
+            response = response[0]
+
+            memberValue = response['payload']['value']
+            memberDict[member] = {"value": memberValue, "type": memberType}
+        
+        self.addVariable(gdbcontroller, 
+            {"name": curName, "type": curType, "value": memberDict},
+            varAddr = structAddr
+        )
+
 
     def processPointer(self, gdbcontroller, variable):
         curName = variable['name']
@@ -47,36 +125,44 @@ class varSnapshot:
                 self.addVariable(gdbcontroller, curDict, curAddr)
                 curName = "(" + curName + ")"
             else:
-                response = gdbcontroller.write('-data-evaluate-expression "(' + curType + ')(' + curAddr + ')"')
+                response = gdbcontroller.write('-data-evaluate-expression "*(' + curType + ')(' + curAddr + ')"')
                 response = response[0]
-                # print(response)
+                print(response)
                 if response['message'] == 'error':
                     curDict["ptrTarget"] = False
                     return
 
                 curValue = response['payload']['value']
+                curType = curType[:-1].strip()
                 curDict = {"name": curName, "type": curType, "value": curValue, 'ptrTarget': True}
                 self.addVariable(gdbcontroller, curDict, curAddr)
 
             curAddr = curValue
             curName = "*" + curName
-            curType = curType[:-1].strip()
+            
         
-        response = gdbcontroller.write('-data-evaluate-expression "(' + curType + ')(' + curAddr + ')"')
+        response = gdbcontroller.write('-data-evaluate-expression "*(' + curType + ')(' + curAddr + ')"')
         response = response[0]
         print(response)
-        # if response['message'] == 'error':
-        #     curDict["ptrTarget"] = False
-        #     return
+        if response['message'] == 'error':
+            curDict["ptrTarget"] = False
+            return
 
-        # curValue = response['payload']['value']
-        # curDict = {"name": curName, "type": curType, "value": curValue, 'ptrTarget': True}
-        # self.addVariable(gdbcontroller, curDict, curAddr)
+        curValue = response['payload']['value']
+        curType = curType[:-1].strip()
+        curDict = {"name": curName, "type": curType, "value": curValue, 'ptrTarget': True}
 
+        if curValue.count("{") == 0:
+            self.addVariable(gdbcontroller, curDict, curAddr)
+        else:
+            print("Maybe a struct or something, need to process further!")
+
+            curDict["name"] = "(*((" + curType + "*)" + "(" + curAddr + ")))"
+            self.processVariable(gdbcontroller, curDict, curAddr)
             
         # print("Ptr")
 
-    def processVariable(self, gdbcontroller, variable):
+    def processVariable(self, gdbcontroller, variable, varAddr = None):
         pprint(variable)
 
         # varName = variable['name']
@@ -88,14 +174,26 @@ class varSnapshot:
 
         if 'value' not in variable:
             # should be either a struct, or an array
-            print("[Error] Cannot process right now.")
+            # print("[Error] Cannot process right now.")
+            if bracketCount != 0:
+                print("[Error] Array detected. Can't process right now.")
+            elif asteriskCount != 0:
+                print("[Error] Can't process right now, seems a bit strange, need to CHECK!")
+            else:
+                print("we have a struct here!")
+                self.processStruct(gdbcontroller, variable, varAddr)
         else:
             if asteriskCount != 0:
+                # Possibly a struct already being dereferenced
                 self.processPointer(gdbcontroller, variable)
             else:
-                self.addVariable(gdbcontroller, variable)
+                if variable['value'].count("{") != 0:
+                    self.processStruct(gdbcontroller, variable, varAddr)
+                else:
+                    self.addVariable(gdbcontroller, variable)
 
     def createVarsnapshot(self, gdbcontroller, varDict):
+        self.varDict = {}
         for variable in varDict["payload"]["variables"]:
             self.processVariable(gdbcontroller, variable)
 
@@ -131,7 +229,7 @@ class pygdbController:
         self.execFilePath = execFilePath
     
     def startController(self,) -> bool:
-        self.controller = GdbController(time_to_check_for_additional_output_sec=0.1)
+        self.controller = GdbController(time_to_check_for_additional_output_sec=0.05)
         print(self.execFilePath)
         isSuccessful = self.sendCommandToGDB('-file-exec-and-symbols "' + self.execFilePath + '"', True)
         self.sendCommandToGDB('-break-insert main', True)

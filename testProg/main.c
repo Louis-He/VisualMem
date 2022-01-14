@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 struct node {
     int val;
@@ -23,14 +24,18 @@ int main() {
     c = &b;
     
     Node* head = malloc(sizeof(Node));
-    Node* tail = malloc(sizeof(Node));
-
-    Node ins = {1, NULL};
-
     head->val = 0;
-    tail->val = 1;
-    head->next = tail;
-    tail->next = NULL;
+    head->next = NULL;
+
+    Node* prev_ptr = head;
+    for (int i = 1; i < 5; i++) {
+        Node* cur_ptr = malloc(sizeof(Node));
+        cur_ptr->val = i;
+        cur_ptr->next = NULL;
+
+        prev_ptr->next = cur_ptr;
+        prev_ptr = cur_ptr;
+    }
 
     return 0;
 }

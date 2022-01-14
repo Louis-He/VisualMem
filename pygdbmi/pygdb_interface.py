@@ -14,6 +14,10 @@ class varSnapshot:
         self.varDict = {}
         self.typeDict = {}
 
+        # All the members below are temperory variables that are used during the 
+        # construction of the varDict
+        self.linkedListBeingRefered = set() # Add to this set if a node has been referenced somewhere 
+
     def addVariable(self, gdbcontroller, variable, varAddr = None):
         varName = variable['name']
 
@@ -24,6 +28,11 @@ class varSnapshot:
             varAddr = response['payload']['value']
 
         print("try to add variable", variable)
+
+        # See if the newly added variable is already being refered 
+        # Now only works for Linked List
+        if "isLL" in variable and varAddr in self.linkedListBeingRefered:
+            variable["isRefered"] = True
 
         if varAddr not in self.varDict:
             self.varDict[varAddr] = variable
@@ -38,6 +47,9 @@ class varSnapshot:
         typeName = surfaceType
         
         if surfaceType not in self.typeDict:
+            # Flags need to be set here
+            linkedMembers = []
+
             # If not already exist add one
             response = gdbcontroller.write('ptype (' + variable['name'] + ')')
             response = response[1:-1]
@@ -75,8 +87,28 @@ class varSnapshot:
 
                     typeMemberDict[memberName] = memberType
 
-                self.typeDict[surfaceType] = {"aliasList": aliasList, "memberDict": typeMemberDict}
-                self.typeDict[typeName] = {"aliasList": aliasList, "memberDict": typeMemberDict}
+                    # check if the member is possibly a linker to another node that has the same type
+                    if memberType.count("*") == 0:
+                        # The member is not even a pointer, pass the check!
+                        continue
+                    
+                    nextNodeType = memberType[:memberType.rfind("*")].strip()
+                    if nextNodeType in aliasList:
+                        linkedMembers.append(memberName)
+
+                print("linkedMembers: ", linkedMembers)
+                newTypeDict = {
+                    "aliasList": aliasList, 
+                    "memberDict": typeMemberDict,
+                    "isLL": False
+                }
+
+                if len(linkedMembers) == 1:
+                    newTypeDict["isLL"] = True
+                    newTypeDict["linkedListMember"] = linkedMembers[0]
+
+                self.typeDict[surfaceType] = newTypeDict
+                self.typeDict[typeName] = self.typeDict[surfaceType]
             else:
                 # Seems like the underlining type is already there
                 # Let's add the new typename to the alias list
@@ -102,14 +134,41 @@ class varSnapshot:
 
             memberValue = response['payload']['value']
             memberDict[member] = {"value": memberValue, "type": memberType}
+
+        newVarDict = {"name": curName, "type": curType, "value": memberDict}
+
+
+        print(self.typeDict[structTypeName])
+        # The first condition: Check if the node is part of a Linked List
+        # The second condition: Only count reference by another node, not by arbitrary pointer!
+        if self.typeDict[structTypeName]["isLL"]:
+            newVarDict["isLL"] = True
+            newVarDict["isRefered"] = False
+            newVarDict["linkedMember"] = self.typeDict[structTypeName]["linkedListMember"]
+            # Special operations for a linked list
+            # Add a field to indicate if the node is the head node or not
+            referredAddr = memberDict[self.typeDict[structTypeName]["linkedListMember"]]["value"]
+            referredType = memberDict[self.typeDict[structTypeName]["linkedListMember"]]["type"]
+
+            if referredAddr in self.varDict:
+                self.varDict[referredAddr]["isRefered"] = True
+            else:
+                # not sure if the node will be added later, so...
+                # Add the node to the temp nodes.
+                self.linkedListBeingRefered.add(referredAddr)
+                self.processPointer(gdbcontroller, {
+                    'name': "((" + referredType + ")(" + referredAddr + "))",
+                    'type': referredType,
+                    'value': referredAddr,
+                }, isAddOriginalPointerAddr = False)
         
         self.addVariable(gdbcontroller, 
-            {"name": curName, "type": curType, "value": memberDict},
+            newVarDict,
             varAddr = structAddr
         )
 
 
-    def processPointer(self, gdbcontroller, variable):
+    def processPointer(self, gdbcontroller, variable, isAddOriginalPointerAddr = True):
         curName = variable['name']
         curType = variable['type']
         curValue = variable['value']
@@ -122,7 +181,11 @@ class varSnapshot:
             print("process pointer")
 
             if curAddr is None:
-                self.addVariable(gdbcontroller, curDict, curAddr)
+                # Only the original pointer will be in this if
+                # Used as the condition to check if this is the first iteration
+
+                if isAddOriginalPointerAddr:
+                    self.addVariable(gdbcontroller, curDict, varAddr=curAddr)
                 curName = "(" + curName + ")"
             else:
                 response = gdbcontroller.write('-data-evaluate-expression "*(' + curType + ')(' + curAddr + ')"')
@@ -135,7 +198,7 @@ class varSnapshot:
                 curValue = response['payload']['value']
                 curType = curType[:-1].strip()
                 curDict = {"name": curName, "type": curType, "value": curValue, 'ptrTarget': True}
-                self.addVariable(gdbcontroller, curDict, curAddr)
+                self.addVariable(gdbcontroller, curDict, varAddr=curAddr)
 
             curAddr = curValue
             curName = "*" + curName
@@ -153,7 +216,7 @@ class varSnapshot:
         curDict = {"name": curName, "type": curType, "value": curValue, 'ptrTarget': True}
 
         if curValue.count("{") == 0:
-            self.addVariable(gdbcontroller, curDict, curAddr)
+            self.addVariable(gdbcontroller, curDict, varAddr=curAddr)
         else:
             print("Maybe a struct or something, need to process further!")
 

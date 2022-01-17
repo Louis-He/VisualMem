@@ -3,11 +3,20 @@ import socket
 import ctypes
 from pygdbmi.gdbcontroller import GdbController
 from pprint import pprint
-
+import sys
 
 HOST = '127.0.0.1'  # The server's hostname or IP address
 PORT = 4000        # The port used by the server
 BUFSIZE = 1024
+
+
+def unbufferedPPrint(*args, **kwargs):
+    pprint(*args, **kwargs)
+    sys.stdout.flush()
+
+def unbufferedPrint(*args, **kwargs):
+    print(*args, **kwargs)
+    sys.stdout.flush()
 
 class varSnapshot:
     def __init__(self) -> None:
@@ -24,10 +33,10 @@ class varSnapshot:
         if varAddr is None:
             response = gdbcontroller.write('-data-evaluate-expression "&(' + varName + ')"')
             response = response[0]
-            # print(response)
+            # unbufferedPrint(response)
             varAddr = response['payload']['value']
 
-        print("try to add variable", variable)
+        unbufferedPrint("try to add variable", variable)
 
         # See if the newly added variable is already being refered 
         # Now only works for Linked List
@@ -38,9 +47,9 @@ class varSnapshot:
             self.varDict[varAddr] = variable
         elif self.varDict[varAddr]['name'].count("*") != 0:
             self.varDict[varAddr] = variable
-            print("[Warning] Overload Variable")
+            unbufferedPrint("[Warning] Overload Variable")
         else:
-            print("[Error] ADDVAR ERROR")
+            unbufferedPrint("[Error] ADDVAR ERROR")
 
     def tryAddType(self, gdbcontroller, variable):
         surfaceType = variable["type"]
@@ -96,7 +105,7 @@ class varSnapshot:
                     if nextNodeType in aliasList:
                         linkedMembers.append(memberName)
 
-                print("linkedMembers: ", linkedMembers)
+                unbufferedPrint("linkedMembers: ", linkedMembers)
                 newTypeDict = {
                     "aliasList": aliasList, 
                     "memberDict": typeMemberDict,
@@ -120,7 +129,7 @@ class varSnapshot:
         return typeName
 
     def processStruct(self, gdbcontroller, variable, structAddr = None):
-        print("process Struct")
+        unbufferedPrint("process Struct")
         structTypeName = self.tryAddType(gdbcontroller, variable)
 
         memberDict = {}
@@ -138,7 +147,7 @@ class varSnapshot:
         newVarDict = {"name": curName, "type": curType, "value": memberDict}
 
 
-        print(self.typeDict[structTypeName])
+        unbufferedPrint(self.typeDict[structTypeName])
         # The first condition: Check if the node is part of a Linked List
         # The second condition: Only count reference by another node, not by arbitrary pointer!
         if self.typeDict[structTypeName]["isLL"]:
@@ -178,7 +187,7 @@ class varSnapshot:
         curAddr = None
 
         for _ in range(asteriskCount):
-            print("process pointer")
+            unbufferedPrint("process pointer")
 
             if curAddr is None:
                 # Only the original pointer will be in this if
@@ -190,7 +199,7 @@ class varSnapshot:
             else:
                 response = gdbcontroller.write('-data-evaluate-expression "*(' + curType + ')(' + curAddr + ')"')
                 response = response[0]
-                print(response)
+                unbufferedPrint(response)
                 if response['message'] == 'error':
                     curDict["ptrTarget"] = False
                     return
@@ -206,7 +215,7 @@ class varSnapshot:
         
         response = gdbcontroller.write('-data-evaluate-expression "*(' + curType + ')(' + curAddr + ')"')
         response = response[0]
-        print(response)
+        unbufferedPrint(response)
         if response['message'] == 'error':
             curDict["ptrTarget"] = False
             return
@@ -218,15 +227,15 @@ class varSnapshot:
         if curValue.count("{") == 0:
             self.addVariable(gdbcontroller, curDict, varAddr=curAddr)
         else:
-            print("Maybe a struct or something, need to process further!")
+            unbufferedPrint("Maybe a struct or something, need to process further!")
 
             curDict["name"] = "(*((" + curType + "*)" + "(" + curAddr + ")))"
             self.processVariable(gdbcontroller, curDict, curAddr)
             
-        # print("Ptr")
+        # unbufferedPrint("Ptr")
 
     def processVariable(self, gdbcontroller, variable, varAddr = None):
-        pprint(variable)
+        unbufferedPPrint(variable)
 
         # varName = variable['name']
         varType = variable['type']
@@ -237,13 +246,13 @@ class varSnapshot:
 
         if 'value' not in variable:
             # should be either a struct, or an array
-            # print("[Error] Cannot process right now.")
+            # unbufferedPrint("[Error] Cannot process right now.")
             if bracketCount != 0:
-                print("[Error] Array detected. Can't process right now.")
+                unbufferedPrint("[Error] Array detected. Can't process right now.")
             elif asteriskCount != 0:
-                print("[Error] Can't process right now, seems a bit strange, need to CHECK!")
+                unbufferedPrint("[Error] Can't process right now, seems a bit strange, need to CHECK!")
             else:
-                print("we have a struct here!")
+                unbufferedPrint("we have a struct here!")
                 self.processStruct(gdbcontroller, variable, varAddr)
         else:
             if asteriskCount != 0:
@@ -260,8 +269,8 @@ class varSnapshot:
         for variable in varDict["payload"]["variables"]:
             self.processVariable(gdbcontroller, variable)
 
-        print("================")
-        pprint(self.varDict)
+        unbufferedPrint("================")
+        unbufferedPPrint(self.varDict)
 
 class pygdbController:
     def __init__(self, socket) -> None:
@@ -275,7 +284,8 @@ class pygdbController:
         response = self.controller.write(command)
 
         if isPrint:
-            pprint(response)
+            unbufferedPPrint(response)
+            
 
         for res in response:
             if res["message"] == "error":
@@ -293,7 +303,7 @@ class pygdbController:
     
     def startController(self,) -> bool:
         self.controller = GdbController(time_to_check_for_additional_output_sec=0.05)
-        print(self.execFilePath)
+        unbufferedPrint(self.execFilePath)
         isSuccessful = self.sendCommandToGDB('-file-exec-and-symbols "' + self.execFilePath + '"', True)
         self.sendCommandToGDB('-break-insert main', True)
         self.sendCommandToGDB('-exec-run', True)
@@ -346,7 +356,7 @@ def processIncomingMessage(pygdb_controller, msg):
             ctypes.py_object(SystemExit))
         if res > 1:
             ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, 0)
-            print('Exception raise failure')
+            unbufferedPrint('Exception raise failure')
 
 
 def pygdb_interface_entry():
@@ -358,12 +368,12 @@ def pygdb_interface_entry():
     while True:
         electron_side = s.recv(BUFSIZE)
         if not electron_side: 
-            print('Electron side exited.')
+            unbufferedPrint('Electron side exited.')
             break
 
         electron_side = electron_side.decode('utf-8')
 
-        print(electron_side)
+        unbufferedPrint(electron_side)
         processIncomingMessage(pygdb_controller, electron_side)
 
 

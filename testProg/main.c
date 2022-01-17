@@ -11,10 +11,7 @@ typedef struct node Node;
 
 
 int main() {
-    int a, b = 1;
-    a = 2;
-    b = 3;
-
+    int b = 2;
     int *c;
     int **d;
     int ***e;

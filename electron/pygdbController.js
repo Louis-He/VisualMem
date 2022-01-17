@@ -1,7 +1,11 @@
 var windowsManager = require('./windowsManager.js');
+var child_process = require('child_process');
 
 const net  = require('net');
 const port = 4000;
+
+var create_python_session_embedded = true;
+var l_pygdb_child_process = null;
 
 var l_pygdb_socket = null;
 var l_attached_controller = false;
@@ -36,6 +40,27 @@ exports.startPygdbSession = function () {
     });
 
     l_socket.listen(port, '127.0.0.1');
+
+    // if enabled, the pygdb_interface will be automatically generated here!
+    if (create_python_session_embedded) {
+        l_pygdb_child_process = child_process.spawn('python', ['-u', './pygdbmi/pygdb_interface.py'], {
+            shell: true,
+        });
+
+        l_pygdb_child_process.stdout.on('data', function (data) {
+            console.log('[PyGDB handler stdout]' + data);
+        });
+
+        l_pygdb_child_process.stderr.on('data', function(data) {
+            console.log('[PyGDB handler stderr]' + data);
+        });
+
+        l_pygdb_child_process.on('close', function (code) {
+            console.log('PyGDB handler instance exited with code ' + code)
+            l_pygdb_child_process = null
+        });
+
+    }
 }
 
 exports.startController = function () {

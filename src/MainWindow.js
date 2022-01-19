@@ -1,5 +1,6 @@
 import React from 'react';
 import './css/App.css';
+import './css/nodeStyle.css';
 import './../node_modules/react-reflex/styles.css';
 import './../node_modules/react-grid-layout/css/styles.css';
 import './../node_modules/react-resizable/css/styles.css';
@@ -9,31 +10,17 @@ import { Folder2Open, CaretRightSquare, XSquare, SkipEndCircle, ArrowRightCircle
 import { ThemeProvider } from "styled-components";
 import { MainBody } from "./components/GlobalStyles";
 import GridLayout from 'react-grid-layout';
-// import {
-//   ReflexContainer,
-//   ReflexSplitter,
-//   ReflexElement
-// } from 'react-reflex'
 
-import ReactFlow from 'react-flow-renderer';
-
+import ReactFlow, { Handle } from 'react-flow-renderer';
 
 const ipcRenderer = window.require("electron").ipcRenderer;
-
-// ==== renderer -> main functions ====
-// function renderRequestOpenConfig() {
-//   ipcRenderer.invoke('requestOpenConfig',)
-// }
-
-
-
 
 
 function renderRequestsendMsgToGDB(msg) {
   ipcRenderer.invoke('sendMsgToGDB', msg)
 }
 
-
+// TODO: need to update
 const elementsCreator = function ({locals}) {
 
   const elementList = [];
@@ -56,33 +43,152 @@ const elementsCreator = function ({locals}) {
   return elementList
 }
 
-
-// ==== renderer <- main functions ====
-// ipcRenderer.on('distributeDetailedLocals', function (evt, locals) {
-//   console.log(locals)
-//   console.log(elementsCreator(locals))
-// });
-
-
-const customNodeStyles = {
-  background: '#9CA8B3',
-  color: '#FFF',
-  padding: 10,
-  opacity: 1,
-};
-
-const CustomNodeComponent = ({ data }) => {
+// special type components
+const arrayHeadComponent = ({ data }) => {
   return (
-    <div style={customNodeStyles}>
-      <div>{data.text}</div>
+    <div className='arrayHead'>
+      <p className='arrayName'> {data.name}</p>
+      <div> 
+        <div className='arrayIndex'> {data.index} </div>
+        <div className='arrayNode'> {data.text} </div>
+      </div>
     </div>
   );
 };
 
+const arrayComponent = ({ data }) => {
+  return (
+    <div>
+      <div className='arrayIndex'> {data.index} </div>
+      <div className='arrayNode'> {data.text} </div>
+    </div>
+  );
+};
+
+const normalComponent = ({ data }) => {
+  return (
+    <div className='normal'>
+      <p className='normalName'> {data.name} </p>
+      <div>
+        <div className='normalNode'> {data.text} </div>
+      </div>
+    </div>
+  );
+};
+
+// TODO: change class name
+const normalNodeComponent = ({ data }) => {
+  return (
+    <div className='normal'>
+      <p className='normalName'> {data.name} </p>
+      <div>
+        <div className='normalNode'> {data.text} </div>
+      </div>
+      <Handle 
+        type="source"
+        position="right"
+        style = {{top: "35%", borderRadius: 0}}
+        className='linkedListNode'
+      />
+    </div>
+  );
+};
+
+// TODO: change class name
+const pointerComponent = ({ data }) => {
+  return (
+    <div className='normal'>
+      <div>
+        <Handle type="source" position="left" style = {{top: "35%", borderRadius: 0}} className='linkedListNode'/>
+        <div className='pointerNode'> </div>
+        <Handle type="target" position="right" style = {{top: "35%", right: "70%", borderRadius: 0}} className='linkedListNode'/>
+      </div>
+      <p className='pointerName'> {data.name} </p>
+    </div>
+  );
+};
+
+const linkedListHeadComponent = ({ data }) => {
+  return (
+    <div className='linkedList'>
+      <p className='linkedListName'> {data.name} </p>
+      <div>
+        <div className='linkedListIndex'> Head </div>
+        <div className='linkedListNode'> {data.text} </div>
+      </div>
+      <Handle 
+        type="source"
+        position="right"
+        className = "handle"
+        style = {{top: "90%", borderRadius: 0}}
+      />
+    </div>
+  )
+}
+
+const linkedListComponent = ({ data }) => {
+  return (
+    <div>
+      <Handle type="target" position="left" className='linkedListNode'/>
+      <div className='linkedListNode'> {data.text} </div>
+      <Handle 
+        type="source"
+        position="right"
+        style = {{top: "70%", borderRadius: 0}}
+        className='linkedListNode'
+      />
+    </div>
+  )
+}
+
+const treeHeadComponent = ({ data }) => {
+  return (
+    <div>
+      <Handle id = "a" type="source" position="bottom" style = {{left: "30%", borderRadius: 0}} className='treeNode'/>
+      <div className='treeNode'> {data.text} </div>
+      <Handle 
+        id = "b"
+        type="source"
+        position="bottom"
+        style = {{left: "70%", borderRadius: 0}}
+        className='treeNode'
+      />
+    </div>
+  )
+}
+
+const treeComponent = ({ data }) => {
+  return (
+    <div>
+      <Handle type="target" position="top" style = {{left: "50%", borderRadius: 0}} className='treeNode' id = 'a'/>
+      <Handle type="target" position="bottom" style = {{left: "30%", borderRadius: 0}} className='treeNode' id = 'b'/>
+      <div className='treeNode'> {data.text} </div>
+      <Handle 
+        type="source"
+        position="bottom"
+        style = {{left: "70%", borderRadius: 0}}
+        className='treeNode'
+        id = 'c'
+      />
+    </div>
+  )
+}
+
 
 const nodeTypes = {
-  special: CustomNodeComponent,
+  array: arrayComponent,
+  arrayHead: arrayHeadComponent,
+  normal: normalComponent,
+  normalNode: normalNodeComponent,
+  pointer: pointerComponent,
+  linkedList: linkedListComponent,
+  linkedListHead: linkedListHeadComponent,
+  tree: treeComponent,
+  treeHead: treeHeadComponent,
 };
+
+var x_test = 50;
+var y_test = 50;
 
 
 // ==== renderer class ====
@@ -98,6 +204,54 @@ export default class MainWindow extends React.Component {
       fileData: "",
       elements: []
     }
+  }
+
+  getNode(element_temp, element_test, element_id, be_pointed, outer_key, value) {
+    if(element_temp[outer_key]['ptrTarget'] && element_id.includes(value)) {
+      this.getNode(element_temp, element_test, element_id, be_pointed, value, element_temp[value]['value'])
+    } else if (element_temp[outer_key]['ptrTarget'] && !element_id.includes(value)) {
+      console.log("ERROR")
+      return
+    }
+  
+    if(element_temp[outer_key]['visited'] === false) {
+      // pointer
+      if(element_temp[outer_key]['ptrTarget']) {
+        console.log(x_test)
+        console.log(y_test)
+        // push for node
+        element_test.push({ id: outer_key,  type: 'pointer', position: {x:x_test + 150, y:y_test}, data: { name: element_temp[outer_key]['name'], text: value}, draggable: true})
+
+        // push for edge
+        element_test.push({
+          id: outer_key + element_temp[outer_key]['value'],
+          source: outer_key,
+          target: element_temp[outer_key]['value'],
+          arrowHeadType: 'arrow', 
+          style: {strokeWidth: 4},
+        })
+  
+        if (be_pointed.includes(outer_key)) {
+          x_test = x_test + 80;
+        } else {
+          x_test = 50;
+          y_test = y_test + 50;
+        }
+      } else {
+        element_test.push({ id: outer_key,  type: 'normalNode', position: {x:x_test, y:y_test}, data: { name: element_temp[outer_key]['name'], text: value}, draggable: true})
+        if (be_pointed.includes(outer_key)) {
+          x_test = x_test + 80;
+        } else {
+          x_test = 50;
+          y_test = y_test + 50;
+        }
+        
+      }
+  
+    }
+  
+    element_temp[outer_key]['visited'] = true;
+    return;
   }
 
   componentDidMount() {
@@ -125,6 +279,69 @@ export default class MainWindow extends React.Component {
         that.displayVar()
       }
     });
+
+    let json = {"0x108c3ff8d0": {"name": "d",
+                    "ptrTarget": true,
+                    "type": "int **",
+                    "value": "0x108c3ff8d8"},
+                "0x108c3ff8d8": {"name": "c",
+                    "ptrTarget": true,
+                    "type": "int *",
+                    "value": "0x108c3ff8e4"},
+                "0x108c3ff8e4": {"name": "b", "type": "int", "value": "3"},
+                "0x108c3ff8f0": {"name": "head",
+                    "ptrTarget": true,
+                    "type": "Node *",
+                    "value": "0x12a46984f80"},
+                "0x108c3ff8f8": {"name": "e",
+                    "ptrTarget": true,
+                    "type": "int ***",
+                    "value": "0x108c3ff8d0"},
+                "0x108c3ff900": {"name": "a", "type": "int", "value": "2"},
+                "0x108c3ff908": {"name": "prev_ptr",
+                    "ptrTarget": true,
+                    "type": "Node *",
+                    "value": "0x12a46987160"},
+}
+
+    var element_test = []
+    var element_temp = Object.create(null);
+    var element_id = [];
+    var be_pointed = [];
+
+    // convert the json into array && added a field
+    for (var i in json) {
+      // i -> outer key
+      // json[i] -> outer value
+      let value = json[i];
+      var map_temp = Object.create(null);
+
+      for (var j in value) {
+        //j -> innner key
+        //json[i][j] -> innner value
+        map_temp[j] = value[j]
+      }
+      if (map_temp['ptrTarget']) {
+        be_pointed.push(map_temp["value"])
+      }
+      map_temp['visited'] = false
+
+      element_temp[i] = map_temp
+      element_id.push(i)
+    }
+
+    console.log(element_temp)
+    console.log(be_pointed)
+
+    for (var key in element_temp) {
+      this.getNode(element_temp, element_test, element_id, be_pointed, key, element_temp[key]['value'])
+    }
+
+    console.log(element_test)
+
+    this.setState({
+      element_test: element_test,
+    })
   }
 
   async renderRequestStartGDB() {
@@ -136,6 +353,7 @@ export default class MainWindow extends React.Component {
       })
     }
   }
+  
 
   renderRequestNextLineExecution() {
     ipcRenderer.invoke('requestNextLineGDB', 1, )
@@ -403,8 +621,8 @@ export default class MainWindow extends React.Component {
                           <p>Current Executable Path: {this.props.executablePath}</p>
                         </div>
 
-                        <div style={{ height: 300, width: 500 }}>
-                          <ReactFlow elements={this.state.elements} nodeTypes={nodeTypes} />
+                        <div style={{ height: 500, width: 800 }}>
+                          <ReactFlow elements={this.state.element_test} nodeTypes={nodeTypes} minZoom={1} maxZoom={1} translateExtent={[[0, 0], [800, 500]]} />
                         </div>
 
                         <div>

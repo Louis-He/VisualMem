@@ -1,0 +1,109 @@
+
+.arrayIndex, .linkedListIndex {
+  text-align: center;
+}
+
+.arrayNode {
+  background: rgb(60, 118, 226);
+  height: 30px;
+  width: 100px;
+  text-align: center;
+  border-width: 1px;
+  border-style: solid;
+  opacity: 1;
+}
+
+.arrayNode:hover {
+  background: rgb(31, 90, 201);
+}
+
+.arrayName {
+  text-align: right;
+  padding-right: 10px;
+  height: 30px;
+  width: 80px;
+  padding-top: 30px;
+}
+
+.normalName {
+  text-align: right;
+  padding-right: 10px;
+  height: 30px;
+  width: 80px;
+}
+
+.pointerName {
+  text-align: left;
+  padding-left: 5px;
+  height: 30px;
+  width: 80px;
+}
+
+.linkedListName {
+  text-align: right;
+  padding-right: 10px;
+  height: 30px;
+  width: 80px;
+  padding-top: 30px;
+}
+
+.arrayHead, .normal, .linkedList {
+  display: flex
+}
+
+
+.normalNode {
+  background: rgb(226, 135, 60);
+  height: 30px;
+  width: 100px;
+  text-align: center;
+  border-width: 1px;
+  border-style: solid;
+  opacity: 1;
+}
+
+.normalNode:hover {
+  background: rgb(185, 115, 24);
+}
+
+.pointerNode {
+  background: rgb(248, 80, 122);
+  height: 30px;
+  width: 30px;
+  text-align: center;
+  border-width: 1px;
+  border-style: solid;
+  opacity: 1;
+}
+
+.pointerNode:hover {
+  background: rgb(189, 46, 81);
+}
+
+.linkedListNode {
+  background: rgb(65, 245, 49);
+  height: 30px;
+  width: 100px;
+  text-align: center;
+  border-width: 1px;
+  border-style: solid;
+  opacity: 1;
+}
+
+.linkedListNode:hover {
+  background: rgb(31, 156, 6);
+}
+
+.treeNode {
+  background: rgb(183, 49, 245);
+  height: 30px;
+  width: 100px;
+  text-align: center;
+  border-width: 1px;
+  border-style: solid;
+  opacity: 1;
+}
+
+.treeNode:hover {
+  background: rgb(156, 6, 149);
+}

@@ -80,16 +80,16 @@ const normalComponent = ({ data }) => {
 const normalNodeComponent = ({ data }) => {
   return (
     <div className='normal'>
+      <Handle 
+        type="source"
+        position="left"
+        style = {{top: "35%", left: "44.44%", borderRadius: 0}}
+        className='linkedListNode'
+      />
       <p className='normalName'> {data.name} </p>
       <div>
         <div className='normalNode'> {data.text} </div>
       </div>
-      <Handle 
-        type="source"
-        position="right"
-        style = {{top: "35%", borderRadius: 0}}
-        className='linkedListNode'
-      />
     </div>
   );
 };
@@ -98,12 +98,12 @@ const normalNodeComponent = ({ data }) => {
 const pointerComponent = ({ data }) => {
   return (
     <div className='normal'>
-      <div>
-        <Handle type="source" position="left" style = {{top: "35%", borderRadius: 0}} className='linkedListNode'/>
-        <div className='pointerNode'> </div>
-        <Handle type="target" position="right" style = {{top: "35%", right: "70%", borderRadius: 0}} className='linkedListNode'/>
-      </div>
       <p className='pointerName'> {data.name} </p>
+      <div>
+        <Handle type="target" position="left" style = {{top: "35%", left: "70%", borderRadius: 0}} className='linkedListNode'/>
+        <div className='pointerNode'> </div>
+        <Handle type="source" position="right" style = {{top: "35%", borderRadius: 0}} className='linkedListNode'/>
+      </div>
     </div>
   );
 };
@@ -190,6 +190,8 @@ const nodeTypes = {
 var x_test = 50;
 var y_test = 50;
 
+var x_min = 0;
+
 
 // ==== renderer class ====
 export default class MainWindow extends React.Component {
@@ -217,10 +219,8 @@ export default class MainWindow extends React.Component {
     if(element_temp[outer_key]['visited'] === false) {
       // pointer
       if(element_temp[outer_key]['ptrTarget']) {
-        console.log(x_test)
-        console.log(y_test)
         // push for node
-        element_test.push({ id: outer_key,  type: 'pointer', position: {x:x_test + 150, y:y_test}, data: { name: element_temp[outer_key]['name'], text: value}, draggable: true})
+        element_test.push({ id: outer_key,  type: 'pointer', position: {x:x_test, y:y_test}, data: { name: element_temp[outer_key]['name'], text: value}, draggable: true})
 
         // push for edge
         element_test.push({
@@ -232,7 +232,10 @@ export default class MainWindow extends React.Component {
         })
   
         if (be_pointed.includes(outer_key)) {
-          x_test = x_test + 80;
+          x_test = x_test - 80;
+          if (x_test <= x_min) {
+            x_min = x_test;
+          }
         } else {
           x_test = 50;
           y_test = y_test + 50;
@@ -240,7 +243,10 @@ export default class MainWindow extends React.Component {
       } else {
         element_test.push({ id: outer_key,  type: 'normalNode', position: {x:x_test, y:y_test}, data: { name: element_temp[outer_key]['name'], text: value}, draggable: true})
         if (be_pointed.includes(outer_key)) {
-          x_test = x_test + 80;
+          x_test = x_test - 80;
+          if (x_test <= x_min) {
+            x_min = x_test;
+          }
         } else {
           x_test = 50;
           y_test = y_test + 50;
@@ -337,7 +343,13 @@ export default class MainWindow extends React.Component {
       this.getNode(element_temp, element_test, element_id, be_pointed, key, element_temp[key]['value'])
     }
 
+    for (var element of element_test){
+      if(element.position !== undefined && (element.position.x < 0 || be_pointed.includes(element.id))) {
+        element.position.x = element.position.x + (-x_min) + 50;
+      }
+    }
     console.log(element_test)
+    
 
     this.setState({
       element_test: element_test,

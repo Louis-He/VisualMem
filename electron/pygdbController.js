@@ -10,6 +10,10 @@ var l_pygdb_child_process = null;
 var l_pygdb_socket = null;
 var l_attached_controller = false;
 
+var isWin = process.platform === "win32";
+var isMac = process.platform === "darwin";
+var isLinux = process.platform === "linux";
+
 exports.startPygdbSession = function () {
     l_socket = net.createServer(function(socket) {
         l_pygdb_socket = socket;
@@ -43,7 +47,13 @@ exports.startPygdbSession = function () {
 
     // if enabled, the pygdb_interface will be automatically generated here!
     if (create_python_session_embedded) {
-        l_pygdb_child_process = child_process.spawn('python', ['-u', './pygdbmi/pygdb_interface.py'], {
+        pythonExecName = 'python3';
+        if (isWin) {
+            pythonExecName = 'python';
+        }
+
+
+        l_pygdb_child_process = child_process.spawn(pythonExecName, ['-u', './pygdbmi/pygdb_interface.py'], {
             shell: true,
         });
 

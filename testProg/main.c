@@ -1,36 +1,38 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
 
-struct test2 {
-    double a;
-    double b;
+struct node {
+    int val;
+    struct node* next;
 };
 
-struct test {
-    int a;
-    struct test2 t;
-    double b;
-    struct test2 t2;
-};
+typedef struct node Node;
 
-void level1() {
-    int b = 0;
-    return;
-}
 
 int main() {
-    int a, b = 1;
-    a = 2;
-    b = 3;
+    int b = 2;
+    int *c;
+    int **d;
+    int ***e;
 
-    // struct test c = {1, {0.6, -0.2}, 0.5, {0.6, -0.2}};
-    // int d[100];
-    // struct test e;
-    // struct test2 f = {0.0, 0.4};
-    // e.a = 2;
-    // d[0] = 2;
+    e = &d;
+    d = &c;
+    c = &b;
+    
+    Node* head = malloc(sizeof(Node));
+    head->val = 0;
+    head->next = NULL;
 
-    // level1();
-    // printf("Hello World, %d\n", e.a);
+    Node* prev_ptr = head;
+    for (int i = 1; i < 5; i++) {
+        Node* cur_ptr = malloc(sizeof(Node));
+        cur_ptr->val = i;
+        cur_ptr->next = NULL;
+
+        prev_ptr->next = cur_ptr;
+        prev_ptr = cur_ptr;
+    }
 
     return 0;
 }

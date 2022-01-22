@@ -2,8 +2,9 @@
  */
 const path = require('path')
 const fs = require('fs')
-var GDBManager = require('./gdbEntry.js');
+// var GDBManager = require('./gdbEntry.js');
 var windowsManager = require('./windowsManager.js');
+var pygdbController = require('./pygdbController.js')
 
 global.share.ipcMain.handle('electronLog', (event, ...args) => {
   console.log(args)
@@ -56,43 +57,50 @@ global.share.ipcMain.handle('requestSwitchMode', (event, ...args) => {
 })
 
 global.share.ipcMain.handle('requestStartGDB', (event, ...args) => {
-  let ifStartGDB = GDBManager.startGDB();
+  // let ifStartGDB = GDBManager.startGDB();
 
-  if (ifStartGDB) {
-    GDBManager.startRunAndStop();
-  }
+  // if (ifStartGDB) {
+  //   GDBManager.startRunAndStop();
+  // }
   
+  pygdbController.startController();
+
+  return true;
   // return ifStartGDB
-  return Promise.resolve(ifStartGDB);
+  // return Promise.resolve(ifStartGDB);
 })
 
 global.share.ipcMain.handle('requestNextLineGDB', (event, ...args) => {
-  let executionLine = args[0]
+  // let executionLine = args[0]
 
-  GDBManager.nextLineExecute();
+  // GDBManager.nextLineExecute();
+  pygdbController.pygdbNextLine();
 })
 
 global.share.ipcMain.handle('requestContinueGDB', (event, ...args) => {
-  GDBManager.continueExecute();
+  // GDBManager.continueExecute();
+  pygdbController.pygdbContinue();
 })
 
 global.share.ipcMain.handle('requestStopGDB', (event, ...args) => {
-  GDBManager.stopGDB();
+  // GDBManager.stopGDB();
+  pygdbController.pygdbFIN();
 })
 
 global.share.ipcMain.handle('sendMsgToGDB', (event, ...args) => {
   console.log(args[0])
 
   if (args[0] == "getStack") {
-    GDBManager.getStack()
+    // GDBManager.getStack()
   } else if (args[0] == "getSources") {
-    GDBManager.getSourceFiles()
+    // GDBManager.getSourceFiles()
   } else if (args[0] == "getLocals") {
-    GDBManager.getLocals()
+    // GDBManager.getLocals()
+    pygdbController.pygdbGetLocal();
   } else if (args[0] == "getDetailedLocals") {
-    GDBManager.getDetailedLocals()
+    // GDBManager.getDetailedLocals()
   } else {
-    GDBManager.execGdbCommand(args[0]);
+    // GDBManager.execGdbCommand(args[0]);
   }
 })
 

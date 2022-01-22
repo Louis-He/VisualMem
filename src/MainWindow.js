@@ -207,12 +207,12 @@ export default class MainWindow extends React.Component {
   }
   
   render() {
-    let startGDBButton = <div></div>
-    let eyeGDBButton = <div></div>
-    let eyeSlashGDBButton = <div></div>
-    let nextLineGDBButton = <div></div>
-    let continueGDBButton = <div></div>
-    let stopGDBButton = <div></div>
+    let startGDBButton = <span></span>
+    let eyeGDBButton = <span></span>
+    let eyeSlashGDBButton = <span></span>
+    let nextLineGDBButton = <span></span>
+    let continueGDBButton = <span></span>
+    let stopGDBButton = <span></span>
 
     if (!this.state.GDBAttached) {
       startGDBButton = [
@@ -288,7 +288,7 @@ export default class MainWindow extends React.Component {
           <Button
             onClick={() => this.updateProgramVis()}
             data-tip data-for="hideVisGDBTip"
-            className="btn btn-second btn-sm"
+            className="btn btn-secondary btn-sm"
             style={{ fontSize: "18px", lineHeight: "1", padding: "5px", marginLeft: "10px" }}
             key="hideVisGDBButton">
               <EyeSlash style={{ verticalAlign: 'baseline' }} />

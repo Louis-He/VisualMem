@@ -189,9 +189,8 @@ const nodeTypes = {
 
 var x_test = 50;
 var y_test = 50;
-
 var x_min = 0;
-
+var groupElement = [];
 
 // ==== renderer class ====
 export default class MainWindow extends React.Component {
@@ -208,17 +207,52 @@ export default class MainWindow extends React.Component {
     }
   }
 
+  // TODO: review
   getNode(element_temp, element_test, element_id, be_pointed, outer_key, value) {
-    if(element_temp[outer_key]['ptrTarget'] && element_id.includes(value)) {
-      this.getNode(element_temp, element_test, element_id, be_pointed, value, element_temp[value]['value'])
-    } else if (element_temp[outer_key]['ptrTarget'] && !element_id.includes(value)) {
+    // if the element has been visited before -> return
+    if (element_temp[outer_key]['visited']) {
+      return
+    }
+
+    if((element_temp[outer_key]['ptrTarget'] && element_id.includes(value))) { // if ptrTarget field presented -> pointer, get the pointed element first (recursion)
+      if(element_temp[value]['isLL']) { //if the next node is a linked list
+        let nextName = element_temp[value]['linkedMember'];
+        let nextNode = element_temp[value]['value'][nextName]['value'];
+        if (nextNode !== '0x0') {
+          this.getNode(element_temp, element_test, element_id, be_pointed, value, nextNode)
+        }
+      } else { // if the next node is not a linked list
+        this.getNode(element_temp, element_test, element_id, be_pointed, value, element_temp[value]['value'])
+      }
+    } else if (element_temp[outer_key]['isLL']) { // the node is in linked list
+      let nextName = element_temp[outer_key]['linkedMember'];
+      let nextNode = element_temp[outer_key]['value'][nextName]['value'];
+      if (nextNode !== '0x0') {
+        this.getNode(element_temp, element_test, element_id, be_pointed, value, nextNode)
+      }
+    } else if (element_temp[outer_key]['ptrTarget'] && !element_id.includes(value)) { // if pointer but the element it points does not exist
       console.log("ERROR")
       return
     }
-  
-    if(element_temp[outer_key]['visited'] === false) {
-      // pointer
-      if(element_temp[outer_key]['ptrTarget']) {
+
+    // when the function gets returned, enters here
+    if(element_temp[outer_key]['visited'] === false) { // only push into array if the element has not been visited
+      console.log(outer_key)
+      console.log(x_test)
+      console.log(y_test)
+      if(element_temp[outer_key]['ptrTarget']) { // for pointers
+
+        // 如果没有指别人 就加y， 指了的话就get被指的x y 
+        if (be_pointed.includes(outer_key)) {
+          x_test = x_test - 80;
+          if (x_test <= x_min) {
+            x_min = x_test;
+          }
+        } else {
+          x_test = 50;
+          y_test = y_test + 50;
+        }
+
         // push for node
         element_test.push({ id: outer_key,  type: 'pointer', position: {x:x_test, y:y_test}, data: { name: element_temp[outer_key]['name'], text: value}, draggable: true})
 
@@ -231,8 +265,9 @@ export default class MainWindow extends React.Component {
           style: {strokeWidth: 4},
         })
   
+      } else if (element_temp[outer_key]['isLL']) { // for linked list
         if (be_pointed.includes(outer_key)) {
-          x_test = x_test - 80;
+          x_test = x_test - 140;
           if (x_test <= x_min) {
             x_min = x_test;
           }
@@ -240,23 +275,44 @@ export default class MainWindow extends React.Component {
           x_test = 50;
           y_test = y_test + 50;
         }
-      } else {
-        element_test.push({ id: outer_key,  type: 'normalNode', position: {x:x_test, y:y_test}, data: { name: element_temp[outer_key]['name'], text: value}, draggable: true})
-        if (be_pointed.includes(outer_key)) {
-          x_test = x_test - 80;
-          if (x_test <= x_min) {
-            x_min = x_test;
-          }
-        } else {
-          x_test = 50;
-          y_test = y_test + 50;
-        }
+
+        //var isHead = !element_temp[outer_key]['isRefered'];
+        var nextName = element_temp[outer_key]['linkedMember'];
+        var nextNode = element_temp[outer_key]['value'][nextName]['value'];
+        var nodeValue = element_temp[outer_key]['value']['val']['value'];
         
+        // push for node
+        element_test.push({ id: outer_key,  type: 'linkedList', position: {x:x_test, y:y_test}, data: { name: element_temp[outer_key]['name'], text: nodeValue}, draggable: true})
+        
+        // push for edge
+        if (nextNode !== '0x0') {
+          element_test.push({
+            id: outer_key + element_temp[outer_key]['value'],
+            source: outer_key,
+            target: nextNode,
+            arrowHeadType: 'arrow', 
+            style: {strokeWidth: 4},
+          })
+        }
+
+      } else { // for normal nodes
+        if (be_pointed.includes(outer_key)) {
+          x_test = x_test - 80;
+          if (x_test <= x_min) {
+            x_min = x_test;
+          }
+        } else {
+          x_test = 50;
+          y_test = y_test + 50;
+        }
+
+        element_test.push({ id: outer_key,  type: 'normalNode', position: {x:x_test, y:y_test}, data: { name: element_temp[outer_key]['name'], text: value}, draggable: true})
       }
   
     }
   
-    element_temp[outer_key]['visited'] = true;
+    element_temp[outer_key]['visited'] = true; // mark the element as visited
+    groupElement.push(outer_key)
     return;
   }
 
@@ -308,6 +364,45 @@ export default class MainWindow extends React.Component {
                     "ptrTarget": true,
                     "type": "Node *",
                     "value": "0x12a46987160"},
+                "0x12a46984f80": {"isLL": true,
+                  "isRefered": false,
+                  "linkedMember": "next",
+                  "name": "(*((Node*)(0x12a46984f80)))",
+                  "type": "Node",
+                  "value": {"next": {"type": "struct node *",
+                                      "value": "0x12a46986ea0"},
+                            "val": {"type": "int", "value": "0"}}},
+                "0x12a46986ea0": {"isLL": true,
+                                  "isRefered": true,
+                                  "linkedMember": "next",
+                                  "name": "(*((struct node*)(0x12a46986ea0)))",
+                                  "type": "struct node",
+                                  "value": {"next": {"type": "struct node *",
+                                                    "value": "0x12a469870e0"},
+                                            "val": {"type": "int", "value": "1"}}},
+                "0x12a469870e0": {"isLL": true,
+                                  "isRefered": true,
+                                  "linkedMember": "next",
+                                  "name": "(*((struct node*)(0x12a469870e0)))",
+                                  "type": "struct node",
+                                  "value": {"next": {"type": "struct node *",
+                                                    "value": "0x12a46987120"},
+                                            "val": {"type": "int", "value": "2"}}},
+                "0x12a46987120": {"isLL": true,
+                                  "isRefered": true,
+                                  "linkedMember": "next",
+                                  "name": "(*((struct node*)(0x12a46987120)))",
+                                  "type": "struct node",
+                                  "value": {"next": {"type": "struct node *",
+                                                    "value": "0x12a46987160"},
+                                            "val": {"type": "int", "value": "3"}}},
+                "0x12a46987160": {"isLL": true,
+                "isRefered": true,
+                "linkedMember": "next",
+                "name": "(*((Node*)(0x12a46987160)))",
+                "type": "Node",
+                "value": {"next": {"type": "struct node *", "value": "0x0"},
+                          "val": {"type": "int", "value": "4"}}}
 }
 
     var element_test = []
@@ -330,6 +425,9 @@ export default class MainWindow extends React.Component {
       if (map_temp['ptrTarget']) {
         be_pointed.push(map_temp["value"])
       }
+      if (map_temp['isLL']) {
+        be_pointed.push(map_temp['value'][map_temp['linkedMember']]['value'])
+      }
       map_temp['visited'] = false
 
       element_temp[i] = map_temp
@@ -339,15 +437,32 @@ export default class MainWindow extends React.Component {
     console.log(element_temp)
     console.log(be_pointed)
 
+    // iterate the json for each of the element
     for (var key in element_temp) {
-      this.getNode(element_temp, element_test, element_id, be_pointed, key, element_temp[key]['value'])
-    }
+      if(element_temp[key]['isLL']) { //if the element is a linked list
+        var nextName = element_temp[key]['linkedMember'];
+        var nextNode = element_temp[key]['value'][nextName]['value'];
 
-    for (var element of element_test){
-      if(element.position !== undefined && (element.position.x < 0 || be_pointed.includes(element.id))) {
-        element.position.x = element.position.x + (-x_min) + 50;
+        if (nextNode !== '0x0') {
+          this.getNode(element_temp, element_test, element_id, be_pointed, key, nextNode)
+        }
+
+      } else { // if the element is not a linked list
+        this.getNode(element_temp, element_test, element_id, be_pointed, key, element_temp[key]['value'])
       }
+
+      // adjust positions
+      for (var element of element_test) {
+        if(groupElement.includes(element.id)) {
+          if(element.position !== undefined && (element.position.x < 0 || be_pointed.includes(element.id))) {
+            element.position.x = element.position.x + (-x_min) + 50;
+          }
+        }
+      }
+      groupElement = [];
+      x_min = 0;
     }
+    
     console.log(element_test)
     
 
@@ -633,8 +748,8 @@ export default class MainWindow extends React.Component {
                           <p>Current Executable Path: {this.props.executablePath}</p>
                         </div>
 
-                        <div style={{ height: 500, width: 800 }}>
-                          <ReactFlow elements={this.state.element_test} nodeTypes={nodeTypes} minZoom={1} maxZoom={1} translateExtent={[[0, 0], [800, 500]]} />
+                        <div style={{ height: 500, width: 1000 }}>
+                          <ReactFlow elements={this.state.element_test} nodeTypes={nodeTypes} minZoom={1} maxZoom={1} translateExtent={[[0, 0], [1000, 500]]} />
                         </div>
 
                         <div>

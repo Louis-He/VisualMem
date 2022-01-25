@@ -244,17 +244,30 @@ export default class MainWindow extends React.Component {
         let y_temp;
 
         for (var element of element_test) {
-          if(element.id === element_temp[outer_key]['value']) {
-            console.log(element_temp[outer_key]['value'])
-            console.log(element.position.x)
-            if(element.position !== undefined) {
-              x_temp = element.position.x - 80;
-              y_temp = element.position.y;
-              if (x_temp <= x_min) {
-                x_min = x_temp;
+          if(element_temp[value]['isLL']) {
+            if(element.id === value) {
+              if(element.position !== undefined) {
+                x_temp = element.position.x - 140;
+                y_temp = element.position.y;
+                if (x_temp <= x_min) {
+                  x_min = x_temp;
+                }
               }
+              break;
             }
-            break;
+          } else {
+            if(element.id === element_temp[outer_key]['value']) {
+              // console.log(element_temp[outer_key]['value'])
+              // console.log(element.position.x)
+              if(element.position !== undefined) {
+                x_temp = element.position.x - 80;
+                y_temp = element.position.y;
+                if (x_temp <= x_min) {
+                  x_min = x_temp;
+                }
+              }
+              break;
+            }
           }
         }
 
@@ -481,6 +494,13 @@ export default class MainWindow extends React.Component {
       groupElement = [];
       x_min = 0;
     }
+    // adjust positions
+    // for (var element of element_test) {
+    //   if(element.position !== undefined && (element.position.x < 0 || be_pointed.includes(element.id))) {
+    //     element.position.x = element.position.x + (-x_min) + 50;
+    //   }
+    // }
+    // x_min = 0;
     
     console.log(element_test)
     console.log(element_temp)

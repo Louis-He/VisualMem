@@ -187,9 +187,10 @@ const nodeTypes = {
   treeHead: treeHeadComponent,
 };
 
-var x_test = 50;
-var y_test = 50;
+var x_test = 0;
+var y_test = 0;
 var x_min = 0;
+var element_index = 0;
 var groupElement = [];
 
 // ==== renderer class ====
@@ -208,7 +209,7 @@ export default class MainWindow extends React.Component {
   }
 
   // TODO: review
-  getNode(element_temp, element_test, element_id, be_pointed, outer_key, value) {
+  getNode(element_temp, element_test, element_id, outer_key, value) {
     // if the element has been visited before -> return
     if (element_temp[outer_key]['visited']) {
       return
@@ -219,16 +220,16 @@ export default class MainWindow extends React.Component {
         let nextName = element_temp[value]['linkedMember'];
         let nextNode = element_temp[value]['value'][nextName]['value'];
         if (nextNode !== '0x0') {
-          this.getNode(element_temp, element_test, element_id, be_pointed, value, nextNode)
+          this.getNode(element_temp, element_test, element_id, value, nextNode)
         }
       } else { // if the next node is not a linked list
-        this.getNode(element_temp, element_test, element_id, be_pointed, value, element_temp[value]['value'])
+        this.getNode(element_temp, element_test, element_id, value, element_temp[value]['value'])
       }
     } else if (element_temp[outer_key]['isLL']) { // the node is in linked list
       let nextName = element_temp[outer_key]['linkedMember'];
       let nextNode = element_temp[outer_key]['value'][nextName]['value'];
       if (nextNode !== '0x0') {
-        this.getNode(element_temp, element_test, element_id, be_pointed, value, nextNode)
+        this.getNode(element_temp, element_test, element_id, value, nextNode)
       }
     } else if (element_temp[outer_key]['ptrTarget'] && !element_id.includes(value)) { // if pointer but the element it points does not exist
       console.log("ERROR")
@@ -237,24 +238,30 @@ export default class MainWindow extends React.Component {
 
     // when the function gets returned, enters here
     if(element_temp[outer_key]['visited'] === false) { // only push into array if the element has not been visited
-      console.log(outer_key)
-      console.log(x_test)
-      console.log(y_test)
-      if(element_temp[outer_key]['ptrTarget']) { // for pointers
 
-        // 如果没有指别人 就加y， 指了的话就get被指的x y 
-        if (be_pointed.includes(outer_key)) {
-          x_test = x_test - 80;
-          if (x_test <= x_min) {
-            x_min = x_test;
+      if(element_temp[outer_key]['ptrTarget']) { // for pointers
+        let x_temp;
+        let y_temp;
+
+        for (var element of element_test) {
+          if(element.id === element_temp[outer_key]['value']) {
+            console.log(element_temp[outer_key]['value'])
+            console.log(element.position.x)
+            if(element.position !== undefined) {
+              x_temp = element.position.x - 80;
+              y_temp = element.position.y;
+              if (x_temp <= x_min) {
+                x_min = x_temp;
+              }
+            }
+            break;
           }
-        } else {
-          x_test = 50;
-          y_test = y_test + 50;
         }
 
         // push for node
-        element_test.push({ id: outer_key,  type: 'pointer', position: {x:x_test, y:y_test}, data: { name: element_temp[outer_key]['name'], text: value}, draggable: true})
+        element_test.push({ id: outer_key,  type: 'pointer', position: {x:x_temp, y:y_temp}, data: { name: element_temp[outer_key]['name'], text: value}, draggable: true})
+        element_temp[outer_key]['index'] = element_index;
+        element_index = element_index + 1;
 
         // push for edge
         element_test.push({
@@ -264,25 +271,41 @@ export default class MainWindow extends React.Component {
           arrowHeadType: 'arrow', 
           style: {strokeWidth: 4},
         })
+        element_index = element_index + 1;
   
       } else if (element_temp[outer_key]['isLL']) { // for linked list
-        if (be_pointed.includes(outer_key)) {
-          x_test = x_test - 140;
-          if (x_test <= x_min) {
-            x_min = x_test;
+
+        let nextName = element_temp[outer_key]['linkedMember'];
+        let nextNode = element_temp[outer_key]['value'][nextName]['value'];
+        let nodeValue = element_temp[outer_key]['value']['val']['value'];
+
+        let x_temp;
+        let y_temp;
+
+        if (nextNode !== '0x0') {
+          for (let element of element_test) {
+            if(element.id === nextNode) {
+              if(element.position !== undefined) {
+                x_temp = element.position.x - 140;
+                y_temp = element.position.y;
+                if (x_temp <= x_min) {
+                  x_min = x_temp;
+                }
+              }
+              break;
+            }
           }
         } else {
           x_test = 50;
           y_test = y_test + 50;
+          x_temp = x_test;
+          y_temp = y_test;
         }
-
-        //var isHead = !element_temp[outer_key]['isRefered'];
-        var nextName = element_temp[outer_key]['linkedMember'];
-        var nextNode = element_temp[outer_key]['value'][nextName]['value'];
-        var nodeValue = element_temp[outer_key]['value']['val']['value'];
         
         // push for node
-        element_test.push({ id: outer_key,  type: 'linkedList', position: {x:x_test, y:y_test}, data: { name: element_temp[outer_key]['name'], text: nodeValue}, draggable: true})
+        element_test.push({ id: outer_key,  type: 'linkedList', position: {x:x_temp, y:y_temp}, data: { name: element_temp[outer_key]['name'], text: nodeValue}, draggable: true})
+        element_temp[outer_key]['index'] = element_index;
+        element_index = element_index + 1;
         
         // push for edge
         if (nextNode !== '0x0') {
@@ -293,20 +316,16 @@ export default class MainWindow extends React.Component {
             arrowHeadType: 'arrow', 
             style: {strokeWidth: 4},
           })
+          element_index = element_index + 1;
         }
 
       } else { // for normal nodes
-        if (be_pointed.includes(outer_key)) {
-          x_test = x_test - 80;
-          if (x_test <= x_min) {
-            x_min = x_test;
-          }
-        } else {
-          x_test = 50;
-          y_test = y_test + 50;
-        }
+        x_test = 50;
+        y_test = y_test + 50;
 
         element_test.push({ id: outer_key,  type: 'normalNode', position: {x:x_test, y:y_test}, data: { name: element_temp[outer_key]['name'], text: value}, draggable: true})
+        element_temp[outer_key]['index'] = element_index;
+        element_index = element_index + 1;
       }
   
     }
@@ -444,11 +463,11 @@ export default class MainWindow extends React.Component {
         var nextNode = element_temp[key]['value'][nextName]['value'];
 
         if (nextNode !== '0x0') {
-          this.getNode(element_temp, element_test, element_id, be_pointed, key, nextNode)
+          this.getNode(element_temp, element_test, element_id, key, nextNode)
         }
 
       } else { // if the element is not a linked list
-        this.getNode(element_temp, element_test, element_id, be_pointed, key, element_temp[key]['value'])
+        this.getNode(element_temp, element_test, element_id, key, element_temp[key]['value'])
       }
 
       // adjust positions
@@ -464,6 +483,7 @@ export default class MainWindow extends React.Component {
     }
     
     console.log(element_test)
+    console.log(element_temp)
     
 
     this.setState({

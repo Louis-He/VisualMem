@@ -4,15 +4,23 @@ var child_process = require('child_process');
 const net  = require('net');
 const port = 4000;
 
-var create_python_session_embedded = true;
+var create_python_session_embedded = false;
 var l_pygdb_child_process = null;
 
 var l_pygdb_socket = null;
 var l_attached_controller = false;
 
+var l_buf_remining_len = 0;
+var l_tmp_recv_buf = "";
+var onMessageReceiveCallbackFunc = null;
+
 var isWin = process.platform === "win32";
 var isMac = process.platform === "darwin";
 var isLinux = process.platform === "linux";
+
+function getVariableInfoCallback (message) {
+    // call graph initializer
+}
 
 exports.startPygdbSession = function () {
     l_socket = net.createServer(function(socket) {
@@ -30,6 +38,37 @@ exports.startPygdbSession = function () {
                 socket.write(`INI;${execFile.length};${execFile}`);
             } else {
                 console.log('[Info] Received: ' + data);
+                let receivedDataLen = data.length
+
+                if (l_buf_remining_len !== 0) {
+                    // continue appending messages
+                    l_tmp_recv_buf += data
+                    l_buf_remining_len -= receivedDataLen
+                } else {
+                    // new message, decode whether this is an info message
+                    if (receivedDataLen < 12) {
+                        return
+                    }
+
+                    let messageType = data.substring(0, 4)
+                    let messageRealLength = parseInt(data.substring(4, 12))
+                    let realMessage = data.substring(12)
+
+                    if (messageType === "INFO") {
+                        l_buf_remining_len = parseInt(messageRealLength)
+                        l_tmp_recv_buf += realMessage
+                        l_buf_remining_len -= realMessage.length
+                        onMessageReceiveCallbackFunc = getVariableInfoCallback
+                    }
+                }
+
+                if (l_buf_remining_len === 0 && onMessageReceiveCallbackFunc != null) {
+                    onMessageReceiveCallbackFunc(l_tmp_recv_buf);
+
+                    l_buf_remining_len = 0
+                    l_tmp_recv_buf = ""
+                    onMessageReceiveCallbackFunc = null
+                }
             }
         });
         

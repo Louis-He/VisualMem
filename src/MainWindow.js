@@ -358,7 +358,9 @@ export default class MainWindow extends React.Component {
     });
 
     ipcRenderer.on('getVariablesForGraphInitializer', function (evt, message) {
-      let elementJson = JSON.parse(message);
+      console.log(message.message)
+      let elementJson = JSON.parse(message.message);
+      console.log("VICKY2", elementJson)
 
       var element_test = [];
       var element_temp = Object.create(null);
@@ -427,6 +429,8 @@ export default class MainWindow extends React.Component {
       
       console.log(element_test)
       console.log(element_temp)
+      x_test = 0;
+      y_test = 0;
       
 
       that.setState({

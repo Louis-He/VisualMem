@@ -305,7 +305,8 @@ class pygdbController:
     
     def startController(self,) -> bool:
         self.controller = GdbController(
-            command=["/Users/qihan6/Documents/gdb_darwin_hang_fix/build/gdb/gdb", "--nx", "--quiet", "--interpreter=mi3"], 
+            # /Users/qihan6/Documents/gdb_darwin_hang_fix/build/gdb/gdb
+            command=["gdb", "--nx", "--quiet", "--interpreter=mi3"], 
             time_to_check_for_additional_output_sec=0.05
         )
         unbufferedPrint(self.execFilePath)

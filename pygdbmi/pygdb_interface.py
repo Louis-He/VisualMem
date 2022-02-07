@@ -304,7 +304,10 @@ class pygdbController:
         self.execFilePath = execFilePath
     
     def startController(self,) -> bool:
-        self.controller = GdbController(time_to_check_for_additional_output_sec=0.05)
+        self.controller = GdbController(
+            command=["gdb", "--nx", "--quiet", "--interpreter=mi3"], 
+            time_to_check_for_additional_output_sec=0.05
+        )
         unbufferedPrint(self.execFilePath)
         isSuccessful = self.sendCommandToGDB('-file-exec-and-symbols "' + self.execFilePath + '"', True)
         self.sendCommandToGDB('-break-insert main', True)

@@ -5,6 +5,7 @@ const fs = require('fs')
 // var GDBManager = require('./gdbEntry.js');
 var windowsManager = require('./windowsManager.js');
 var pygdbController = require('./pygdbController.js')
+var compilerController = require('./compilerController.js')
 
 global.share.ipcMain.handle('electronLog', (event, ...args) => {
   console.log(args)
@@ -141,6 +142,11 @@ global.share.ipcMain.handle('requestSelectExecutable', async (event, ...args) =>
       mainWindow.webContents.send('distributeSelectedExecutable', { 'executablePath': result.filePaths[0] });
     }
   }
+})
+
+global.share.ipcMain.handle('requestCompilation', async (event, ...args) => {
+  windowsManager.setExecFile(result.filePaths[0]);
+  compilerController.compile();
 })
 
 global.share.ipcMain.handle('showFile', async (event, ...args) => {

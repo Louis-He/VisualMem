@@ -9,6 +9,7 @@ var l_configWindow = null;
 var l_debug = true;
 var l_project_folder = "";
 var l_exec_file = "";
+var l_source_file = "";
 
 exports.isDebugMode = function() {
   return l_debug;
@@ -53,6 +54,7 @@ exports.initialize = function () {
   let setting = JSON.parse(rawdata);
   
   l_exec_file = setting.execFile;
+  l_source_file = setting.sourceFile;
   l_project_folder = setting.project_path;
 }
 
@@ -98,6 +100,31 @@ exports.setExecFile = function (execFile) {
       console.log(`Error writing file: ${err}`);
     } else {
       console.log(`executablePath: ${execFile}`);
+    }
+  });
+}
+
+exports.getSourceFile = function () {
+  return l_source_file
+}
+
+exports.setSourceFile = function (sourceFile) {
+  l_source_file = sourceFile;
+
+  const sourceFilePath = `${path.join(__dirname, '../config/gdb.json')}`
+  let rawdata = fs.readFileSync(sourceFilePath);
+  let setting = JSON.parse(rawdata);
+  setting.sourceFile = sourceFile;
+
+  // convert JSON object to a string
+  const data = JSON.stringify(setting);
+
+  // write file to disk
+  fs.writeFile(sourceFilePath, data, 'utf8', (err) => {
+    if (err) {
+      console.log(`Error writing file: ${err}`);
+    } else {
+      console.log(`sourceFilePath: ${sourceFile}`);
     }
   });
 }

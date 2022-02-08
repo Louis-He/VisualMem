@@ -357,6 +357,87 @@ export default class MainWindow extends React.Component {
       })
     });
 
+    ipcRenderer.on('getVariablesForGraphInitializer', function (evt, message) {
+      console.log(message.message)
+      let elementJson = JSON.parse(message.message);
+      console.log("VICKY2", elementJson)
+
+      var element_test = [];
+      var element_temp = Object.create(null);
+      var element_id = [];
+      var be_pointed = [];
+
+      // convert the json into array && added a field
+      for (var i in elementJson) {
+        // i -> outer key
+        // elementJson[i] -> outer value
+        let value = elementJson[i];
+        var map_temp = Object.create(null);
+
+        for (var j in value) {
+          //j -> innner key
+          //elementJson[i][j] -> innner value
+          map_temp[j] = value[j]
+        }
+        if (map_temp['ptrTarget']) {
+          be_pointed.push(map_temp["value"])
+        }
+        if (map_temp['isLL']) {
+          be_pointed.push(map_temp['value'][map_temp['linkedMember']]['value'])
+        }
+        map_temp['visited'] = false
+
+        element_temp[i] = map_temp
+        element_id.push(i)
+      }
+
+      console.log(element_temp)
+      console.log(be_pointed)
+
+      // iterate the json for each of the element
+      for (var key in element_temp) {
+        if(element_temp[key]['isLL']) { //if the element is a linked list
+          var nextName = element_temp[key]['linkedMember'];
+          var nextNode = element_temp[key]['value'][nextName]['value'];
+
+          if (nextNode !== '0x0') {
+            that.getNode(element_temp, element_test, element_id, key, nextNode)
+          }
+
+        } else { // if the element is not a linked list
+          that.getNode(element_temp, element_test, element_id, key, element_temp[key]['value'])
+        }
+
+        // adjust positions
+        for (var element of element_test) {
+          if(groupElement.includes(element.id)) {
+            if(element.position !== undefined && (element.position.x < 0 || be_pointed.includes(element.id))) {
+              element.position.x = element.position.x + (-x_min) + 50;
+            }
+          }
+        }
+        groupElement = [];
+        x_min = 0;
+      }
+      // adjust positions
+      // for (var element of element_test) {
+      //   if(element.position !== undefined && (element.position.x < 0 || be_pointed.includes(element.id))) {
+      //     element.position.x = element.position.x + (-x_min) + 50;
+      //   }
+      // }
+      // x_min = 0;
+      
+      console.log(element_test)
+      console.log(element_temp)
+      x_test = 0;
+      y_test = 0;
+      
+
+      that.setState({
+        element_test: element_test,
+      })
+    });
+
     ipcRenderer.on('distributeUserProgramExited', function (evt) {
       if (that.state.GDBAttached) {
         that.setState( {
@@ -374,141 +455,6 @@ export default class MainWindow extends React.Component {
       }
     });
 
-    let json = {"0x108c3ff8d0": {"name": "d",
-                    "ptrTarget": true,
-                    "type": "int **",
-                    "value": "0x108c3ff8d8"},
-                "0x108c3ff8d8": {"name": "c",
-                    "ptrTarget": true,
-                    "type": "int *",
-                    "value": "0x108c3ff8e4"},
-                "0x108c3ff8e4": {"name": "b", "type": "int", "value": "3"},
-                "0x108c3ff8f0": {"name": "head",
-                    "ptrTarget": true,
-                    "type": "Node *",
-                    "value": "0x12a46984f80"},
-                "0x108c3ff8f8": {"name": "e",
-                    "ptrTarget": true,
-                    "type": "int ***",
-                    "value": "0x108c3ff8d0"},
-                "0x108c3ff900": {"name": "a", "type": "int", "value": "2"},
-                "0x108c3ff908": {"name": "prev_ptr",
-                    "ptrTarget": true,
-                    "type": "Node *",
-                    "value": "0x12a46987160"},
-                "0x12a46984f80": {"isLL": true,
-                  "isRefered": false,
-                  "linkedMember": "next",
-                  "name": "(*((Node*)(0x12a46984f80)))",
-                  "type": "Node",
-                  "value": {"next": {"type": "struct node *",
-                                      "value": "0x12a46986ea0"},
-                            "val": {"type": "int", "value": "0"}}},
-                "0x12a46986ea0": {"isLL": true,
-                                  "isRefered": true,
-                                  "linkedMember": "next",
-                                  "name": "(*((struct node*)(0x12a46986ea0)))",
-                                  "type": "struct node",
-                                  "value": {"next": {"type": "struct node *",
-                                                    "value": "0x12a469870e0"},
-                                            "val": {"type": "int", "value": "1"}}},
-                "0x12a469870e0": {"isLL": true,
-                                  "isRefered": true,
-                                  "linkedMember": "next",
-                                  "name": "(*((struct node*)(0x12a469870e0)))",
-                                  "type": "struct node",
-                                  "value": {"next": {"type": "struct node *",
-                                                    "value": "0x12a46987120"},
-                                            "val": {"type": "int", "value": "2"}}},
-                "0x12a46987120": {"isLL": true,
-                                  "isRefered": true,
-                                  "linkedMember": "next",
-                                  "name": "(*((struct node*)(0x12a46987120)))",
-                                  "type": "struct node",
-                                  "value": {"next": {"type": "struct node *",
-                                                    "value": "0x12a46987160"},
-                                            "val": {"type": "int", "value": "3"}}},
-                "0x12a46987160": {"isLL": true,
-                "isRefered": true,
-                "linkedMember": "next",
-                "name": "(*((Node*)(0x12a46987160)))",
-                "type": "Node",
-                "value": {"next": {"type": "struct node *", "value": "0x0"},
-                          "val": {"type": "int", "value": "4"}}}
-}
-
-    var element_test = []
-    var element_temp = Object.create(null);
-    var element_id = [];
-    var be_pointed = [];
-
-    // convert the json into array && added a field
-    for (var i in json) {
-      // i -> outer key
-      // json[i] -> outer value
-      let value = json[i];
-      var map_temp = Object.create(null);
-
-      for (var j in value) {
-        //j -> innner key
-        //json[i][j] -> innner value
-        map_temp[j] = value[j]
-      }
-      if (map_temp['ptrTarget']) {
-        be_pointed.push(map_temp["value"])
-      }
-      if (map_temp['isLL']) {
-        be_pointed.push(map_temp['value'][map_temp['linkedMember']]['value'])
-      }
-      map_temp['visited'] = false
-
-      element_temp[i] = map_temp
-      element_id.push(i)
-    }
-
-    console.log(element_temp)
-    console.log(be_pointed)
-
-    // iterate the json for each of the element
-    for (var key in element_temp) {
-      if(element_temp[key]['isLL']) { //if the element is a linked list
-        var nextName = element_temp[key]['linkedMember'];
-        var nextNode = element_temp[key]['value'][nextName]['value'];
-
-        if (nextNode !== '0x0') {
-          this.getNode(element_temp, element_test, element_id, key, nextNode)
-        }
-
-      } else { // if the element is not a linked list
-        this.getNode(element_temp, element_test, element_id, key, element_temp[key]['value'])
-      }
-
-      // adjust positions
-      for (var element of element_test) {
-        if(groupElement.includes(element.id)) {
-          if(element.position !== undefined && (element.position.x < 0 || be_pointed.includes(element.id))) {
-            element.position.x = element.position.x + (-x_min) + 50;
-          }
-        }
-      }
-      groupElement = [];
-      x_min = 0;
-    }
-    // adjust positions
-    // for (var element of element_test) {
-    //   if(element.position !== undefined && (element.position.x < 0 || be_pointed.includes(element.id))) {
-    //     element.position.x = element.position.x + (-x_min) + 50;
-    //   }
-    // }
-    // x_min = 0;
-    
-    console.log(element_test)
-    console.log(element_temp)
-    
-
-    this.setState({
-      element_test: element_test,
-    })
   }
 
   async renderRequestStartGDB() {

@@ -5,6 +5,8 @@ from pygdbmi.gdbcontroller import GdbController
 from pprint import pprint
 import sys
 
+import json
+
 HOST = '127.0.0.1'  # The server's hostname or IP address
 PORT = 4000        # The port used by the server
 BUFSIZE = 1024
@@ -302,7 +304,11 @@ class pygdbController:
         self.execFilePath = execFilePath
     
     def startController(self,) -> bool:
-        self.controller = GdbController(time_to_check_for_additional_output_sec=0.05)
+        self.controller = GdbController(
+            # /Users/qihan6/Documents/gdb_darwin_hang_fix/build/gdb/gdb
+            command=["gdb", "--nx", "--quiet", "--interpreter=mi3"], 
+            time_to_check_for_additional_output_sec=0.05
+        )
         unbufferedPrint(self.execFilePath)
         isSuccessful = self.sendCommandToGDB('-file-exec-and-symbols "' + self.execFilePath + '"', True)
         self.sendCommandToGDB('-break-insert main', True)
@@ -314,12 +320,14 @@ class pygdbController:
         
         return True
 
-    def runNextLine(self) -> bool:
+    def runNextLine(self, isGetVariables=False) -> bool:
         isSuccessful = self.sendCommandToGDB('-exec-next', True)
+        self.sendBackVarInfo()
         return isSuccessful
 
-    def runContinue(self) -> bool:
+    def runContinue(self, isGetVariables=False) -> bool:
         isSuccessful = self.sendCommandToGDB('-exec-continue', True)
+        self.sendBackVarInfo()
         return isSuccessful
 
     def stopgdb(self):
@@ -331,6 +339,13 @@ class pygdbController:
         response = response[0]
 
         self.varSnapshot.createVarsnapshot(self.controller, response)
+
+    def sendBackVarInfo(self):
+        self.getVariables()
+        varInfoJsonStr = json.dumps(self.varSnapshot.varDict)
+
+        parsedStr = "INFO" + '{:8d}'.format(len(varInfoJsonStr)) + varInfoJsonStr
+        self.electron_socket.send(parsedStr.encode())
 
 
 def processIncomingMessage(pygdb_controller, msg):

@@ -303,7 +303,9 @@ class pygdbController:
 
         self.execFilePath = execFilePath
     
-    def startController(self,) -> bool:
+    def startController(self, execFilePath) -> bool:
+        self.initializeController(execFilePath)
+
         self.controller = GdbController(
             # /Users/qihan6/Documents/gdb_darwin_hang_fix/build/gdb/gdb
             command=["gdb", "--nx", "--quiet", "--interpreter=mi3"], 
@@ -353,9 +355,9 @@ def processIncomingMessage(pygdb_controller, msg):
     if msgArr[0] == 'SYN':
         pygdb_controller.electron_socket.send("SYN".encode())
     elif msgArr[0] == 'INI':
-        pygdb_controller.initializeController(msgArr[2])
+        pass
     elif msgArr[0] == 'START':
-        pygdb_controller.startController()
+        pygdb_controller.startController(msgArr[2])
     elif msgArr[0] == 'GETLOCAL':
         pygdb_controller.getVariables()
     elif msgArr[0] == 'CMD':

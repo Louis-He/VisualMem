@@ -117,7 +117,8 @@ exports.startPygdbSession = function () {
 }
 
 exports.startController = function () {
-    l_pygdb_socket.write("START;0;");
+    var execFile = windowsManager.getExecFile()
+    l_pygdb_socket.write(`START;${execFile.length};${execFile}`);
     l_attached_controller = true;
 
     return true;

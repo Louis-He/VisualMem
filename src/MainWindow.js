@@ -204,7 +204,9 @@ export default class MainWindow extends React.Component {
 
       GDBCommand: "> ",
       fileData: "",
-      elements: []
+      elements: [],
+      sourceFile: "",
+      lineNumber: ""
     }
   }
 
@@ -358,9 +360,15 @@ export default class MainWindow extends React.Component {
     });
 
     ipcRenderer.on('getVariablesForGraphInitializer', function (evt, message) {
-      console.log(message.message)
-      let elementJson = JSON.parse(message.message);
-      console.log("VICKY2", elementJson)
+      const parsedJson = JSON.parse(message.message)
+      let elementJson = parsedJson['locals'];
+
+      that.setState({
+        sourceFile: parsedJson['sourceFile'],
+        lineNumber: parsedJson['lineNumber']
+      })
+      console.log(parsedJson['lineNumber'])
+      console.log(parsedJson['sourceFile'])
 
       var element_test = [];
       var element_temp = Object.create(null);
@@ -712,6 +720,14 @@ export default class MainWindow extends React.Component {
 
                         <div>
                           <p>Current Selected Folder: {this.props.projectFolder}</p>
+                        </div>
+
+                        <div>
+                          <p>Current source file: {this.state.sourceFile}</p>
+                        </div>
+
+                        <div>
+                          <p>Current line number: {this.state.lineNumber}</p>
                         </div>
 
                         <div>

@@ -19,10 +19,10 @@ var isMac = process.platform === "darwin";
 var isLinux = process.platform === "linux";
 
 function getVariableInfoCallback (message) {
-    // call graph initializer
     const mainWindow = windowsManager.getMainWindows()
     if (mainWindow !== null) {
-      mainWindow.webContents.send('getVariablesForGraphInitializer', { 'message': message});
+        // send back variable info to graph initializer
+        mainWindow.webContents.send('getVariablesForGraphInitializer', { 'message': message});
     }
 }
 

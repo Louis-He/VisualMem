@@ -42,7 +42,7 @@ class varSnapshot:
 
         # See if the newly added variable is already being refered 
         # Now only works for Linked List
-        if "isLL" in variable and varAddr in self.linkedListBeingRefered:
+        if "isLL" in variable and varAddr in self.linkedListBeingRefered: # TODO: add tree here
             variable["isRefered"] = True
 
         if varAddr not in self.varDict:
@@ -116,7 +116,9 @@ class varSnapshot:
 
                 if len(linkedMembers) == 1:
                     newTypeDict["isLL"] = True
-                    newTypeDict["linkedListMember"] = linkedMembers[0]
+                    newTypeDict["linkedListMember"] = linkedMembers[0] 
+                # TODO: if len(linkedMembers) == 2: -> tree
+                # add tree here
 
                 self.typeDict[surfaceType] = newTypeDict
                 self.typeDict[typeName] = self.typeDict[surfaceType]
@@ -152,6 +154,8 @@ class varSnapshot:
         unbufferedPrint(self.typeDict[structTypeName])
         # The first condition: Check if the node is part of a Linked List
         # The second condition: Only count reference by another node, not by arbitrary pointer!
+
+        # TODO: tree add here
         if self.typeDict[structTypeName]["isLL"]:
             newVarDict["isLL"] = True
             newVarDict["isRefered"] = False
@@ -279,6 +283,8 @@ class pygdbController:
         self.electron_socket = socket
         self.execFilePath = None
         self.controller = None
+        self.lineNumber = ''
+        self.sourceFile = ''
 
         self.varSnapshot = varSnapshot()
 
@@ -344,10 +350,16 @@ class pygdbController:
 
     def sendBackVarInfo(self):
         self.getVariables()
-        varInfoJsonStr = json.dumps(self.varSnapshot.varDict)
+        self.getSourceFileAndLineNumber()
+        varInfoJsonStr = json.dumps({'lineNumber': self.lineNumber, 'sourceFile': self.sourceFile, 'locals': self.varSnapshot.varDict}) 
 
         parsedStr = "INFO" + '{:8d}'.format(len(varInfoJsonStr)) + varInfoJsonStr
         self.electron_socket.send(parsedStr.encode())
+
+    def getSourceFileAndLineNumber(self):
+        response = self.controller.write('-file-list-exec-source-file')
+        self.lineNumber = response[0]['payload']['line']
+        self.sourceFile = response[0]['payload']['fullname']
 
 
 def processIncomingMessage(pygdb_controller, msg):

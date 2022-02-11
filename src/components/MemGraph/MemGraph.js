@@ -157,19 +157,27 @@ export default class MemGraph extends React.Component {
         super(props)
 
         this.state = {
-            element_graph: ""
+            element_graph: "",
+            sourceFile: "",
+            lineNumber: "", 
         }
     }
 
     componentDidMount () {
         var that = this;
         ipcRenderer.on('getVariablesForGraphInitializer', function (evt, message) {
-            console.log(message.message)
+            const parsedJson = JSON.parse(message.message)
+
             that.setState({
-              variableDict: JSON.parse(message.message)
+              variableDict: parsedJson['locals'],
             })
-            let elementJson = JSON.parse(message.message);
-            console.log("VICKY2", elementJson)
+            
+            that.props.appState.setState({
+              sourceFile: parsedJson['sourceFile'],
+              lineNumber: parsedJson['lineNumber']
+            })
+
+            let elementJson = parsedJson['locals'];
       
             var element_test = [];
             var element_temp = Object.create(null);

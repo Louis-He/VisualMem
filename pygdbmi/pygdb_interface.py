@@ -279,6 +279,8 @@ class pygdbController:
         self.electron_socket = socket
         self.execFilePath = None
         self.controller = None
+        self.lineNumber = ''
+        self.sourceFile = ''
 
         self.varSnapshot = varSnapshot()
 
@@ -344,11 +346,17 @@ class pygdbController:
 
     def sendBackVarInfo(self):
         self.getVariables()
-        varInfoJsonStr = json.dumps(self.varSnapshot.varDict)
+        self.getSourceFileAndLineNumber()
+        varInfoJsonStr = json.dumps({'lineNumber': self.lineNumber, 'sourceFile': self.sourceFile, 'locals': self.varSnapshot.varDict})
 
         parsedStr = "INFO" + '{:8d}'.format(len(varInfoJsonStr)) + varInfoJsonStr
         self.electron_socket.send(parsedStr.encode())
 
+
+    def getSourceFileAndLineNumber(self):
+        response = self.controller.write('-file-list-exec-source-file')
+        self.lineNumber = response[0]['payload']['line']
+        self.sourceFile = response[0]['payload']['fullname']
 
 def processIncomingMessage(pygdb_controller, msg):
     msgArr = msg.split(';')

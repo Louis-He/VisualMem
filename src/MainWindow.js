@@ -58,6 +58,8 @@ export default class MainWindow extends React.Component {
       fileData: "",
       elements: [],
       variableDict: {},
+      sourceFile: "",
+      lineNumber: "", 
     }
   }
 
@@ -347,6 +349,14 @@ export default class MainWindow extends React.Component {
                         </div>
 
                         <div>
+                          <p>Current source file: {this.state.sourceFile}</p>
+                        </div>
+
+                        <div>
+                          <p>Current line number: {this.state.lineNumber}</p>
+                        </div>
+
+                        <div>
                           <label>Select Executable
                             <span
                               htmlFor="files"
@@ -366,7 +376,7 @@ export default class MainWindow extends React.Component {
                           <p>Current Executable Path: {this.props.executablePath}</p>
                         </div>
 
-                        <MemGraph/>
+                        <MemGraph appState = {this}/>
 
                         <div>
                           <Form>

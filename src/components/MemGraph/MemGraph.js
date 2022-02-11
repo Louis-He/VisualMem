@@ -158,8 +158,6 @@ export default class MemGraph extends React.Component {
 
         this.state = {
             element_graph: "",
-            sourceFile: "",
-            lineNumber: "", 
         }
     }
 

@@ -42,7 +42,7 @@ class varSnapshot:
 
         # See if the newly added variable is already being refered 
         # Now only works for Linked List
-        if "isLL" in variable and varAddr in self.linkedListBeingRefered:
+        if "isLL" in variable and varAddr in self.linkedListBeingRefered: # TODO: add tree here
             variable["isRefered"] = True
 
         if varAddr not in self.varDict:
@@ -117,6 +117,8 @@ class varSnapshot:
                 if len(linkedMembers) == 1:
                     newTypeDict["isLL"] = True
                     newTypeDict["linkedListMember"] = linkedMembers[0]
+                # TODO: if len(linkedMembers) == 2: -> tree
+                # add tree here
 
                 self.typeDict[surfaceType] = newTypeDict
                 self.typeDict[typeName] = self.typeDict[surfaceType]
@@ -152,6 +154,8 @@ class varSnapshot:
         unbufferedPrint(self.typeDict[structTypeName])
         # The first condition: Check if the node is part of a Linked List
         # The second condition: Only count reference by another node, not by arbitrary pointer!
+        
+        # TODO: tree add here
         if self.typeDict[structTypeName]["isLL"]:
             newVarDict["isLL"] = True
             newVarDict["isRefered"] = False

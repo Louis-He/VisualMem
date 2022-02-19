@@ -42,7 +42,7 @@ class varSnapshot:
 
         # See if the newly added variable is already being refered 
         # Now only works for Linked List
-        if "isLL" in variable and varAddr in self.linkedListBeingRefered: # TODO: add tree here
+        if (("isLL" in variable or "isTree" in variable) and varAddr in self.linkedListBeingRefered):
             variable["isRefered"] = True
 
         if varAddr not in self.varDict:
@@ -73,9 +73,22 @@ class varSnapshot:
 
             typeStrArr = typeStr.split("\\n")
 
-            typeNameLine = typeStrArr[0]
-            typeName = typeNameLine[typeNameLine.find("=") + 1:typeNameLine.find("{")].strip()
+            # typeNameLine = typeStrArr[0]
+
+            # remove the error line for python
+            for line in typeStrArr:
+                if line.startswith("Python"):
+                    typeStrArr.remove(line)
+                    break
+            # get the type name line
+            for line in typeStrArr:
+                if line.startswith('type'):
+                    typeNameLine = line
+                    break
             
+            # parse type name
+            typeName = typeNameLine[typeNameLine.find("=") + 1:typeNameLine.find("{")].strip()
+
             if typeName not in self.varDict:
                 # The underlining type also does not exist
                 if typeName not in aliasList:
@@ -83,10 +96,10 @@ class varSnapshot:
 
                 typeStrArr = typeStrArr[1:-2]
                 typeMemberDict = {}
+
                 for memberLine in typeStrArr:
                     memberLine = memberLine.strip()
                     memberLine = memberLine.replace(";", "")
-
                     lastSpace = memberLine.rfind(" ")
                     lastAsterisk = memberLine.rfind("*")
                     lastRightBracket = memberLine.rfind("]")
@@ -111,14 +124,22 @@ class varSnapshot:
                 newTypeDict = {
                     "aliasList": aliasList, 
                     "memberDict": typeMemberDict,
-                    "isLL": False
+                    "isLL": False,
+                    "isTree": False
                 }
 
+                # If only one linked member -> linked list
                 if len(linkedMembers) == 1:
                     newTypeDict["isLL"] = True
                     newTypeDict["linkedListMember"] = linkedMembers[0]
-                # TODO: if len(linkedMembers) == 2: -> tree
-                # add tree here
+                # If two linked member -> tree
+                elif len(linkedMembers) == 2:
+                    newTypeDict["isTree"] = True
+                    #TODO: change hardcode
+                    newTypeDict["linkedListMember"] = {}
+                    newTypeDict["linkedListMember"]["left"] = linkedMembers[0] 
+                    newTypeDict["linkedListMember"]["right"] = linkedMembers[1]
+
 
                 self.typeDict[surfaceType] = newTypeDict
                 self.typeDict[typeName] = self.typeDict[surfaceType]
@@ -155,7 +176,6 @@ class varSnapshot:
         # The first condition: Check if the node is part of a Linked List
         # The second condition: Only count reference by another node, not by arbitrary pointer!
         
-        # TODO: tree add here
         if self.typeDict[structTypeName]["isLL"]:
             newVarDict["isLL"] = True
             newVarDict["isRefered"] = False
@@ -175,6 +195,39 @@ class varSnapshot:
                     'name': "((" + referredType + ")(" + referredAddr + "))",
                     'type': referredType,
                     'value': referredAddr,
+                }, isAddOriginalPointerAddr = False)
+
+        elif self.typeDict[structTypeName]["isTree"]:
+            unbufferedPrint("=========self.typeDict[structTypeName]", self.typeDict[structTypeName])
+            unbufferedPrint("=========newVarDict", newVarDict)
+            newVarDict["isTree"] = True
+            newVarDict["isRefered"] = False
+            newVarDict["linkedMember"] = {"left": self.typeDict[structTypeName]["linkedListMember"]["left"], "right": self.typeDict[structTypeName]["linkedListMember"]["right"]}
+
+            referredLeftAddr = memberDict[self.typeDict[structTypeName]["linkedListMember"]["left"]]["value"]
+            referredrightAddr = memberDict[self.typeDict[structTypeName]["linkedListMember"]["right"]]["value"]
+            referredLeftType = memberDict[self.typeDict[structTypeName]["linkedListMember"]["left"]]["type"]
+            referredrightType = memberDict[self.typeDict[structTypeName]["linkedListMember"]["right"]]["type"]
+
+            if referredLeftAddr in self.varDict:
+                self.varDict[referredLeftAddr]["isRefered"] = True
+            else:
+                # TODO: not sure if we need to change linkedListBeingRefered or not
+                self.linkedListBeingRefered.add(referredLeftAddr)
+                self.processPointer(gdbcontroller, {
+                    'name': "((" + referredLeftType + ")(" + referredLeftAddr + "))",
+                    'type': referredLeftType,
+                    'value': referredLeftAddr,
+                }, isAddOriginalPointerAddr = False)
+
+            if referredrightAddr in self.varDict:
+                self.varDict[referredrightAddr]["isRefered"] = True
+            else:
+                self.linkedListBeingRefered.add(referredrightAddr)
+                self.processPointer(gdbcontroller, {
+                    'name': "((" + referredrightType + ")(" + referredrightAddr + "))",
+                    'type': referredrightType,
+                    'value': referredrightAddr,
                 }, isAddOriginalPointerAddr = False)
         
         self.addVariable(gdbcontroller, 
@@ -230,6 +283,7 @@ class varSnapshot:
         curType = curType[:-1].strip()
         curDict = {"name": curName, "type": curType, "value": curValue, 'ptrTarget': True}
 
+
         if curValue.count("{") == 0:
             self.addVariable(gdbcontroller, curDict, varAddr=curAddr)
         else:
@@ -241,6 +295,7 @@ class varSnapshot:
         # unbufferedPrint("Ptr")
 
     def processVariable(self, gdbcontroller, variable, varAddr = None):
+        unbufferedPrint("========VICKY1========")
         unbufferedPPrint(variable)
 
         # varName = variable['name']
@@ -314,7 +369,7 @@ class pygdbController:
 
         self.controller = GdbController(
             # /Users/qihan6/Documents/gdb_darwin_hang_fix/build/gdb/gdb
-            command=["gdb", "--nx", "--quiet", "--interpreter=mi3"], 
+            command=["/Users/qihan6/Documents/gdb_darwin_hang_fix/build/gdb/gdb", "--nx", "--quiet", "--interpreter=mi3"], 
             time_to_check_for_additional_output_sec=0.05
         )
         unbufferedPrint(self.execFilePath)
@@ -352,15 +407,16 @@ class pygdbController:
         self.getVariables()
         self.getSourceFileAndLineNumber()
         varInfoJsonStr = json.dumps({'lineNumber': self.lineNumber, 'sourceFile': self.sourceFile, 'locals': self.varSnapshot.varDict})
+        unbufferedPrint('lineNumber: ', self.lineNumber, 'sourceFile: ', self.sourceFile)
 
         parsedStr = "INFO" + '{:8d}'.format(len(varInfoJsonStr)) + varInfoJsonStr
         self.electron_socket.send(parsedStr.encode())
-
 
     def getSourceFileAndLineNumber(self):
         response = self.controller.write('-file-list-exec-source-file')
         self.lineNumber = response[0]['payload']['line']
         self.sourceFile = response[0]['payload']['fullname']
+
 
 def processIncomingMessage(pygdb_controller, msg):
     msgArr = msg.split(';')

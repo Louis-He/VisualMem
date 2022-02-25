@@ -1,12 +1,53 @@
+import MemGraphElementClass from "./MemGraphElementClass"
 import MemGraphObjClass from "./MemGraphObjClass"
 
 export default class MemGraphClass {
     constructor() {
-        this.graphObjMap = new Object()
+        this.graphObjMap = []
+        this.graphEleMap = {}
     }
 
-    init() {
-        this.graphObjMap = new Object()
+    init(localVarJson) {
+        this.graphObjMap = []
+        this.graphEleMap = {}
+
+        // create a MemGraphElementClass object for each object in localVarJson
+        for (var addr in localVarJson) {
+            this.graphEleMap[addr] = new MemGraphElementClass(addr, localVarJson[addr])
+        }
+
+        var that = this
+        function eachAddrOperation(addr, afterAddr) {
+            if (afterAddr in that.graphEleMap) {
+                that.graphEleMap[afterAddr].addPrevAddr(addr)
+            } else {
+                that.graphEleMap[addr].removeAfterAddr(afterAddr)
+            }
+        }
+
+        // Update MemGraphElementMap so that each MemGraphElementClass has links to prevAddr and afterAddr
+        for (const addr in this.graphEleMap) {
+            let afterAddrs = this.graphEleMap[addr].getAfterAddr()
+
+            afterAddrs.forEach(afterAddr => eachAddrOperation(addr, afterAddr))
+        }
+
+        console.log(this.graphEleMap)
+    }
+
+    constructGraph() {
+        for (const addr in this.graphEleMap) {
+            if (this.graphEleMap[addr].isVisited) {
+                continue
+            }
+
+            // add a new object here
+            let newGraphObj = new MemGraphObjClass()
+            this._addElement(newGraphObj, this.graphEleMap[addr])
+            this.graphObjMap.push(newGraphObj)
+        }
+
+        console.log(this.graphObjMap)
     }
 
     /**
@@ -14,69 +55,45 @@ export default class MemGraphClass {
      * 1. If referenceAddr is not null, then add this element to the already existing graphObj
      * 2. If referenceAddr is null, then create a new graphObj and add to the graphObjMap
      * 
-     * @param {string} addr          : address of the new element
-     * @param {object} ele           : the new element
-     * @param {string} referenceAddr : address of the already existing element that this new element should group together
+     * @param {MemGraphObjClass} newGraphObj : the graph object map that the new element will add to
+     * @param {MemGraphElementClass} ele     : the new element
+     * @param {boolean} lookBefore           : whether to check the element before this element
+     * @param {boolean} lookAfter            : whether to check the element after this element
      */
-    _addElement(addr, ele, referenceAddr) {
-        if (referenceAddr !== null && referenceAddr in this.graphObjMap) {
-            this.graphObjMap[referenceAddr].addElement(ele)
-            this.graphObjMap[addr] = this.graphObjMap[referenceAddr]
-        } else {
-            this.graphObjMap[addr] = new MemGraphObjClass
-            this.graphObjMap[addr].addElement(ele)
+    _addElement(newGraphObj, ele) {
+        // if the element is pointed by another element, but doesn't point to anything else
+        if (ele.addr in newGraphObj) {
+            return
         }
+        // newGraphObj[ele.addr] = ele
+        newGraphObj.addElement(ele.addr, ele)
+
+        ele.isVisited = true
+
+
+        let afterAddrs = ele.getAfterAddr()
+
+        var that = this
+        afterAddrs.forEach(afterAddr => {
+            that._addElement(newGraphObj, that.graphEleMap[afterAddr])
+        })
+
+        let beforeAddrs = ele.getPrevAddr()
+
+        beforeAddrs.forEach(beforeAddr => {
+            that._addElement(newGraphObj, that.graphEleMap[beforeAddr])
+        })
     }
 
-    /**
-     * Try to add one element to the graph.
-     * 
-     * @param {string} addr          : the address of the element 
-     * @param {object} ele           : detailed information of the element
-     * @param {string} referenceAddr : the reference address of the element that this new element should group together
-     * @returns {"isContinue": boolean, "nextAddr": String}
-     *          If the element connects to another one by pointer, then return the next address that needs to be explored.
-     *          If the element connects to nothing or invalid address, then return not continuing.
-     */
-    addElement(addr, ele, referenceAddr) {
-        // does not support linked list at this moment
-        if ("isLL" in ele) {
-            return {"isContinue": false}
-        }
-        
-        if (addr in this.graphObjMap) {
-            return {"isContinue": false}
-        }
 
-        if ("ptrTarget" in ele) {
-            // if the pointer points to a legal memory
-            if (ele.ptrTarget) {
-                // check if the memory it points to is already been added in the map,
-                // if that is the case, update reference address and stop searching
-                if (ele.value in this.graphObjMap){
-                    referenceAddr = ele.value
-                    this._addElement(addr, ele, referenceAddr)
-                    return {"isContinue": false}
-                } else {
-                    this._addElement(addr, ele, referenceAddr)
-                    return {"isContinue": true, "nextAddr": ele.value}
-                }
-            } else {
-                // if the pointer points to an illegal memory, than this pointer is the deepest node of this whole tree
-                this._addElement(addr, ele, referenceAddr)
-                return {"isContinue": false}
-            }
-        } else {
-            // the element is a value, just add the element
-            this._addElement(addr, ele, referenceAddr)
-            return {"isContinue": false}
-        }
-    }
+    // dumpElement() {
+    //     // console.log(this.graphObjMap)
+    //     for (let key in this.graphObjMap) {
+    //         this.graphObjMap[key].resetDebugPrintFlag()
+    //     }
 
-    dumpElement() {
-        console.log(this.graphObjMap)
-        // for (let key in this.graphObjMap) {
-        //     this.graphObjMap[key].dumpElement()
-        // }
-    }
+    //     for (let key in this.graphObjMap) {
+    //         this.graphObjMap[key].dumpElement()
+    //     }
+    // }
 }

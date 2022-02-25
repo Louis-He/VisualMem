@@ -147,11 +147,11 @@ const nodeTypes = {
     treeHead: treeHeadComponent,
 };
 
-var x_test = 0;
-var y_test = 0;
-var x_min = 0;
-var element_index = 0;
-var groupElement = [];
+// var x_test = 0;
+// var y_test = 0;
+// var x_min = 0;
+// var element_index = 0;
+// var groupElement = [];
 
 export default class MemGraph extends React.Component {
     constructor(props) {
@@ -182,16 +182,18 @@ export default class MemGraph extends React.Component {
 
             // Construct the new memory graph, initialize the whole graph
             console.log(localVarJson)
-            memGraph.init()
-            for (var addr in localVarJson) {
-                let addResult = memGraph.addElement(addr, localVarJson[addr], null)
-                let referenceAddr = addr
+            memGraph.init(localVarJson)
 
-                while (addResult.isContinue) {
-                    addResult = memGraph.addElement(addResult.nextAddr, localVarJson[addResult.nextAddr], referenceAddr)
-                }
-            }
-            memGraph.dumpElement()
+            memGraph.constructGraph()
+            // for (var addr in localVarJson) {
+            //     let addResult = memGraph.addElement(addr, localVarJson[addr], null)
+            //     let referenceAddr = addr
+
+            //     while (addResult.isContinue) {
+            //         addResult = memGraph.addElement(addResult.nextAddr, localVarJson[addResult.nextAddr], referenceAddr)
+            //     }
+            // }
+            // memGraph.dumpElement()
 
       
             // var element_graph = [];
@@ -272,143 +274,143 @@ export default class MemGraph extends React.Component {
     }
     
 
-    getNode(element_temp, element_graph, element_id, outer_key, value) {
-        // if the element has been visited before -> return
-        if (element_temp[outer_key]['visited']) {
-            return
-        }
+    // getNode(element_temp, element_graph, element_id, outer_key, value) {
+    //     // if the element has been visited before -> return
+    //     if (element_temp[outer_key]['visited']) {
+    //         return
+    //     }
     
-        if((element_temp[outer_key]['ptrTarget'] && element_id.has(value))) { // if ptrTarget field presented -> pointer, get the pointed element first (recursion)
-            if(element_temp[value]['isLL']) { //if the next node is a linked list
-                let nextName = element_temp[value]['linkedMember'];
-                let nextNode = element_temp[value]['value'][nextName]['value'];
-                if (nextNode !== '0x0') {
-                    this.getNode(element_temp, element_graph, element_id, value, nextNode)
-                }
-            } else { // if the next node is not a linked list
-                this.getNode(element_temp, element_graph, element_id, value, element_temp[value]['value'])
-            }
-        } else if (element_temp[outer_key]['isLL']) { // the node is in linked list
-            let nextName = element_temp[outer_key]['linkedMember'];
-            let nextNode = element_temp[outer_key]['value'][nextName]['value'];
-            if (nextNode !== '0x0') {
-                this.getNode(element_temp, element_graph, element_id, value, nextNode)
-            }
-        } else if (element_temp[outer_key]['ptrTarget'] && !element_id.has(value)) { // if pointer but the element it points does not exist
-            console.log("ERROR")
-            return
-        }
+    //     if((element_temp[outer_key]['ptrTarget'] && element_id.has(value))) { // if ptrTarget field presented -> pointer, get the pointed element first (recursion)
+    //         if(element_temp[value]['isLL']) { //if the next node is a linked list
+    //             let nextName = element_temp[value]['linkedMember'];
+    //             let nextNode = element_temp[value]['value'][nextName]['value'];
+    //             if (nextNode !== '0x0') {
+    //                 this.getNode(element_temp, element_graph, element_id, value, nextNode)
+    //             }
+    //         } else { // if the next node is not a linked list
+    //             this.getNode(element_temp, element_graph, element_id, value, element_temp[value]['value'])
+    //         }
+    //     } else if (element_temp[outer_key]['isLL']) { // the node is in linked list
+    //         let nextName = element_temp[outer_key]['linkedMember'];
+    //         let nextNode = element_temp[outer_key]['value'][nextName]['value'];
+    //         if (nextNode !== '0x0') {
+    //             this.getNode(element_temp, element_graph, element_id, value, nextNode)
+    //         }
+    //     } else if (element_temp[outer_key]['ptrTarget'] && !element_id.has(value)) { // if pointer but the element it points does not exist
+    //         console.log("ERROR")
+    //         return
+    //     }
     
-        // when the function gets returned, enters here
-        if(element_temp[outer_key]['visited'] === false) { // only push into array if the element has not been visited
-          if(element_temp[outer_key]['ptrTarget']) { // for pointers
-            let x_temp;
-            let y_temp;
+    //     // when the function gets returned, enters here
+    //     if(element_temp[outer_key]['visited'] === false) { // only push into array if the element has not been visited
+    //       if(element_temp[outer_key]['ptrTarget']) { // for pointers
+    //         let x_temp;
+    //         let y_temp;
     
-            for (var element of element_graph) {
-              if(element_temp[value]['isLL']) {
-                if(element.id === value) {
-                  if(element.position !== undefined) {
-                    x_temp = element.position.x - 140;
-                    y_temp = element.position.y;
-                    if (x_temp <= x_min) {
-                      x_min = x_temp;
-                    }
-                  }
-                  break;
-                }
-              } else {
-                if(element.id === element_temp[outer_key]['value']) {
-                  // console.log(element_temp[outer_key]['value'])
-                  // console.log(element.position.x)
-                  if(element.position !== undefined) {
-                    x_temp = element.position.x - 80;
-                    y_temp = element.position.y;
-                    if (x_temp <= x_min) {
-                      x_min = x_temp;
-                    }
-                  }
-                  break;
-                }
-              }
-            }
+    //         for (var element of element_graph) {
+    //           if(element_temp[value]['isLL']) {
+    //             if(element.id === value) {
+    //               if(element.position !== undefined) {
+    //                 x_temp = element.position.x - 140;
+    //                 y_temp = element.position.y;
+    //                 if (x_temp <= x_min) {
+    //                   x_min = x_temp;
+    //                 }
+    //               }
+    //               break;
+    //             }
+    //           } else {
+    //             if(element.id === element_temp[outer_key]['value']) {
+    //               // console.log(element_temp[outer_key]['value'])
+    //               // console.log(element.position.x)
+    //               if(element.position !== undefined) {
+    //                 x_temp = element.position.x - 80;
+    //                 y_temp = element.position.y;
+    //                 if (x_temp <= x_min) {
+    //                   x_min = x_temp;
+    //                 }
+    //               }
+    //               break;
+    //             }
+    //           }
+    //         }
     
-            // push for node
-            element_graph.push({ id: outer_key,  type: 'pointer', position: {x:x_temp, y:y_temp}, data: { name: element_temp[outer_key]['name'], text: value}, draggable: true})
-            element_temp[outer_key]['index'] = element_index;
-            element_index = element_index + 1;
+    //         // push for node
+    //         element_graph.push({ id: outer_key,  type: 'pointer', position: {x:x_temp, y:y_temp}, data: { name: element_temp[outer_key]['name'], text: value}, draggable: true})
+    //         element_temp[outer_key]['index'] = element_index;
+    //         element_index = element_index + 1;
     
-            // push for edge
-            element_graph.push({
-              id: outer_key + element_temp[outer_key]['value'],
-              source: outer_key,
-              target: element_temp[outer_key]['value'],
-              arrowHeadType: 'arrow', 
-              style: {strokeWidth: 4},
-            })
-            element_index = element_index + 1;
+    //         // push for edge
+    //         element_graph.push({
+    //           id: outer_key + element_temp[outer_key]['value'],
+    //           source: outer_key,
+    //           target: element_temp[outer_key]['value'],
+    //           arrowHeadType: 'arrow', 
+    //           style: {strokeWidth: 4},
+    //         })
+    //         element_index = element_index + 1;
       
-          } else if (element_temp[outer_key]['isLL']) { // for linked list
+    //       } else if (element_temp[outer_key]['isLL']) { // for linked list
     
-            let nextName = element_temp[outer_key]['linkedMember'];
-            let nextNode = element_temp[outer_key]['value'][nextName]['value'];
-            let nodeValue = element_temp[outer_key]['value']['val']['value'];
+    //         let nextName = element_temp[outer_key]['linkedMember'];
+    //         let nextNode = element_temp[outer_key]['value'][nextName]['value'];
+    //         let nodeValue = element_temp[outer_key]['value']['val']['value'];
     
-            let x_temp;
-            let y_temp;
+    //         let x_temp;
+    //         let y_temp;
     
-            if (nextNode !== '0x0') {
-              for (let element of element_graph) {
-                if(element.id === nextNode) {
-                  if(element.position !== undefined) {
-                    x_temp = element.position.x - 140;
-                    y_temp = element.position.y;
-                    if (x_temp <= x_min) {
-                      x_min = x_temp;
-                    }
-                  }
-                  break;
-                }
-              }
-            } else {
-              x_test = 50;
-              y_test = y_test + 50;
-              x_temp = x_test;
-              y_temp = y_test;
-            }
+    //         if (nextNode !== '0x0') {
+    //           for (let element of element_graph) {
+    //             if(element.id === nextNode) {
+    //               if(element.position !== undefined) {
+    //                 x_temp = element.position.x - 140;
+    //                 y_temp = element.position.y;
+    //                 if (x_temp <= x_min) {
+    //                   x_min = x_temp;
+    //                 }
+    //               }
+    //               break;
+    //             }
+    //           }
+    //         } else {
+    //           x_test = 50;
+    //           y_test = y_test + 50;
+    //           x_temp = x_test;
+    //           y_temp = y_test;
+    //         }
             
-            // push for node
-            element_graph.push({ id: outer_key,  type: 'linkedList', position: {x:x_temp, y:y_temp}, data: { name: element_temp[outer_key]['name'], text: nodeValue}, draggable: true})
-            element_temp[outer_key]['index'] = element_index;
-            element_index = element_index + 1;
+    //         // push for node
+    //         element_graph.push({ id: outer_key,  type: 'linkedList', position: {x:x_temp, y:y_temp}, data: { name: element_temp[outer_key]['name'], text: nodeValue}, draggable: true})
+    //         element_temp[outer_key]['index'] = element_index;
+    //         element_index = element_index + 1;
             
-            // push for edge
-            if (nextNode !== '0x0') {
-              element_graph.push({
-                id: outer_key + element_temp[outer_key]['value'],
-                source: outer_key,
-                target: nextNode,
-                arrowHeadType: 'arrow', 
-                style: {strokeWidth: 4},
-              })
-              element_index = element_index + 1;
-            }
+    //         // push for edge
+    //         if (nextNode !== '0x0') {
+    //           element_graph.push({
+    //             id: outer_key + element_temp[outer_key]['value'],
+    //             source: outer_key,
+    //             target: nextNode,
+    //             arrowHeadType: 'arrow', 
+    //             style: {strokeWidth: 4},
+    //           })
+    //           element_index = element_index + 1;
+    //         }
     
-          } else { // for normal nodes
-            x_test = 50;
-            y_test = y_test + 50;
+    //       } else { // for normal nodes
+    //         x_test = 50;
+    //         y_test = y_test + 50;
     
-            element_graph.push({ id: outer_key,  type: 'normalNode', position: {x:x_test, y:y_test}, data: { name: element_temp[outer_key]['name'], text: value}, draggable: true})
-            element_temp[outer_key]['index'] = element_index;
-            element_index = element_index + 1;
-          }
+    //         element_graph.push({ id: outer_key,  type: 'normalNode', position: {x:x_test, y:y_test}, data: { name: element_temp[outer_key]['name'], text: value}, draggable: true})
+    //         element_temp[outer_key]['index'] = element_index;
+    //         element_index = element_index + 1;
+    //       }
       
-        }
+    //     }
       
-        element_temp[outer_key]['visited'] = true; // mark the element as visited
-        groupElement.push(outer_key)
-        return;
-    }
+    //     element_temp[outer_key]['visited'] = true; // mark the element as visited
+    //     groupElement.push(outer_key)
+    //     return;
+    // }
 
     render() {
         // this.updateGraph();.

@@ -198,8 +198,8 @@ class varSnapshot:
                 }, isAddOriginalPointerAddr = False)
 
         elif self.typeDict[structTypeName]["isTree"]:
-            unbufferedPrint("=========self.typeDict[structTypeName]", self.typeDict[structTypeName])
-            unbufferedPrint("=========newVarDict", newVarDict)
+            # unbufferedPrint("=========self.typeDict[structTypeName]", self.typeDict[structTypeName])
+            # unbufferedPrint("=========newVarDict", newVarDict)
             newVarDict["isTree"] = True
             newVarDict["isRefered"] = False
             newVarDict["linkedMember"] = {"left": self.typeDict[structTypeName]["linkedListMember"]["left"], "right": self.typeDict[structTypeName]["linkedListMember"]["right"]}
@@ -258,7 +258,7 @@ class varSnapshot:
             else:
                 response = gdbcontroller.write('-data-evaluate-expression "*(' + curType + ')(' + curAddr + ')"')
                 response = response[0]
-                unbufferedPrint(response)
+                # unbufferedPrint(response)
                 if response['message'] == 'error':
                     curDict["ptrTarget"] = False
                     return
@@ -274,7 +274,7 @@ class varSnapshot:
         
         response = gdbcontroller.write('-data-evaluate-expression "*(' + curType + ')(' + curAddr + ')"')
         response = response[0]
-        unbufferedPrint(response)
+        # unbufferedPrint(response)
         if response['message'] == 'error':
             curDict["ptrTarget"] = False
             return
@@ -295,8 +295,8 @@ class varSnapshot:
         # unbufferedPrint("Ptr")
 
     def processVariable(self, gdbcontroller, variable, varAddr = None):
-        unbufferedPrint("========VICKY1========")
-        unbufferedPPrint(variable)
+        # unbufferedPrint("========VICKY1========")
+        # unbufferedPPrint(variable)
 
         # varName = variable['name']
         varType = variable['type']
@@ -369,7 +369,7 @@ class pygdbController:
 
         self.controller = GdbController(
             # /Users/qihan6/Documents/gdb_darwin_hang_fix/build/gdb/gdb
-            command=["/Users/qihan6/Documents/gdb_darwin_hang_fix/build/gdb/gdb", "--nx", "--quiet", "--interpreter=mi3"], 
+            # command=["/Users/qihan6/Documents/gdb_darwin_hang_fix/build/gdb/gdb", "--nx", "--quiet", "--interpreter=mi3"], 
             time_to_check_for_additional_output_sec=0.05
         )
         unbufferedPrint(self.execFilePath)

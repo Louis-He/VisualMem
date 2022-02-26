@@ -185,6 +185,9 @@ export default class MemGraph extends React.Component {
             memGraph.init(localVarJson)
 
             memGraph.constructGraph()
+
+            var reactFlowGraph = memGraph.generateReactflowGraph()
+            
             // for (var addr in localVarJson) {
             //     let addResult = memGraph.addElement(addr, localVarJson[addr], null)
             //     let referenceAddr = addr
@@ -267,9 +270,9 @@ export default class MemGraph extends React.Component {
             // y_test = 0;
             
       
-            // that.setState({
-            //     element_graph: element_graph,
-            // })
+            that.setState({
+                element_graph: reactFlowGraph,
+            })
         });
     }
     
@@ -418,6 +421,7 @@ export default class MemGraph extends React.Component {
         // return "TEST";
         
         if (this.state.element_graph !== "") {
+          console.log(this.state.element_graph)
             return (
                 <div style={{ height: 500, width: 1000 }}>
                     <ReactFlow elements={this.state.element_graph} nodeTypes={nodeTypes} minZoom={1} maxZoom={1} translateExtent={[[0, 0], [1000, 500]]} />

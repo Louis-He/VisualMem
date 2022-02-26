@@ -5,6 +5,8 @@ export default class MemGraphClass {
     constructor() {
         this.graphObjMap = []
         this.graphEleMap = {}
+
+        this.reactFlowArray = []
     }
 
     init(localVarJson) {
@@ -48,6 +50,28 @@ export default class MemGraphClass {
         }
 
         console.log(this.graphObjMap)
+
+        for (var i = 0; i < this.graphObjMap.length; i++) { 
+            this.graphObjMap[i].generateObjectGraph();
+        }
+
+        console.log(this.graphObjMap)
+    }
+
+    generateReactflowGraph() {
+        var startingY = 0
+        for (var i = 0; i < this.graphObjMap.length; i++) {
+            startingY = this.graphObjMap[i].generateReactflowGraph(startingY);
+            startingY += 1
+        }
+
+        this.reactFlowArray = []
+        for (var i = 0; i < this.graphObjMap.length; i++) {
+            this.reactFlowArray.push(...this.graphObjMap[i].memGraphRepresentation)
+        }
+
+        console.log(this.reactFlowArray)
+        return this.reactFlowArray
     }
 
     /**
@@ -62,7 +86,7 @@ export default class MemGraphClass {
      */
     _addElement(newGraphObj, ele) {
         // if the element is pointed by another element, but doesn't point to anything else
-        if (ele.addr in newGraphObj) {
+        if (ele.addr in newGraphObj.elementMap) {
             return
         }
         // newGraphObj[ele.addr] = ele

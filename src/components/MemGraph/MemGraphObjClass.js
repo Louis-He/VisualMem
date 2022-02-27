@@ -129,35 +129,63 @@ export default class MemGraphObjClass {
         this.placementOccupiedSet.add(formattedNumber)
 
         // draw the node
-        this.memGraphRepresentation.push({ 
-            id: ele.addr, 
-            type: 'pointer', 
-            position: {x: startingX * 90 + 10, y: startingY * 40 + 10}, 
-            data: { 
-                name: ele.name, 
-                text: ele.value
-            }, 
-            draggable: true
-        })
+        if (ele.getAfterAddr().size !== 0) {
+            this.memGraphRepresentation.push({ 
+                id: ele.addr, 
+                type: 'pointer', 
+                position: {x: startingX * 120 + 10, y: startingY * 60 + 10}, 
+                data: { 
+                    name: ele.name, 
+                    text: ele.getValue()
+                }, 
+                draggable: true
+            })
+        } else if(ele.isLL) {
+            this.memGraphRepresentation.push({ 
+                id: ele.addr, 
+                type: 'linkedList', 
+                position: {x: startingX * 120 + 10, y: startingY * 60 + 10}, 
+                data: { 
+                    name: ele.name, 
+                    text: ele.getValue()
+                }, 
+                draggable: true
+            })
+        } else {
+            this.memGraphRepresentation.push({ 
+                id: ele.addr, 
+                type: 'normalNode', 
+                position: {x: startingX * 120 + 10, y: startingY * 60 + 10}, 
+                data: { 
+                    name: ele.name, 
+                    text: ele.getValue()
+                }, 
+                draggable: true
+            })
+        }
+        
 
         // draw the edge if srcAddr is not null pointer, means that
         // this node has a child
         if (srcAddr !== "0x0") {
             this.memGraphRepresentation.push({
-                id: srcAddr + ele.addr,
-                source: srcAddr,
-                target: ele.addr,
+                id: ele.addr + srcAddr,
+                source: ele.addr,
+                target: srcAddr,
                 arrowHeadType: 'arrow', 
                 style: {strokeWidth: 4},
             })
         }
 
         var Y_addition = 0
-        var ret_startingY = 0
+        var ret_startingY = startingY
         for (let prevEleAddr of ele.getPrevAddr()) {
             // nextLeafNodesSet.add(prevEleAddr + ";" + ele.addr)
             if (Y_addition === 0) {
-                ret_startingY = this._generateReactflowGraphHelper(ele.addr, this.elementMap[prevEleAddr], startingY + Y_addition, startingX - 1);
+                ret_startingY = Math.max(
+                    ret_startingY, 
+                    this._generateReactflowGraphHelper(ele.addr, this.elementMap[prevEleAddr], startingY + Y_addition, startingX - 1)
+                );
             } else {
                 ret_startingY = Math.max(
                     ret_startingY, 
@@ -188,7 +216,7 @@ export default class MemGraphObjClass {
         this.placementOccupiedSet = new Set()
         this.memGraphRepresentation = []
         
-        var nextY = 0
+        var nextY = startingY
         for (let addr in this.elementMap) {
             if (this.elementMap[addr].getAfterAddr().size === 0) {
                 nextY = this._generateReactflowGraphHelper(

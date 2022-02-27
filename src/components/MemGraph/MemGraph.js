@@ -61,9 +61,11 @@ const pointerComponent = ({ data }) => {
     <div className='normal'>
       <p className='pointerName'> {data.name} </p>
       <div>
-        <Handle type="target" position="left" style = {{top: "35%", left: "70%", borderRadius: 0}} className='linkedListNode'/>
+      <Handle type="source" position="right" style = {{top: "35%", borderRadius: 0}} className='linkedListNode'/>
+
         <div className='pointerNode'> </div>
-        <Handle type="source" position="right" style = {{top: "35%", borderRadius: 0}} className='linkedListNode'/>
+        <Handle type="target" position="left" style = {{top: "35%", left: "70%", borderRadius: 0}} className='linkedListNode'/>
+
       </div>
     </div>
   );

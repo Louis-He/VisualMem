@@ -43,6 +43,10 @@ export default class MemGraphElementClass {
         this._afterAddr.delete(addr)
     }
 
+    getValue() {
+        return JSON.stringify(this.value)
+    }
+
     getAfterAddr() {
         return this._afterAddr
     }

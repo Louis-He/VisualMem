@@ -60,13 +60,15 @@ export default class MemGraphClass {
 
     generateReactflowGraph() {
         var startingY = 0
-        for (var i = 0; i < this.graphObjMap.length; i++) {
+        var i
+        
+        for (i = 0; i < this.graphObjMap.length; i++) {
             startingY = this.graphObjMap[i].generateReactflowGraph(startingY);
             startingY += 1
         }
 
         this.reactFlowArray = []
-        for (var i = 0; i < this.graphObjMap.length; i++) {
+        for (i = 0; i < this.graphObjMap.length; i++) {
             this.reactFlowArray.push(...this.graphObjMap[i].memGraphRepresentation)
         }
 

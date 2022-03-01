@@ -22,7 +22,7 @@ function getVariableInfoCallback (message) {
     // call graph initializer
     const mainWindow = windowsManager.getMainWindows()
     if (mainWindow !== null) {
-      //mainWindow.webContents.send('getVariablesForGraphInitializer', { 'message': message});
+      mainWindow.webContents.send('getVariablesForGraphInitializer', { 'message': message});
     }
 }
 

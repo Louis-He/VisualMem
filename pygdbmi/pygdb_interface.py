@@ -60,6 +60,7 @@ class varSnapshot:
         if surfaceType not in self.typeDict:
             # Flags need to be set here
             linkedMembers = []
+            members = []
 
             # If not already exist add one
             response = gdbcontroller.write('ptype (' + variable['name'] + ')')
@@ -114,6 +115,7 @@ class varSnapshot:
                     # check if the member is possibly a linker to another node that has the same type
                     if memberType.count("*") == 0:
                         # The member is not even a pointer, pass the check!
+                        members.append(memberName)
                         continue
                     
                     nextNodeType = memberType[:memberType.rfind("*")].strip()
@@ -127,6 +129,8 @@ class varSnapshot:
                     "isLL": False,
                     "isTree": False
                 }
+                
+                newTypeDict["members"] = members
 
                 # If only one linked member -> linked list
                 if len(linkedMembers) == 1:
@@ -180,6 +184,7 @@ class varSnapshot:
             newVarDict["isLL"] = True
             newVarDict["isRefered"] = False
             newVarDict["linkedMember"] = self.typeDict[structTypeName]["linkedListMember"]
+            newVarDict["members"] = self.typeDict[structTypeName]["members"]
             # Special operations for a linked list
             # Add a field to indicate if the node is the head node or not
             referredAddr = memberDict[self.typeDict[structTypeName]["linkedListMember"]]["value"]
@@ -369,7 +374,7 @@ class pygdbController:
 
         self.controller = GdbController(
             # /Users/qihan6/Documents/gdb_darwin_hang_fix/build/gdb/gdb
-            # command=["/Users/qihan6/Documents/gdb_darwin_hang_fix/build/gdb/gdb", "--nx", "--quiet", "--interpreter=mi3"], 
+            command=["/Users/qihan6/Documents/gdb_darwin_hang_fix/build/gdb/gdb", "--nx", "--quiet", "--interpreter=mi3"], 
             time_to_check_for_additional_output_sec=0.05
         )
         unbufferedPrint(self.execFilePath)

@@ -163,14 +163,30 @@ export default class MemGraphObjClass {
             let arrayList = ele.value;
             this.memGraphRepresentation.push({ 
                 id: ele.addr, 
-                type: 'normalNode', 
+                type: 'arrayHead', 
                 position: {x: startingX * 120 + 10, y: startingY * 60 + 10}, 
                 data: { 
                     name: ele.name.includes("*") ? " " : ele.name, 
-                    text: ele.getValue().toString().replace(/"/g, "")
+                    index: 0,
+                    text: arrayList[0]
                 }, 
                 draggable: true
             })
+            console.log(arrayList.length)
+            for (var i = 1; i < arrayList.length; i++) {
+                console.log(i)
+                this.memGraphRepresentation.push({ 
+                    id: ele.addr+i, 
+                    type: 'array', 
+                    position: {x: startingX * 120 + 10, y: startingY * 60 + 10}, 
+                    data: { 
+                        name: ele.name.includes("*") ? " " : ele.name, 
+                        index: i,
+                        text: arrayList[i]
+                    }, 
+                    draggable: true
+                })
+            }
         } else {
             this.memGraphRepresentation.push({ 
                 id: ele.addr, 

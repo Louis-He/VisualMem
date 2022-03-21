@@ -14,6 +14,7 @@ export default class MemGraphElementClass {
         this.value       = ele.value
 
         this.isLL        = "isLL" in ele && ele.isLL
+        this.isArray     = "isArray" in ele && ele.isLL
         if (this.isLL) {
             this.linkedMember     = "linkedMember" in ele && ele.linkedMember
             this.members          = "members" in ele && ele.members

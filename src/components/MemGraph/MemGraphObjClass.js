@@ -159,6 +159,18 @@ export default class MemGraphObjClass {
                 }, 
                 draggable: true
             })
+        } else if (ele.isArray) {
+            let arrayList = ele.value;
+            this.memGraphRepresentation.push({ 
+                id: ele.addr, 
+                type: 'normalNode', 
+                position: {x: startingX * 120 + 10, y: startingY * 60 + 10}, 
+                data: { 
+                    name: ele.name.includes("*") ? " " : ele.name, 
+                    text: ele.getValue().toString().replace(/"/g, "")
+                }, 
+                draggable: true
+            })
         } else {
             this.memGraphRepresentation.push({ 
                 id: ele.addr, 

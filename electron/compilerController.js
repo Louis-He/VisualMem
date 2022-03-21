@@ -5,6 +5,16 @@ var child_process = require('child_process');
 
 const gccCompilerExec = 'gcc';
 
+
+exports.saveSourceFile = function (text) {
+    try {
+        fs.writeFileSync(windowsManager.getSourceFile(), text, 'utf-8');
+    } catch (e) {
+        console.error("Source file save failed");
+    }
+}
+
+
 exports.compile = function () {   
     l_gcc_compilation_child_process = child_process.spawn(gccCompilerExec, ['-g', '"' + windowsManager.getSourceFile() + '"'], {
         shell: true,

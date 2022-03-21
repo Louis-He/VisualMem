@@ -312,28 +312,32 @@ class varSnapshot:
         # get the size of the array
         arraySize = curType.split('[')[1][0:-1]
 
+        # get the name of the type
+        arrayType = curType.split(' ')[0]
+
         # get the address of the variable
         response = gdbcontroller.write('-data-evaluate-expression "&(' + curName + ')"')
         response = response[0]
         headAddr = response['payload']['value']
 
+        # get the size of the variable type
+        response = gdbcontroller.write('-data-evaluate-expression sizeof(' + arrayType + ')')
+        response = response[0]
+        varSize = int(response['payload']['value'])
+
         # get the value of the head address
-        # TODO: type name
-        # TODO: sizeof(type) name
-        response = gdbcontroller.write('-data-evaluate-expression "*(int *)(' + headAddr + ')"')
+        response = gdbcontroller.write('-data-evaluate-expression "*(' + arrayType+ ' *)(' + headAddr + ')"')
         response = response[0]
         curValue.append(response['payload']['value'])
-        # unbufferedPrint(response)
 
         # increment the address by a letter to get the next element
-        curAddr = self.incrementAddr(headAddr)
+        curAddr = self.incrementAddr(headAddr, varSize)
 
         for i in range(int(arraySize)-1):
-            response = gdbcontroller.write('-data-evaluate-expression "*(int *)(' + curAddr + ')"')
+            response = gdbcontroller.write('-data-evaluate-expression "*(' + arrayType+ ' *)(' + curAddr + ')"')
             response = response[0]
-            # unbufferedPrint(response)
             curValue.append(response['payload']['value'])
-            curAddr = self.incrementAddr(curAddr)
+            curAddr = self.incrementAddr(curAddr, varSize)
         
         unbufferedPrint(curValue)
         curDict = {"name": curName, "type": curType, "isArray": True, "value": curValue}
@@ -343,18 +347,15 @@ class varSnapshot:
 
         #unbufferedPrint(curDict)
 
-    def incrementAddr(self, address):
-        # 去掉0x hex转decimal，increment， 转hex 看有没有function
-        lastLetter = address[-1]
-        secondLast = address[-2]
-        letter_ascii = ord(lastLetter)
+    def incrementAddr(self, address, varSize):
+        # convert the address from hex to int
+        addressDec = int(address, 16)
 
-        if (letter_ascii + 4 > 102): # if last letter + 4 > f -> increment to the second last letter
-            return address[0:-2] + chr(ord(secondLast) + 1) + chr(48 + ((letter_ascii + 4) % 103))
-        elif (letter_ascii + 4 > 57):
-            return address[0:-1] + chr(letter_ascii + 43)
-        else:
-            return address[0:-1] + chr(letter_ascii + 4)
+        # add the variable size to get to the next element address
+        addressDec = addressDec + varSize
+
+        # return the changed back hex address
+        return hex(addressDec)
         
 
     def processVariable(self, gdbcontroller, variable, varAddr = None):

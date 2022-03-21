@@ -14,8 +14,12 @@ export default class MemGraphElementClass {
         this.value       = ele.value
 
         this.isLL        = "isLL" in ele && ele.isLL
+        this.isArray     = "isArray" in ele && ele.isArray
+        this.isTree      = "isTree" in ele && ele.isTree
+
         if (this.isLL) {
             this.linkedMember     = "linkedMember" in ele && ele.linkedMember
+            this.members          = "members" in ele && ele.members
             if (this.linkedMember in ele.value) {
                 this.nextLinkedMemberAddr =  ele.value[this.linkedMember].value
                 this.addAfterAddr(this.nextLinkedMemberAddr)
@@ -44,7 +48,8 @@ export default class MemGraphElementClass {
     }
 
     getValue() {
-        return JSON.stringify(this.value)
+        // return JSON.stringify(this.value)
+        return this.value
     }
 
     getAfterAddr() {
@@ -53,5 +58,9 @@ export default class MemGraphElementClass {
 
     getPrevAddr() {
         return this._prevAddr
+    }
+
+    getMembers() {
+        return this.members
     }
 }

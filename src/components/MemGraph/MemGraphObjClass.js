@@ -135,30 +135,69 @@ export default class MemGraphObjClass {
                 type: 'pointer', 
                 position: {x: startingX * 120 + 10, y: startingY * 60 + 10}, 
                 data: { 
-                    name: ele.name, 
-                    text: ele.getValue()
+                    name: ele.name.includes("*") ? " " : ele.name, 
+                    text: ele.getValue().toString()
                 }, 
                 draggable: true
             })
         } else if(ele.isLL) {
+            let members = ele.getMembers()
+            var textContent = ''
+
+            members.forEach(member => {
+                let memberValue = ele.getValue()[member]["value"]
+                textContent = textContent + member + ":" + memberValue + " "
+                }
+            )
             this.memGraphRepresentation.push({ 
                 id: ele.addr, 
                 type: 'linkedList', 
                 position: {x: startingX * 120 + 10, y: startingY * 60 + 10}, 
                 data: { 
-                    name: ele.name, 
-                    text: ele.getValue()
+                    name: ele.name.includes("*") ? " " : ele.name, 
+                    text: textContent
                 }, 
                 draggable: true
             })
+        } else if (ele.isArray) {
+            let arrayList = ele.value;
+            this.memGraphRepresentation.push({ 
+                id: ele.addr, 
+                type: 'arrayHead', 
+                position: {x: startingX * 120 + 10, y: startingY * 60 + 10}, 
+                data: { 
+                    name: ele.name.includes("*") ? " " : ele.name, 
+                    index: 0,
+                    text: arrayList[0]
+                }, 
+                draggable: true
+            })
+            console.log(arrayList.length)
+            for (var i = 1; i < arrayList.length; i++) {
+                // TODO: handle position!!
+                console.log(i)
+                this.memGraphRepresentation.push({ 
+                    id: ele.addr+i, 
+                    type: 'array', 
+                    position: {x: startingX * 120 + 10, y: startingY * 60 + 10}, 
+                    data: { 
+                        name: ele.name.includes("*") ? " " : ele.name, 
+                        index: i,
+                        text: arrayList[i]
+                    }, 
+                    draggable: true
+                })
+            }
+        } else if (ele.isTree) {
+            // do nothing for now
         } else {
             this.memGraphRepresentation.push({ 
                 id: ele.addr, 
                 type: 'normalNode', 
                 position: {x: startingX * 120 + 10, y: startingY * 60 + 10}, 
                 data: { 
-                    name: ele.name, 
-                    text: ele.getValue()
+                    name: ele.name.includes("*") ? " " : ele.name, 
+                    text: ele.getValue().toString().replace(/"/g, "")
                 }, 
                 draggable: true
             })
@@ -179,7 +218,11 @@ export default class MemGraphObjClass {
 
         var Y_addition = 0
         var ret_startingY = startingY
-        for (let prevEleAddr of ele.getPrevAddr()) {
+
+        let allPrevAddrs = Array.from(ele.getPrevAddr())
+        this.bubbleSort(allPrevAddrs, allPrevAddrs.length)
+
+        for (let prevEleAddr of allPrevAddrs) {
             // nextLeafNodesSet.add(prevEleAddr + ";" + ele.addr)
             if (Y_addition === 0) {
                 ret_startingY = Math.max(
@@ -196,6 +239,24 @@ export default class MemGraphObjClass {
         }
 
         return ret_startingY
+    }
+
+    bubbleSort(allPrevAddrs, size) {
+        var i, j;
+
+        for (i = 0; i < size-1; i++) {
+            for (j = 0; j < size-i-1; j++) {
+                if (this.elementMap[allPrevAddrs[j]].depth < this.elementMap[allPrevAddrs[j+1]].depth) {
+                    this.swap(allPrevAddrs,j,j+1);
+                }
+            }
+        }
+    }
+    
+    swap(array, before, after) {
+        var temp = array[before];
+        array[before] = array[after];
+        array[after] = temp;
     }
 
     /**

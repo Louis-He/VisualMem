@@ -60,6 +60,7 @@ class varSnapshot:
         if surfaceType not in self.typeDict:
             # Flags need to be set here
             linkedMembers = []
+            members = []
 
             # If not already exist add one
             response = gdbcontroller.write('ptype (' + variable['name'] + ')')
@@ -114,6 +115,7 @@ class varSnapshot:
                     # check if the member is possibly a linker to another node that has the same type
                     if memberType.count("*") == 0:
                         # The member is not even a pointer, pass the check!
+                        members.append(memberName)
                         continue
                     
                     nextNodeType = memberType[:memberType.rfind("*")].strip()
@@ -127,6 +129,8 @@ class varSnapshot:
                     "isLL": False,
                     "isTree": False
                 }
+                
+                newTypeDict["members"] = members
 
                 # If only one linked member -> linked list
                 if len(linkedMembers) == 1:
@@ -180,6 +184,7 @@ class varSnapshot:
             newVarDict["isLL"] = True
             newVarDict["isRefered"] = False
             newVarDict["linkedMember"] = self.typeDict[structTypeName]["linkedListMember"]
+            newVarDict["members"] = self.typeDict[structTypeName]["members"]
             # Special operations for a linked list
             # Add a field to indicate if the node is the head node or not
             referredAddr = memberDict[self.typeDict[structTypeName]["linkedListMember"]]["value"]
@@ -242,6 +247,8 @@ class varSnapshot:
         curValue = variable['value']
         curDict = {"name": variable['name'], "type": variable['type'], "value": variable['value'], 'ptrTarget': True}
 
+        unbufferedPrint(curDict)
+
         asteriskCount = variable['type'].count("*")
         curAddr = None
 
@@ -293,6 +300,62 @@ class varSnapshot:
             self.processVariable(gdbcontroller, curDict, curAddr)
             
         # unbufferedPrint("Ptr")
+    
+    def processArray(self, gdbcontroller, variable, isAddOriginalPointerAddr = True):
+        unbufferedPrint("=============Processing array!!!")
+
+        curName = variable['name']
+        curType = variable['type']
+        
+        curValue = []
+
+        # get the size of the array
+        arraySize = curType.split('[')[1][0:-1]
+
+        # get the address of the variable
+        response = gdbcontroller.write('-data-evaluate-expression "&(' + curName + ')"')
+        response = response[0]
+        headAddr = response['payload']['value']
+
+        # get the value of the head address
+        # TODO: type name
+        # TODO: sizeof(type) name
+        response = gdbcontroller.write('-data-evaluate-expression "*(int *)(' + headAddr + ')"')
+        response = response[0]
+        curValue.append(response['payload']['value'])
+        # unbufferedPrint(response)
+
+        # increment the address by a letter to get the next element
+        curAddr = self.incrementAddr(headAddr)
+
+        for i in range(int(arraySize)-1):
+            response = gdbcontroller.write('-data-evaluate-expression "*(int *)(' + curAddr + ')"')
+            response = response[0]
+            # unbufferedPrint(response)
+            curValue.append(response['payload']['value'])
+            curAddr = self.incrementAddr(curAddr)
+        
+        unbufferedPrint(curValue)
+        curDict = {"name": curName, "type": curType, "isArray": True, "value": curValue}
+
+        self.addVariable(gdbcontroller, curDict, varAddr=headAddr)
+        unbufferedPrint("=============Done Processing array!!!")
+
+        #unbufferedPrint(curDict)
+
+    def incrementAddr(self, address):
+        # 去掉0x hex转decimal，increment， 转hex 看有没有function
+        lastLetter = address[-1]
+        secondLast = address[-2]
+        letter_ascii = ord(lastLetter)
+
+        if (letter_ascii + 4 > 102): # if last letter + 4 > f -> increment to the second last letter
+            return address[0:-2] + chr(ord(secondLast) + 1) + chr(48 + ((letter_ascii + 4) % 103))
+        elif (letter_ascii + 4 > 57):
+            return address[0:-1] + chr(letter_ascii + 43)
+        else:
+            return address[0:-1] + chr(letter_ascii + 4)
+        
 
     def processVariable(self, gdbcontroller, variable, varAddr = None):
         # unbufferedPrint("========VICKY1========")
@@ -309,7 +372,7 @@ class varSnapshot:
             # should be either a struct, or an array
             # unbufferedPrint("[Error] Cannot process right now.")
             if bracketCount != 0:
-                unbufferedPrint("[Error] Array detected. Can't process right now.")
+                self.processArray(gdbcontroller, variable)
             elif asteriskCount != 0:
                 unbufferedPrint("[Error] Can't process right now, seems a bit strange, need to CHECK!")
             else:

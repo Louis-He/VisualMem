@@ -174,6 +174,7 @@ export default class MemGraphObjClass {
             })
             console.log(arrayList.length)
             for (var i = 1; i < arrayList.length; i++) {
+                // TODO: handle position!!
                 console.log(i)
                 this.memGraphRepresentation.push({ 
                     id: ele.addr+i, 
@@ -187,6 +188,8 @@ export default class MemGraphObjClass {
                     draggable: true
                 })
             }
+        } else if (ele.isTree) {
+            // do nothing for now
         } else {
             this.memGraphRepresentation.push({ 
                 id: ele.addr, 

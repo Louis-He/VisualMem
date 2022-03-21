@@ -318,6 +318,8 @@ class varSnapshot:
         headAddr = response['payload']['value']
 
         # get the value of the head address
+        # TODO: type name
+        # TODO: sizeof(type) name
         response = gdbcontroller.write('-data-evaluate-expression "*(int *)(' + headAddr + ')"')
         response = response[0]
         curValue.append(response['payload']['value'])
@@ -342,6 +344,7 @@ class varSnapshot:
         #unbufferedPrint(curDict)
 
     def incrementAddr(self, address):
+        # 去掉0x hex转decimal，increment， 转hex 看有没有function
         lastLetter = address[-1]
         secondLast = address[-2]
         letter_ascii = ord(lastLetter)

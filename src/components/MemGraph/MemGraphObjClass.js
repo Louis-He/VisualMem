@@ -159,6 +159,37 @@ export default class MemGraphObjClass {
                 }, 
                 draggable: true
             })
+        } else if (ele.isArray) {
+            let arrayList = ele.value;
+            this.memGraphRepresentation.push({ 
+                id: ele.addr, 
+                type: 'arrayHead', 
+                position: {x: startingX * 120 + 10, y: startingY * 60 + 10}, 
+                data: { 
+                    name: ele.name.includes("*") ? " " : ele.name, 
+                    index: 0,
+                    text: arrayList[0]
+                }, 
+                draggable: true
+            })
+            console.log(arrayList.length)
+            for (var i = 1; i < arrayList.length; i++) {
+                // TODO: handle position!!
+                console.log(i)
+                this.memGraphRepresentation.push({ 
+                    id: ele.addr+i, 
+                    type: 'array', 
+                    position: {x: startingX * 120 + 10, y: startingY * 60 + 10}, 
+                    data: { 
+                        name: ele.name.includes("*") ? " " : ele.name, 
+                        index: i,
+                        text: arrayList[i]
+                    }, 
+                    draggable: true
+                })
+            }
+        } else if (ele.isTree) {
+            // do nothing for now
         } else {
             this.memGraphRepresentation.push({ 
                 id: ele.addr, 

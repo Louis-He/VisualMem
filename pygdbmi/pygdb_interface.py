@@ -247,6 +247,8 @@ class varSnapshot:
         curValue = variable['value']
         curDict = {"name": variable['name'], "type": variable['type'], "value": variable['value'], 'ptrTarget': True}
 
+        unbufferedPrint(curDict)
+
         asteriskCount = variable['type'].count("*")
         curAddr = None
 
@@ -298,6 +300,62 @@ class varSnapshot:
             self.processVariable(gdbcontroller, curDict, curAddr)
             
         # unbufferedPrint("Ptr")
+    
+    def processArray(self, gdbcontroller, variable, isAddOriginalPointerAddr = True):
+        unbufferedPrint("=============Processing array!!!")
+
+        curName = variable['name']
+        curType = variable['type']
+        
+        curValue = []
+
+        # get the size of the array
+        arraySize = curType.split('[')[1][0:-1]
+
+        # get the address of the variable
+        response = gdbcontroller.write('-data-evaluate-expression "&(' + curName + ')"')
+        response = response[0]
+        headAddr = response['payload']['value']
+
+        # get the value of the head address
+        # TODO: type name
+        # TODO: sizeof(type) name
+        response = gdbcontroller.write('-data-evaluate-expression "*(int *)(' + headAddr + ')"')
+        response = response[0]
+        curValue.append(response['payload']['value'])
+        # unbufferedPrint(response)
+
+        # increment the address by a letter to get the next element
+        curAddr = self.incrementAddr(headAddr)
+
+        for i in range(int(arraySize)-1):
+            response = gdbcontroller.write('-data-evaluate-expression "*(int *)(' + curAddr + ')"')
+            response = response[0]
+            # unbufferedPrint(response)
+            curValue.append(response['payload']['value'])
+            curAddr = self.incrementAddr(curAddr)
+        
+        unbufferedPrint(curValue)
+        curDict = {"name": curName, "type": curType, "isArray": True, "value": curValue}
+
+        self.addVariable(gdbcontroller, curDict, varAddr=headAddr)
+        unbufferedPrint("=============Done Processing array!!!")
+
+        #unbufferedPrint(curDict)
+
+    def incrementAddr(self, address):
+        # 去掉0x hex转decimal，increment， 转hex 看有没有function
+        lastLetter = address[-1]
+        secondLast = address[-2]
+        letter_ascii = ord(lastLetter)
+
+        if (letter_ascii + 4 > 102): # if last letter + 4 > f -> increment to the second last letter
+            return address[0:-2] + chr(ord(secondLast) + 1) + chr(48 + ((letter_ascii + 4) % 103))
+        elif (letter_ascii + 4 > 57):
+            return address[0:-1] + chr(letter_ascii + 43)
+        else:
+            return address[0:-1] + chr(letter_ascii + 4)
+        
 
     def processVariable(self, gdbcontroller, variable, varAddr = None):
         # unbufferedPrint("========VICKY1========")
@@ -314,7 +372,7 @@ class varSnapshot:
             # should be either a struct, or an array
             # unbufferedPrint("[Error] Cannot process right now.")
             if bracketCount != 0:
-                unbufferedPrint("[Error] Array detected. Can't process right now.")
+                self.processArray(gdbcontroller, variable)
             elif asteriskCount != 0:
                 unbufferedPrint("[Error] Can't process right now, seems a bit strange, need to CHECK!")
             else:

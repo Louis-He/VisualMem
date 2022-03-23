@@ -145,8 +145,8 @@ export default class MemGraphObjClass {
             var textContent = ''
 
             members.forEach(member => {
-                let memberValue = ele.getValue()[member]["value"]
-                textContent = textContent + member + ":" + memberValue + " "
+                    let memberValue = ele.getValue()[member]["value"]
+                    textContent = textContent + member + ":" + memberValue + " "
                 }
             )
             this.memGraphRepresentation.push({ 
@@ -172,14 +172,14 @@ export default class MemGraphObjClass {
                 }, 
                 draggable: true
             })
-            console.log(arrayList.length)
+            startingX += 1;
+            
             for (var i = 1; i < arrayList.length; i++) {
                 // TODO: handle position!!
-                console.log(i)
                 this.memGraphRepresentation.push({ 
                     id: ele.addr+i, 
                     type: 'array', 
-                    position: {x: startingX * 120 + 10, y: startingY * 60 + 10}, 
+                    position: {x: startingX * 120 + 10 + 80, y: startingY * 60 + 10}, 
                     data: { 
                         name: ele.name.includes("*") ? " " : ele.name, 
                         index: i,
@@ -187,6 +187,7 @@ export default class MemGraphObjClass {
                     }, 
                     draggable: true
                 })
+                startingX += 1;
             }
         } else if (ele.isTree) {
             // do nothing for now

@@ -91,14 +91,17 @@ const linkedListHeadComponent = ({ data }) => {
   
 const linkedListComponent = ({ data }) => {
   return (
-    <div>
-      <Handle type="target" position="left" className='linkedListNode'/>
-      <div className='linkedListNode'> {data.text} </div>
+    <div className='linkedList'>
+      <p className='linkedListName'> {data.name} </p>
+      <div>
+        <div className='linkedListNode'>{data.text}</div>
+      </div>
+      <Handle type="target" position="left" style = {{top: "35%", left: "42%", borderRadius: 0}} className = "handle"/>
       <Handle 
         type="source"
         position="right"
-        style = {{top: "70%", borderRadius: 0}}
-        className='linkedListNode'
+        className = "handle"
+        style = {{top: "35%", borderRadius: 0}}
       />
     </div>
   )

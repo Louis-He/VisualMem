@@ -288,7 +288,7 @@ export default class MemGraphObjClass {
             } else {
                 ret_startingY = Math.max(
                     ret_startingY, 
-                    this._generateReactflowGraphHelper(ele.addr, "s" + i.toString(), this.elementMap[prevEleAddr], startingY + Y_addition, startingX, customNodeStyle)
+                    this._generateReactflowGraphHelper(ele.addr, "s" + i.toString(), this.elementMap[prevEleAddr], startingY + Y_addition, startingX - 1, customNodeStyle)
                 );
             }
             Y_addition += 1

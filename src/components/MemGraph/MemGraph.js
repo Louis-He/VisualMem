@@ -447,7 +447,7 @@ export default class MemGraph extends React.Component {
             console.log(nodeTypes)
             return (
                 <div style={{ height: 500, width: 1000 }}>
-                    <ReactFlow elements={this.state.element_graph} nodeTypes={nodeTypes} nodeTypesId={this.state.nodeTypesId} minZoom={1} maxZoom={1} translateExtent={[[0, 0], [1000, 500]]} />
+                    <ReactFlow elements={this.state.element_graph} nodeTypes={nodeTypes} nodeTypesId={this.state.nodeTypesId} minZoom={0.1} maxZoom={10} translateExtent={[[0, 0], [10000, 5000]]} />
                 </div>
             )
         }

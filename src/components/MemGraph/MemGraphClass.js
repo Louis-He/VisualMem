@@ -58,12 +58,12 @@ export default class MemGraphClass {
         console.log(this.graphObjMap)
     }
 
-    generateReactflowGraph() {
+    generateReactflowGraph(customNodeStyle) {
         var startingY = 0
         var i
         
         for (i = 0; i < this.graphObjMap.length; i++) {
-            startingY = this.graphObjMap[i].generateReactflowGraph(startingY);
+            startingY = this.graphObjMap[i].generateReactflowGraph(startingY, customNodeStyle);
             startingY += 1
         }
 

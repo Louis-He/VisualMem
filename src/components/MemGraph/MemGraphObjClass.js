@@ -1,4 +1,4 @@
-import ReactFlow, { Handle } from 'react-flow-renderer';
+import { Handle } from 'react-flow-renderer';
 
 export default class MemGraphObjClass {
     constructor() {
@@ -278,7 +278,7 @@ export default class MemGraphObjClass {
         
         this.bubbleSort(allPrevAddrs, allPrevAddrs.length)
 
-        var i = 0
+        i = 0
         for (let prevEleAddr of allPrevAddrs) {
             if (Y_addition === 0) {
                 ret_startingY = Math.max(

@@ -152,10 +152,6 @@ export default class MainWindow extends React.Component {
   }
 
 
-  selectExecutable(e) {
-    e.preventDefault();
-    ipcRenderer.invoke('requestSelectExecutable', this.props.projectFolder)
-  }
 
   showFile(e) {
     e.preventDefault();

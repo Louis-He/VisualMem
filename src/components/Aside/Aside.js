@@ -8,7 +8,14 @@ import {
   SidebarContent,
   SidebarFooter
 } from "react-pro-sidebar";
-import { FaGem, FaList, FaGithub } from "react-icons/fa";
+import { FaGithub } from "react-icons/fa";
+import { AiOutlineFile, AiFillFolderOpen } from "react-icons/ai";
+//import FileTree from "./../../components/RightPanel/FileTree.js"
+//import dirTree from 'directory-tree';
+//import FileTree from 'react-filetree-electron';
+
+const ipcRenderer = window.require("electron").ipcRenderer;
+
 
 
 //const Aside = () => {
@@ -30,6 +37,16 @@ export default class Aside extends React.Component{
     console.log(this.state.pageID)
   }
 
+  selectProjectFolder(e) {
+    e.preventDefault();
+    ipcRenderer.invoke('requestSelectProjectFolder',)
+  }
+
+  selectExecutable(e) {
+    e.preventDefault();
+    ipcRenderer.invoke('requestSelectExecutable', this.props.projectFolder)
+  }
+
   render(){
     const headerStyle = {
       padding: "24px",
@@ -46,8 +63,8 @@ export default class Aside extends React.Component{
         <SidebarHeader style={headerStyle}>Debugger Visualizer</SidebarHeader>
         <SidebarContent>
           <Menu iconShape="circle">
-            <MenuItem icon={<FaList />} onClick={() => this.changePage('M1')}>Func 1</MenuItem>
-            <MenuItem icon={<FaGem />} onClick={() => this.changePage('M2')}>Func 2</MenuItem>
+            <MenuItem icon={<AiFillFolderOpen />} onClick={(e) => this.selectProjectFolder(e)}>Select Project Folder</MenuItem>
+            <MenuItem icon={<AiOutlineFile />} onClick={(e) => this.selectExecutable(e)}>Select Executable File</MenuItem>
           </Menu>
           <Menu iconShape="circle">
             <SubMenu
@@ -60,6 +77,9 @@ export default class Aside extends React.Component{
             </SubMenu>
           </Menu>
         </SidebarContent>
+        {/* <SidebarContent>
+          <FileTree executablePath={this.state.executablePath}/>
+        </SidebarContent> */}
         <SidebarFooter style={{ textAlign: "center" }}>
           <div className="sidebar-btn-wrapper">
             <a

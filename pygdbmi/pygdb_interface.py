@@ -370,11 +370,11 @@ class varSnapshot:
                     curAddr = self.incrementAddr(curAddr, varSize)
                 curValue.append(rowValue)
                 rowValue = []
-
-            unbufferedPrint(curValue)
-
-
             
+            unbufferedPrint(curValue)
+            curDict = {"name": curName, "type": curType, "isArray": True, "is2D": True, "value": curValue}
+
+            self.addVariable(gdbcontroller, curDict, varAddr=headAddr)
 
         else:
             unbufferedPrint("More than 2 dimensional array detected! Cannot process right now")

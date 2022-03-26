@@ -178,6 +178,7 @@ export default class MemGraph extends React.Component {
                 sourceFile: parsedJson['sourceFile'],
                 lineNumber: parsedJson['lineNumber']
             })
+            // that.props.updateLineNumber()
 
             let localVarJson = parsedJson['locals'];
             let memGraph = that.state.memGraph;

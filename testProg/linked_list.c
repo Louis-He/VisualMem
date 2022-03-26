@@ -15,10 +15,14 @@ int main() {
     int *c;
     int **d;
     int ***e;
+    int *f, *g;
 
     e = &d;
     d = &c;
     c = &b;
+
+    f = &b;
+    g = &b;
     
     Node* head = malloc(sizeof(Node));
     head->val = 0;

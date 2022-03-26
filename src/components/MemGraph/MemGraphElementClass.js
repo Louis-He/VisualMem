@@ -47,6 +47,13 @@ export default class MemGraphElementClass {
         this._afterAddr.delete(addr)
     }
 
+    /**
+     * return the length of the element name
+     */
+    getElementName() {
+        return this.name.length
+    }
+
     getValue() {
         // return JSON.stringify(this.value)
         return this.value

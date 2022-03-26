@@ -5,7 +5,10 @@
 
 int main () {
 
-    int array_1_longlongnametest[] = {11, 22, 33, 44, 55};
+    int array_1[] = {11, 22, 33, 44, 55};
+
+    int array_3[2][4] = { {10, 11, 12, 13},
+                          {14, 15, 16, 17}};
     
     int *array_2 = NULL;
 

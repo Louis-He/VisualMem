@@ -61,6 +61,9 @@ export default class MainWindow extends React.Component {
       sourceFile: "",
       lineNumber: "", 
     }
+
+    this.updateLineNumber = this.updateLineNumber.bind(this);
+    this.updateSourceFile = this.updateSourceFile.bind(this);
   }
 
   componentDidMount() {
@@ -89,6 +92,18 @@ export default class MainWindow extends React.Component {
       }
     });
 
+  }
+
+  updateLineNumber(lineNum) {
+    this.setState({
+      lineNumber: lineNum
+    })
+  }
+
+  updateSourceFile(sourceF) {
+    this.setState({
+      sourceFile: sourceF
+    })
   }
 
   async renderRequestStartGDB() {
@@ -376,7 +391,7 @@ export default class MainWindow extends React.Component {
                           <p>Current Executable Path: {this.props.executablePath}</p>
                         </div>
 
-                        <MemGraph appState = {this}/>
+                        <MemGraph updateLineNumber = {this.updateLineNumber} updateSourceFile = {this.updateSourceFile}/>
 
                         <div>
                           <Form>

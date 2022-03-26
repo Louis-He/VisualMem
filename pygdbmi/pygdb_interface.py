@@ -306,43 +306,81 @@ class varSnapshot:
 
         curName = variable['name']
         curType = variable['type']
+        unbufferedPrint(curName)
         
         curValue = []
 
-        # get the size of the array
-        arraySize = curType.split('[')[1][0:-1]
+        brasketCount = variable['type'].count("[")
 
-        # get the name of the type
+        # get array type
         arrayType = curType.split(' ')[0]
-
-        # get the address of the variable
-        response = gdbcontroller.write('-data-evaluate-expression "&(' + curName + ')"')
-        response = response[0]
-        headAddr = response['payload']['value']
 
         # get the size of the variable type
         response = gdbcontroller.write('-data-evaluate-expression sizeof(' + arrayType + ')')
         response = response[0]
         varSize = int(response['payload']['value'])
 
-        # get the value of the head address
-        response = gdbcontroller.write('-data-evaluate-expression "*(' + arrayType+ ' *)(' + headAddr + ')"')
+        # get the address of the variable
+        response = gdbcontroller.write('-data-evaluate-expression "&(' + curName + ')"')
         response = response[0]
-        curValue.append(response['payload']['value'])
+        headAddr = response['payload']['value']
 
-        # increment the address by a letter to get the next element
-        curAddr = self.incrementAddr(headAddr, varSize)
+        if (brasketCount == 1): # 1d array
+            # get the length of the array
+            arrayLength = curType.split('[')[1][0:-1]
 
-        for i in range(int(arraySize)-1):
-            response = gdbcontroller.write('-data-evaluate-expression "*(' + arrayType+ ' *)(' + curAddr + ')"')
+            # get the value of the head address
+            response = gdbcontroller.write('-data-evaluate-expression "*(' + arrayType+ ' *)(' + headAddr + ')"')
             response = response[0]
             curValue.append(response['payload']['value'])
-            curAddr = self.incrementAddr(curAddr, varSize)
-        
-        unbufferedPrint(curValue)
-        curDict = {"name": curName, "type": curType, "isArray": True, "value": curValue}
 
-        self.addVariable(gdbcontroller, curDict, varAddr=headAddr)
+            # increment the address by the variable size to get the next element
+            curAddr = self.incrementAddr(headAddr, varSize)
+
+            for i in range(int(arrayLength)-1):
+                # get rest of the values
+                response = gdbcontroller.write('-data-evaluate-expression "*(' + arrayType+ ' *)(' + curAddr + ')"')
+                response = response[0]
+                curValue.append(response['payload']['value'])
+                curAddr = self.incrementAddr(curAddr, varSize)
+            
+            unbufferedPrint(curValue)
+            curDict = {"name": curName, "type": curType, "isArray": True, "value": curValue}
+
+            self.addVariable(gdbcontroller, curDict, varAddr=headAddr)
+
+        elif (brasketCount == 2): # 2d array
+            # get number of rows for the array
+            numRow = curType.split('[')[1][0:-1]
+
+            # get number of cols for the array
+            numCol = curType.split('[')[2][0:-1]
+
+            curAddr = headAddr
+
+            for i in range(int(numRow)):
+                rowValue = []
+                for j in range(int(numCol)):
+                    unbufferedPrint(curAddr)
+                    # unbufferedPrint('-data-evaluate-expression "**(' + arrayType+ ')(' + curAddr + ')"')
+                    response = gdbcontroller.write('-data-evaluate-expression "*(' + arrayType+ ' *)(' + curAddr + ')"')
+                    response = response[0]
+                    unbufferedPrint(response)
+                    rowValue.append(response['payload']['value'])
+                    curAddr = self.incrementAddr(curAddr, varSize)
+                curValue.append(rowValue)
+                rowValue = []
+            
+            unbufferedPrint(curValue)
+            curDict = {"name": curName, "type": curType, "isArray": True, "is2D": True, "value": curValue}
+
+            self.addVariable(gdbcontroller, curDict, varAddr=headAddr)
+
+        else:
+            unbufferedPrint("More than 2 dimensional array detected! Cannot process right now")
+
+        
+
         unbufferedPrint("=============Done Processing array!!!")
 
         #unbufferedPrint(curDict)

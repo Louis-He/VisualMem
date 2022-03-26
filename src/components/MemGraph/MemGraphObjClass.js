@@ -217,7 +217,7 @@ export default class MemGraphObjClass {
                 let finalPos = 100;
                 let beginingPos = startPos + (finalPos - startPos) / (prevAddrLength-1) / 2
 
-                for (i = 1; i < prevAddrLength; i++) {
+                for (si = 1; i < prevAddrLength; i++) {
                     let pos = beginingPos + (finalPos - startPos) * (i-1) / (prevAddrLength-1);
                     targetArr.push(
                         <Handle type="target" position="bottom" className={nodeClassName} key={"t" + i.toString()} id={"t" + i.toString()}

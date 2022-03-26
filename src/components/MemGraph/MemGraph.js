@@ -192,10 +192,8 @@ export default class MemGraph extends React.Component {
             //   variableDict: parsedJson['locals'],
             // })
             
-            that.props.appState.setState({
-                sourceFile: parsedJson['sourceFile'],
-                lineNumber: parsedJson['lineNumber']
-            })
+            that.props.updateLineNumber(parsedJson['lineNumber'])
+            that.props.updateSourceFile(parsedJson['sourceFile'])
 
             let localVarJson = parsedJson['locals'];
             let memGraph = that.state.memGraph;

@@ -135,8 +135,9 @@ export default class MemGraphObjClass {
      * @param {enum} nodeClassName
      */
     _generateCustomReactflowComponent(prevAddrLength, afterAddrLength, nodeClassName) {
+        var targetArr = []
+        var i = 0
         if (nodeClassName === nodeTypes.normal) {
-            var targetArr = []
             
             if (prevAddrLength !== 0) {
                 targetArr.push(
@@ -151,7 +152,7 @@ export default class MemGraphObjClass {
                 let finalPos = 100;
                 let beginingPos = startPos + (finalPos - startPos) / (prevAddrLength-1) / 2
 
-                for (var i = 1; i < prevAddrLength; i++) {
+                for (i = 1; i < prevAddrLength; i++) {
                     let pos = beginingPos + (finalPos - startPos) * (i-1) / (prevAddrLength-1);
                     targetArr.push(
                         <Handle type="target" position="bottom" className={nodeClassName} key={"t" + i.toString()} id={"t" + i.toString()}
@@ -169,9 +170,7 @@ export default class MemGraphObjClass {
                     </div>
                 </div>
             )}
-        } else if (nodeClassName === nodeTypes.pointer) {
-            var targetArr = []
-            
+        } else if (nodeClassName === nodeTypes.pointer) {            
             if (prevAddrLength !== 0) {
                 targetArr.push(
                     <Handle type="target" position="left" className={nodeClassName} key="t0" id="t0" 
@@ -185,7 +184,7 @@ export default class MemGraphObjClass {
                 let finalPos = 100;
                 let beginingPos = startPos + (finalPos - startPos) / (prevAddrLength-1) / 2
 
-                for (var i = 1; i < prevAddrLength; i++) {
+                for (i = 1; i < prevAddrLength; i++) {
                     let pos = beginingPos + (finalPos - startPos) * (i-1) / (prevAddrLength-1);
                     targetArr.push(
                         <Handle type="target" position="bottom" className={nodeClassName} key={"t" + i.toString()} id={"t" + i.toString()}
@@ -205,8 +204,6 @@ export default class MemGraphObjClass {
                 </div>
             )}
         } else if (nodeClassName === nodeTypes.linkedListHead || nodeTypes.linkedListNode) {
-            var targetArr = []
-            
             if (prevAddrLength !== 0) {
                 targetArr.push(
                     <Handle type="target" position="left" className="handle" key="t0" id="t0" 
@@ -220,7 +217,7 @@ export default class MemGraphObjClass {
                 let finalPos = 100;
                 let beginingPos = startPos + (finalPos - startPos) / (prevAddrLength-1) / 2
 
-                for (var i = 1; i < prevAddrLength; i++) {
+                for (i = 1; i < prevAddrLength; i++) {
                     let pos = beginingPos + (finalPos - startPos) * (i-1) / (prevAddrLength-1);
                     targetArr.push(
                         <Handle type="target" position="bottom" className={nodeClassName} key={"t" + i.toString()} id={"t" + i.toString()}

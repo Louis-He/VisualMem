@@ -13,6 +13,7 @@ export default class MemGraphElementClass {
         this.type        = ele.type
         this.value       = ele.value
 
+        this.isPtr       = "ptrTarget" in ele
         this.isLL        = "isLL" in ele && ele.isLL
         this.isArray     = "isArray" in ele && ele.isArray
         this.isTree      = "isTree" in ele && ele.isTree

@@ -1,5 +1,14 @@
 import { Handle } from 'react-flow-renderer';
 
+let nodeTypes = {
+    normal: "normalNode", 
+    pointer: "pointerNode", 
+    linkedListHead: "linkedListHead", 
+    linkedListNode: "linkedList", 
+    arrayHead: "arrayHead", 
+    arrayNode: "arrayNode"
+}
+
 export default class MemGraphObjClass {
     constructor() {
         this.elementMap = {}
@@ -122,52 +131,134 @@ export default class MemGraphObjClass {
     /**
      * Create a custom reactflow coponent based on prevAddrLength
      * @param {int} prevAddrLength 
+     * @param {int} afterAddrLength
+     * @param {enum} nodeClassName
      */
-    _generateCustomReactflowComponent(prevAddrLength, nodeClassName) {
+    _generateCustomReactflowComponent(prevAddrLength, afterAddrLength, nodeClassName) {
         var targetArr = []
-        
-        targetArr.push(
-            <Handle type="target" position="left" className={nodeClassName} key="s0" id="s0" 
-                style = {{top: "35%", left: "44.44%", borderRadius: 0}}/>
-        )
-
-        // if we have more than one prevAddr, we need to create a custom reactflow component for each prevAddr
-        if (prevAddrLength !== 0) {
-            let startPos = 50;
-            let finalPos = 100;
-            let beginingPos = startPos + (finalPos - startPos) / (prevAddrLength-1) / 2
-
-            for (var i = 1; i < prevAddrLength; i++) {
-                let pos = beginingPos + (finalPos - startPos) * (i-1) / (prevAddrLength-1);
+        var i = 0
+        if (nodeClassName === nodeTypes.normal) {
+            
+            if (prevAddrLength !== 0) {
                 targetArr.push(
-                    <Handle type="target" position="bottom" className={nodeClassName} key={"s" + i.toString()} id={"s" + i.toString()}
-                        style = {{top: "52%", left: pos.toString()+"%", borderRadius: 0}}/>
+                    <Handle type="target" position="left" className={nodeClassName} key="t0" id="t0" 
+                        style = {{top: "35%", left: "44.44%", borderRadius: 0}}/>
                 )
-            } 
-        }
-        
-        return ({ data }) => {return (
-            <div className='normal'>
-                {targetArr}
-                <p className='normalName'> {data.name} </p>
-                <div>
-                    <div className='normalNode'> {data.text} </div>
+            }
+
+            // if we have more than one prevAddr, we need to create a custom reactflow component for each prevAddr
+            if (prevAddrLength > 1) {
+                let startPos = 50;
+                let finalPos = 100;
+                let beginingPos = startPos + (finalPos - startPos) / (prevAddrLength-1) / 2
+
+                for (i = 1; i < prevAddrLength; i++) {
+                    let pos = beginingPos + (finalPos - startPos) * (i-1) / (prevAddrLength-1);
+                    targetArr.push(
+                        <Handle type="target" position="bottom" className={nodeClassName} key={"t" + i.toString()} id={"t" + i.toString()}
+                            style = {{top: "52%", left: pos.toString()+"%", borderRadius: 0}}/>
+                    )
+                } 
+            }
+            
+            return ({ data }) => {return (
+                <div className='normal'>
+                    {targetArr}
+                    <p className='normalName'> {data.name} </p>
+                    <div>
+                        <div className='normalNode'> {data.text} </div>
+                    </div>
                 </div>
-            </div>
-        )}
+            )}
+        } else if (nodeClassName === nodeTypes.pointer) {            
+            if (prevAddrLength !== 0) {
+                targetArr.push(
+                    <Handle type="target" position="left" className={nodeClassName} key="t0" id="t0" 
+                        style = {{top: "35%", left: "70%", borderRadius: 0}}/>
+                )
+            }
+
+            // if we have more than one prevAddr, we need to create a custom reactflow component for each prevAddr
+            if (prevAddrLength > 1) {
+                let startPos = 70;
+                let finalPos = 100;
+                let beginingPos = startPos + (finalPos - startPos) / (prevAddrLength-1) / 2
+
+                for (i = 1; i < prevAddrLength; i++) {
+                    let pos = beginingPos + (finalPos - startPos) * (i-1) / (prevAddrLength-1);
+                    targetArr.push(
+                        <Handle type="target" position="bottom" className={nodeClassName} key={"t" + i.toString()} id={"t" + i.toString()}
+                            style = {{top: "52%", left: pos.toString()+"%", borderRadius: 0}}/>
+                    )
+                } 
+            }
+
+            return ({ data }) => {return (
+                <div className='normal'>
+                  <p className='pointerName'> {data.name} </p>
+                  <div>
+                    <Handle type="source" position="right" style = {{top: "35%", borderRadius: 0}} className={nodeClassName} id="s0"/>
+                    <div className={nodeClassName}> </div>
+                    {targetArr}
+                  </div>
+                </div>
+            )}
+        } else if (nodeClassName === nodeTypes.linkedListHead || nodeTypes.linkedListNode) {
+            if (prevAddrLength !== 0) {
+                targetArr.push(
+                    <Handle type="target" position="left" className="handle" key="t0" id="t0" 
+                        style = {{top: "35%", left: "44.44%", borderRadius: 0}}/>
+                )
+            }
+
+            // if we have more than one prevAddr, we need to create a custom reactflow component for each prevAddr
+            if (prevAddrLength > 1) {
+                let startPos = 50;
+                let finalPos = 100;
+                let beginingPos = startPos + (finalPos - startPos) / (prevAddrLength-1) / 2
+
+                for (i = 1; i < prevAddrLength; i++) {
+                    let pos = beginingPos + (finalPos - startPos) * (i-1) / (prevAddrLength-1);
+                    targetArr.push(
+                        <Handle type="target" position="bottom" className={nodeClassName} key={"t" + i.toString()} id={"t" + i.toString()}
+                            style = {{top: "52%", left: pos.toString()+"%", borderRadius: 0}}/>
+                    )
+                } 
+            }
+
+            let sorceHandler = <div></div>
+            if (afterAddrLength !== 0) {
+                sorceHandler = <Handle type="source" position="right" style = {{top: "35%", borderRadius: 0}} className="handle" id="s0"/>
+            }
+
+            return ({ data }) => {return (
+                <div className='linkedList'>
+                    <p className='linkedListName'> {data.name} </p>
+                    <div>
+                        <div className='linkedListNode'> {data.text} </div>
+                    </div>
+                    {sorceHandler}
+                    {targetArr}
+                </div>
+            )}
+        }  else if (nodeClassName === nodeTypes.arrayHead) {
+
+        } else if (nodeClassName === nodeTypes.arrayNode) {
+
+        }
     }
 
     /**
      * The helper function to generate the memGraphRepresentation for each node
      * @param {MemGraphElementClass Object} srcAddr The node after the current node that requested the node generation
-     * @param {int} srcId The id of the target handler that the current node should be connected to
+     * @param {int} targetId The id of the target handler that the current node should be connected to
      * @param {MemGraphElementClass Object} ele The current node
      * @param {int} startingY The starting y position of the node
      * @param {int} startingX The starting x position of the node
      * @param {Object of node styles} customNodeStyle All the styles for the graph
      * @returns 
      */
-    _generateReactflowGraphHelper(srcAddr, srcId, ele, startingY, startingX, customNodeStyle) {
+    _generateReactflowGraphHelper(srcAddr, targetId, ele, startingY, startingX, customNodeStyle) {
         // check if staringY and startingX has already been occupied
         var formattedNumber = ("000" + startingX).slice(-4) + ("000" + startingY).slice(-4);
 
@@ -178,21 +269,38 @@ export default class MemGraphObjClass {
         this.placementOccupiedSet.add(formattedNumber)
 
         let allPrevAddrs = Array.from(ele.getPrevAddr())
+        let allAfterAddrs = Array.from(ele.getAfterAddr())
 
         // draw the node
-        if (ele.getAfterAddr().size !== 0) {
+        // if (ele.getAfterAddr().size !== 0) {
+        if (ele.isPtr) {
+            // this.memGraphRepresentation.push({ 
+            //     id: ele.addr, 
+            //     type: 'pointer', 
+            //     position: {x: startingX * 120 + 10, y: startingY * 60 + 10}, 
+            //     data: { 
+            //         name: ele.name.includes("*") ? " " : ele.name, 
+            //         text: ele.getValue().toString()
+            //     }, 
+            //     targetHandle: '1',
+            //     draggable: true
+            // })
+
+            customNodeStyle[ele.addr + allPrevAddrs.length.toString() + "_style"] = this._generateCustomReactflowComponent(allPrevAddrs.length, allAfterAddrs.length, nodeTypes.pointer);
+
             this.memGraphRepresentation.push({ 
                 id: ele.addr, 
-                type: 'pointer', 
+                type: ele.addr + allPrevAddrs.length.toString() + "_style", 
                 position: {x: startingX * 120 + 10, y: startingY * 60 + 10}, 
                 data: { 
                     name: ele.name.includes("*") ? " " : ele.name, 
                     text: ele.getValue().toString()
                 }, 
-                targetHandle: '1',
                 draggable: true
             })
         } else if(ele.isLL) {
+            customNodeStyle[ele.addr + allPrevAddrs.length.toString() + "_style"] = this._generateCustomReactflowComponent(allPrevAddrs.length, allAfterAddrs.length, nodeTypes.linkedListNode);
+
             let members = ele.getMembers()
             var textContent = ''
 
@@ -201,9 +309,19 @@ export default class MemGraphObjClass {
                     textContent = textContent + member + ":" + memberValue + " "
                 }
             )
+            // this.memGraphRepresentation.push({ 
+            //     id: ele.addr, 
+            //     type: 'linkedList', 
+            //     position: {x: startingX * 120 + 10, y: startingY * 60 + 10}, 
+            //     data: { 
+            //         name: ele.name.includes("*") ? " " : ele.name, 
+            //         text: textContent
+            //     }, 
+            //     draggable: true
+            // })
             this.memGraphRepresentation.push({ 
                 id: ele.addr, 
-                type: 'linkedList', 
+                type: ele.addr + allPrevAddrs.length.toString() + "_style", 
                 position: {x: startingX * 120 + 10, y: startingY * 60 + 10}, 
                 data: { 
                     name: ele.name.includes("*") ? " " : ele.name, 
@@ -211,6 +329,7 @@ export default class MemGraphObjClass {
                 }, 
                 draggable: true
             })
+
         } else if (ele.isArray) {
             let arrayList = ele.value;
             this.memGraphRepresentation.push({ 
@@ -244,7 +363,8 @@ export default class MemGraphObjClass {
         } else if (ele.isTree) {
             // do nothing for now
         } else {
-            customNodeStyle[ele.addr + allPrevAddrs.length.toString() + "_style"] = this._generateCustomReactflowComponent(allPrevAddrs.length, "normalNode");
+            // for normal nodes
+            customNodeStyle[ele.addr + allPrevAddrs.length.toString() + "_style"] = this._generateCustomReactflowComponent(allPrevAddrs.length, allAfterAddrs.length, nodeTypes.normal);
 
             this.memGraphRepresentation.push({ 
                 id: ele.addr, 
@@ -267,8 +387,8 @@ export default class MemGraphObjClass {
                 source: ele.addr,
                 target: srcAddr,
                 arrowHeadType: 'arrow', 
-                targetHandle: srcId,
-                style: {strokeWidth: 4},
+                targetHandle: targetId,
+                style: {strokeWidth: 2},
             })
         }
 
@@ -283,12 +403,12 @@ export default class MemGraphObjClass {
             if (Y_addition === 0) {
                 ret_startingY = Math.max(
                     ret_startingY, 
-                    this._generateReactflowGraphHelper(ele.addr, "s" + i.toString(), this.elementMap[prevEleAddr], startingY + Y_addition, startingX - 1, customNodeStyle)
+                    this._generateReactflowGraphHelper(ele.addr, "t" + i.toString(), this.elementMap[prevEleAddr], startingY + Y_addition, startingX - 1, customNodeStyle)
                 );
             } else {
                 ret_startingY = Math.max(
                     ret_startingY, 
-                    this._generateReactflowGraphHelper(ele.addr, "s" + i.toString(), this.elementMap[prevEleAddr], startingY + Y_addition, startingX - 1, customNodeStyle)
+                    this._generateReactflowGraphHelper(ele.addr, "t" + i.toString(), this.elementMap[prevEleAddr], startingY + Y_addition, startingX - 1, customNodeStyle)
                 );
             }
             Y_addition += 1
@@ -339,7 +459,7 @@ export default class MemGraphObjClass {
             if (this.elementMap[addr].getAfterAddr().size === 0) {
                 nextY = this._generateReactflowGraphHelper(
                     "0x0",
-                    "s0",
+                    "t0",
                     this.elementMap[addr],
                     startingY,
                     this.elementMap[addr].depth,

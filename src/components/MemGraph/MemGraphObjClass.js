@@ -242,7 +242,20 @@ export default class MemGraphObjClass {
                 startingX += 1;
             }
         } else if (ele.isTree) {
-            // do nothing for now
+            // let leftAddr = ele.getLeftAddr()
+            // let rightAddr = ele.getRightAddr()
+
+            this.memGraphRepresentation.push({ 
+                id: ele.addr, 
+                type: 'tree', 
+                position: {x: startingX * 120 + 10, y: startingY * 60 + 10}, 
+                data: { 
+                    name: ele.name.includes("*") ? " " : ele.name, 
+                    text: ele.getValue()["data"]["value"]
+                }, 
+                draggable: true
+            })
+
         } else {
             customNodeStyle[ele.addr + allPrevAddrs.length.toString() + "_style"] = this._generateCustomReactflowComponent(allPrevAddrs.length, "normalNode");
 
@@ -271,12 +284,16 @@ export default class MemGraphObjClass {
                 style: {strokeWidth: 4},
             })
         }
+        console.log(ele.addr)
+        console.log(srcAddr)
 
         var Y_addition = 0
         var ret_startingY = startingY
 
         
         this.bubbleSort(allPrevAddrs, allPrevAddrs.length)
+
+        console.log(allPrevAddrs)
 
         i = 0
         for (let prevEleAddr of allPrevAddrs) {

@@ -13,15 +13,29 @@ export default class MemGraphElementClass {
         this.type        = ele.type
         this.value       = ele.value
 
-        this.isLL        = "isLL" in ele && ele.isLL
+        this.isLL        = "isLL"    in ele && ele.isLL
         this.isArray     = "isArray" in ele && ele.isArray
-        this.isTree      = "isTree" in ele && ele.isTree
+        this.is2D        = "is2D"    in ele && ele.is2D // if the array is a 2D array
+        this.isTree      = "isTree"  in ele && ele.isTree
 
         if (this.isLL) {
             this.linkedMember     = "linkedMember" in ele && ele.linkedMember
             this.members          = "members" in ele && ele.members
             if (this.linkedMember in ele.value) {
                 this.nextLinkedMemberAddr =  ele.value[this.linkedMember].value
+                this.addAfterAddr(this.nextLinkedMemberAddr)
+            }
+        }
+
+        if(this.isTree) {
+            this.linkedMemberLeft   = "linkedMember" in ele && ele.linkedMember.left
+            this.linkedMemberRight  = "linkedMember" in ele && ele.linkedMember.right
+            if (this.linkedMemberLeft in ele.value) {
+                this.nextLinkedMemberAddr =  ele.value[this.linkedMemberLeft].value
+                this.addAfterAddr(this.nextLinkedMemberAddr)
+            }
+            if (this.linkedMemberRight in ele.value) {
+                this.nextLinkedMemberAddr = ele.value[this.linkedMemberRight].value
                 this.addAfterAddr(this.nextLinkedMemberAddr)
             }
         }
@@ -69,5 +83,13 @@ export default class MemGraphElementClass {
 
     getMembers() {
         return this.members
+    }
+
+    getLeftAddr() {
+        return this.linkedMemberLeft
+    }
+
+    getRightAddr() {
+        return this.linkedMemberRight
     }
 }

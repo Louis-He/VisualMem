@@ -5,6 +5,7 @@ export default class MemGraphElementClass {
         this.visitedFrom = new Set()
         this.height      = -1
         this.depth       = -1
+        this.sourceCount = 0
 
         this._prevAddr   = new Set()
         this._afterAddr  = new Set()

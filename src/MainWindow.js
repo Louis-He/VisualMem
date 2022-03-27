@@ -6,16 +6,16 @@ import './../node_modules/react-grid-layout/css/styles.css';
 import './../node_modules/react-resizable/css/styles.css';
 import { Container, Button, Form } from 'react-bootstrap';
 import ReactTooltip from "react-tooltip";
-import { Folder2Open, CaretRightSquare, XSquare, SkipEndCircle, ArrowRightCircle, Eye, EyeSlash } from 'react-bootstrap-icons';
+import { CaretRightSquare, XSquare, SkipEndCircle, ArrowRightCircle, Eye, EyeSlash } from 'react-bootstrap-icons';
 import { ThemeProvider } from "styled-components";
 import { MainBody } from "./components/GlobalStyles";
 import GridLayout from 'react-grid-layout';
-import Editor from './components/RightPanel/Editor.js'
+//import Editor from './components/RightPanel/Editor.js'
 import Aside from "./components/Aside/Aside"
 import Page1 from "./components/RightPanel/Page1.js"
 import "./components/Aside/AsideStyle.css"
 import "react-pro-sidebar/dist/css/styles.css";
-import { Resizable } from "re-resizable";
+//import { Resizable } from "re-resizable";
 
 // import ReactFlow, { Handle } from 'react-flow-renderer';
 

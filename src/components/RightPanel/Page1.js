@@ -1,9 +1,10 @@
 import React from "react";
-import { Container, Button, Form } from 'react-bootstrap';
-import Editor from "./Editor.js"
+import { Container } from 'react-bootstrap';
+//import Editor from "./Editor.js"
+import Editor2 from "./Editor_2"
 import { MainBody } from "./../../components/GlobalStyles";
 
-const ipcRenderer = window.require("electron").ipcRenderer;
+//const ipcRenderer = window.require("electron").ipcRenderer;
 
 
 
@@ -20,6 +21,7 @@ export default class Aside extends React.Component{
 
 
   render(){
+    /*
     const headerStyle = {
       padding: "24px",
       textTransform: "uppercase",
@@ -29,13 +31,14 @@ export default class Aside extends React.Component{
       textOverflow: "ellipsis",
       whiteSpace: "noWrap"
     };
+    */
 
     return (
       <MainBody>
         <Container style={{height:"100%",width:"70vh", overflow:"scroll"}}>
           <div>
             <p></p>
-            <Editor source_code ={this.props.fileData}/>
+            <Editor2 source_code ={this.props.fileData}/>
           </div>
         </Container>
       </MainBody>

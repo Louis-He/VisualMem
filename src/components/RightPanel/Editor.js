@@ -8,12 +8,15 @@ import 'ace-builds/src-noconflict/mode-c_cpp'
 import 'ace-builds/src-noconflict/theme-monokai'
 import 'ace-builds/src-noconflict/ext-language_tools'
 import 'ace-builds/src-noconflict/ext-beautify'
+import './Editor.css'
 
 function Editor(props) {
     /*const [code, setCode] = useState(`int main(){
     printf("hello world");
     return 0;
 }`)*/
+
+
   const { source_code } = props
   var code_temp = source_code
   //code_temp = 'int main()'

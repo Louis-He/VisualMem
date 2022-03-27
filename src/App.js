@@ -5,8 +5,10 @@ import MainWindow from './MainWindow.js'
 import ConfigurationWindow from './ConfigurationWindow.js'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { lightTheme, darkTheme } from "./components/Themes"
-import Aside from "./components/Aside/Aside"
+//import Aside from "./components/Aside/Aside"
 //import Page1 from "./components/RightPanel/Page1.js"
+//import Editor from "./components/RightPanel/Editor.js"
+//import MiddleWindow from './MainWindow.js'
 import "./components/Aside/AsideStyle.css"
 import "react-pro-sidebar/dist/css/styles.css";
 
@@ -28,7 +30,10 @@ export default class App extends React.Component {
     this.state = {
       theme: 'light',
       projectFolder: '',
-      executablePath: ''
+      executablePath: '',
+      fileData: "",
+      sourceFile: "",
+      lineNumber: "", 
     }
     this.themeSwitchHandler = this.themeSwitchHandler.bind(this)
   }
@@ -73,6 +78,17 @@ export default class App extends React.Component {
     })
   }
 
+  showFile(e) {
+    e.preventDefault();
+    ipcRenderer.invoke('showFile', this.props.executablePath)
+    var that = this;
+    ipcRenderer.on('distributeFileData', function (evt, response) {
+      that.setState({
+        fileData: response.fileData
+      })
+    });
+  }
+
 
   render() {
     console.log(this.state.theme);
@@ -80,8 +96,9 @@ export default class App extends React.Component {
       console.log("DEV")
       return (
         <BrowserRouter>
-        <Aside />
-        <div style={{height:"100%",width:"100%", overflow:"scroll"}}>
+
+        
+        <div style={{height:"100%",width:"100%"}}>
           <Switch>
             <Route exact path="/" render={() =>
               <MainWindow

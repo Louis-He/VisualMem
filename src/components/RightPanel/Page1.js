@@ -1,7 +1,7 @@
 import React from "react";
 import { Container } from 'react-bootstrap';
-//import Editor from "./Editor.js"
-import Editor2 from "./Editor_2"
+import Editor from "./Editor.js"
+//import Editor2 from "./Editor_2"
 import { MainBody } from "./../../components/GlobalStyles";
 
 //const ipcRenderer = window.require("electron").ipcRenderer;
@@ -38,7 +38,7 @@ export default class Aside extends React.Component{
         <Container style={{height:"100%",width:"70vh", overflow:"scroll"}}>
           <div>
             <p></p>
-            <Editor2 source_code ={this.props.fileData}/>
+            <Editor fileData ={this.props.fileData} fileUpdatefunc={this.props.fileUpdatefunc}/>
           </div>
         </Container>
       </MainBody>

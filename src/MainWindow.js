@@ -70,6 +70,7 @@ export default class MainWindow extends React.Component {
 
     this.updateLineNumber = this.updateLineNumber.bind(this);
     this.updateSourceFile = this.updateSourceFile.bind(this);
+    this.fileUpdate = this.fileUpdate.bind(this);
   }
 
   componentDidMount() {
@@ -80,6 +81,12 @@ export default class MainWindow extends React.Component {
     //     elements: elementTemp
     //   })
     // });
+
+    ipcRenderer.on('distributeFileData', function (evt, response) {
+      that.setState({
+        fileData: response.fileData
+      })
+    });
 
     ipcRenderer.on('distributeUserProgramExited', function (evt) {
       if (that.state.GDBAttached) {
@@ -179,13 +186,13 @@ export default class MainWindow extends React.Component {
 
   showFile(e) {
     e.preventDefault();
-    ipcRenderer.invoke('showFile', this.props.executablePath)
-    var that = this;
-    ipcRenderer.on('distributeFileData', function (evt, response) {
-      that.setState({
-        fileData: response.fileData
-      })
-    });
+    ipcRenderer.invoke('showFile', this.props.executablePath) 
+  }
+
+  fileUpdate(newValue){
+    this.setState({
+      fileData: newValue
+    })
   }
   
   render() {
@@ -294,7 +301,7 @@ export default class MainWindow extends React.Component {
         <>
         <div className = "MainWindow">
           <Aside />
-          <Page1 fileData={this.state.fileData} />
+          <Page1 fileData={this.state.fileData} fileUpdatefunc={this.fileUpdate} />
           <div style={{height:"100%",width:"100%", overflow:"scroll"}}>
           <MainBody>
           
@@ -370,10 +377,6 @@ export default class MainWindow extends React.Component {
                           <p>Current Executable Path: {this.props.executablePath}</p>
                         </div>
 
-
-                        <Button variant="primary" onClick={(e) => this.showFile(e)}>
-                          Show Source File
-                        </Button>
 
                         <p></p>
 

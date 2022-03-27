@@ -98,7 +98,7 @@ export default class App extends React.Component {
         <BrowserRouter>
 
         
-        <div style={{height:"100%",width:"100%", overflow:"scroll"}}>
+        <div style={{height:"100%",width:"100%"}}>
           <Switch>
             <Route exact path="/" render={() =>
               <MainWindow

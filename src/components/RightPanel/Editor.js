@@ -1,4 +1,4 @@
-import {useState} from 'react'
+//import {useState} from 'react'
 import React from "react";
 import AceEditor from 'react-ace'
 
@@ -10,11 +10,13 @@ import 'ace-builds/src-noconflict/ext-language_tools'
 import 'ace-builds/src-noconflict/ext-beautify'
 import './Editor.css'
 
-function Editor(props) {
     /*const [code, setCode] = useState(`int main(){
     printf("hello world");
     return 0;
 }`)*/
+/*
+function Editor(props) {
+
 
 
   const { source_code } = props
@@ -57,10 +59,10 @@ function Editor(props) {
 }
 
 export default Editor
+*/
 
 
 
-/*
 export default class App extends React.Component {
 
   constructor(props, context) {
@@ -70,23 +72,36 @@ export default class App extends React.Component {
   }
 
   onChange(newValue) {
-      console.log('change', newValue);
+      this.props.fileUpdatefunc(newValue);
   }
 
   render() {
       return (
           <div>
               <AceEditor
+                  style={{
+                    borderRadius: '15px',
+                    height: '96vh',
+                    width: '100%',
+                  }}
                   mode="c_cpp"
                   theme="monokai"
                   onChange={this.onChange}
                   name="UNIQUE_ID_OF_DIV"
+                  value={this.props.fileData}
+                  fontSize={18}
                   editorProps={{
                       $blockScrolling: true
                   }}
+                  setOptions={{
+                    enableBasicAutocompletion: true,
+                    enableLiveAutocompletion: true,
+                    enableSnippets: true,
+                    showLineNumbers: true,
+                    tabSize: 4,
+                }}
               />
           </div>
       );
   }
 }
-*/

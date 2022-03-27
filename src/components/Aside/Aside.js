@@ -83,7 +83,7 @@ export default class Aside extends React.Component{
         <SidebarFooter style={{ textAlign: "center" }}>
           <div className="sidebar-btn-wrapper">
             <a
-              href="https://www.github.com"
+              href="https://github.com/Louis-He/VisualMem"
               target="_blank"
               className="sidebar-btn"
               rel="noopener noreferrer"

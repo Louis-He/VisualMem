@@ -95,8 +95,9 @@ export default class App extends React.Component {
     if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
       console.log("DEV")
       return (
+        
         <BrowserRouter>
-        <Aside />
+
         
         <div style={{height:"100%",width:"100%", overflow:"scroll"}}>
           <Switch>
@@ -114,7 +115,6 @@ export default class App extends React.Component {
             />
           </Switch>
           </div>
-          <Page1 fileData={this.state.fileData}/>
         </BrowserRouter>)
     } else {
       console.log("PRODUCTION")

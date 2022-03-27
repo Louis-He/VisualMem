@@ -22,10 +22,11 @@ function Editor(props) {
 //return(<div>{code_temp}</div>)
   if(true){
     return (
+      <div>
         <AceEditor
             style={{
                 borderRadius: '15px',
-                height: '80vh',
+                height: '96vh',
                 width: '100%',
             }}
             placeholder='Start Coding'
@@ -37,7 +38,8 @@ function Editor(props) {
             showPrintMargin={true}
             showGutter={true}
             highlightActiveLine={true}
-            value={code_temp}
+            defaultValue = {code_temp}
+            value={code}
             setOptions={{
                 enableBasicAutocompletion: true,
                 enableLiveAutocompletion: true,
@@ -46,8 +48,42 @@ function Editor(props) {
                 tabSize: 4,
             }}
         />
+      </div>
     )
   }
 }
 
 export default Editor
+
+
+
+/*
+export default class App extends React.Component {
+
+  constructor(props, context) {
+      super(props, context);
+      
+      this.onChange = this.onChange.bind(this);
+  }
+
+  onChange(newValue) {
+      console.log('change', newValue);
+  }
+
+  render() {
+      return (
+          <div>
+              <AceEditor
+                  mode="c_cpp"
+                  theme="monokai"
+                  onChange={this.onChange}
+                  name="UNIQUE_ID_OF_DIV"
+                  editorProps={{
+                      $blockScrolling: true
+                  }}
+              />
+          </div>
+      );
+  }
+}
+*/

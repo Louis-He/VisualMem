@@ -36,23 +36,6 @@ export default class Aside extends React.Component{
           <div>
             <p></p>
             <Editor source_code ={this.props.fileData}/>
-            <p></p>
-            <div style={{height:"20vh",width:"100%"}}>
-              <Form>
-                <Form.Group controlId="exampleForm.ControlTextarea1">
-                  <Form.Label>Command Sent to GDB</Form.Label>
-                  <Form.Control as="textarea" rows={3}
-                    value={this.state.GDBCommand}
-                    onKeyDown={(e) => this.onGDBCommandEnterPress(e)}
-                    onChange={(e) => this.GDBCommandLineOnChangeHandler(e)} />
-                </Form.Group>
-
-                <Button variant="primary" onClick={(e) => this.sendGDBCommandButton()}>
-                  Send
-                </Button>
-
-              </Form>
-            </div>
           </div>
         </Container>
       </MainBody>

@@ -11,6 +11,11 @@ import { ThemeProvider } from "styled-components";
 import { MainBody } from "./components/GlobalStyles";
 import GridLayout from 'react-grid-layout';
 import Editor from './components/RightPanel/Editor.js'
+import Aside from "./components/Aside/Aside"
+import Page1 from "./components/RightPanel/Page1.js"
+import "./components/Aside/AsideStyle.css"
+import "react-pro-sidebar/dist/css/styles.css";
+import { Resizable } from "re-resizable";
 
 // import ReactFlow, { Handle } from 'react-flow-renderer';
 
@@ -268,9 +273,14 @@ export default class MainWindow extends React.Component {
       {i: 'c', x: 4, y: 0, w: 1, h: 2}
     ];
 
+
     return (
       <ThemeProvider theme={this.props.theme}>
         <>
+        <div className = "MainWindow">
+          <Aside />
+          <Page1 fileData={this.state.fileData} />
+          <div style={{height:"100%",width:"100%", overflow:"scroll"}}>
           <MainBody>
           
             
@@ -351,7 +361,6 @@ export default class MainWindow extends React.Component {
 
                         <p></p>
 
-                        <Editor source_code ={this.state.fileData}/>
 
                         <MemGraph appState = {this}/>
 
@@ -391,7 +400,9 @@ export default class MainWindow extends React.Component {
                           <div key="c">c</div>
                         </GridLayout>
                       </Container>
-          </MainBody>
+            </MainBody>
+            </div>
+          </div>
         </>
       </ThemeProvider>
     );

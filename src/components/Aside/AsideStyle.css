@@ -7,14 +7,14 @@ body {
   }
   
   #root,
-  .App {
+  .MainWindow {
     font-family: sans-serif;
     height: 100%;
     display: flex;
     position: relative;
   }
   
-  .App .main {
+  .MainWindow .main {
     padding: 24px;
     flex-grow: 1;
     display: flex;

@@ -11,11 +11,6 @@ import { ThemeProvider } from "styled-components";
 import { MainBody } from "./components/GlobalStyles";
 import GridLayout from 'react-grid-layout';
 import Editor from './components/RightPanel/Editor.js'
-import Aside from "./components/Aside/Aside"
-import Page1 from "./components/RightPanel/Page1.js"
-import "./components/Aside/AsideStyle.css"
-import "react-pro-sidebar/dist/css/styles.css";
-import { Resizable } from "re-resizable";
 
 // import ReactFlow, { Handle } from 'react-flow-renderer';
 
@@ -67,9 +62,6 @@ export default class MainWindow extends React.Component {
       sourceFile: "",
       lineNumber: "", 
     }
-
-    this.updateLineNumber = this.updateLineNumber.bind(this);
-    this.updateSourceFile = this.updateSourceFile.bind(this);
   }
 
   componentDidMount() {
@@ -98,18 +90,6 @@ export default class MainWindow extends React.Component {
       }
     });
 
-  }
-
-  updateLineNumber(lineNum) {
-    this.setState({
-      lineNumber: lineNum
-    })
-  }
-
-  updateSourceFile(sourceF) {
-    this.setState({
-      sourceFile: sourceF
-    })
   }
 
   async renderRequestStartGDB() {
@@ -172,10 +152,6 @@ export default class MainWindow extends React.Component {
   }
 
 
-  selectExecutable(e) {
-    e.preventDefault();
-    ipcRenderer.invoke('requestSelectExecutable', this.props.projectFolder)
-  }
 
   showFile(e) {
     e.preventDefault();
@@ -288,14 +264,9 @@ export default class MainWindow extends React.Component {
       {i: 'c', x: 4, y: 0, w: 1, h: 2}
     ];
 
-
     return (
       <ThemeProvider theme={this.props.theme}>
         <>
-        <div className = "MainWindow">
-          <Aside />
-          <Page1 fileData={this.state.fileData} />
-          <div style={{height:"100%",width:"100%", overflow:"scroll"}}>
           <MainBody>
           
             
@@ -370,15 +341,15 @@ export default class MainWindow extends React.Component {
                           <p>Current Executable Path: {this.props.executablePath}</p>
                         </div>
 
-
                         <Button variant="primary" onClick={(e) => this.showFile(e)}>
                           Show Source File
                         </Button>
 
                         <p></p>
 
+                        <Editor source_code ={this.state.fileData}/>
 
-                        <MemGraph updateLineNumber = {this.updateLineNumber} updateSourceFile = {this.updateSourceFile}/>
+                        <MemGraph appState = {this}/>
 
                         <div>
                           <Form>
@@ -416,9 +387,7 @@ export default class MainWindow extends React.Component {
                           <div key="c">c</div>
                         </GridLayout>
                       </Container>
-            </MainBody>
-            </div>
-          </div>
+          </MainBody>
         </>
       </ThemeProvider>
     );

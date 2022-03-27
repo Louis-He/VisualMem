@@ -288,7 +288,7 @@ class varSnapshot:
 
         curValue = response['payload']['value']
         curType = curType[:-1].strip()
-        curDict = {"name": curName, "type": curType, "value": curValue, 'ptrTarget': True}
+        curDict = {"name": curName, "type": curType, "value": curValue}
 
 
         if curValue.count("{") == 0:

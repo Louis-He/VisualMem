@@ -14,10 +14,12 @@ int main() {
     int b = 2;
     int *c;
     int **d;
-    int ***e;
+    int ***e, ***h, ***i;
     int *f, *g;
 
     e = &d;
+    h = &d;
+    i = &d;
     d = &c;
     c = &b;
 
@@ -29,8 +31,9 @@ int main() {
     head->next = NULL;
 
     Node* prev_ptr = head;
+    Node* cur_ptr;
     for (int i = 1; i < 5; i++) {
-        Node* cur_ptr = malloc(sizeof(Node));
+        cur_ptr = malloc(sizeof(Node));
         cur_ptr->val = i;
         cur_ptr->next = NULL;
 

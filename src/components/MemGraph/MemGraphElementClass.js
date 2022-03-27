@@ -13,7 +13,8 @@ export default class MemGraphElementClass {
         this.type        = ele.type
         this.value       = ele.value
 
-        this.isLL        = "isLL"    in ele && ele.isLL
+        this.isPtr       = "ptrTarget" in ele
+        this.isLL        = "isLL" in ele && ele.isLL
         this.isArray     = "isArray" in ele && ele.isArray
         this.is2D        = "is2D"    in ele && ele.is2D // if the array is a 2D array
         this.isTree      = "isTree"  in ele && ele.isTree

@@ -6,16 +6,11 @@ import './../node_modules/react-grid-layout/css/styles.css';
 import './../node_modules/react-resizable/css/styles.css';
 import { Container, Button, Form } from 'react-bootstrap';
 import ReactTooltip from "react-tooltip";
-import { CaretRightSquare, XSquare, SkipEndCircle, ArrowRightCircle, Eye, EyeSlash } from 'react-bootstrap-icons';
+import { Folder2Open, CaretRightSquare, XSquare, SkipEndCircle, ArrowRightCircle, Eye, EyeSlash } from 'react-bootstrap-icons';
 import { ThemeProvider } from "styled-components";
 import { MainBody } from "./components/GlobalStyles";
 import GridLayout from 'react-grid-layout';
-//import Editor from './components/RightPanel/Editor.js'
-import Aside from "./components/Aside/Aside"
-import Page1 from "./components/RightPanel/Page1.js"
-import "./components/Aside/AsideStyle.css"
-import "react-pro-sidebar/dist/css/styles.css";
-//import { Resizable } from "re-resizable";
+import Editor from './components/RightPanel/Editor.js'
 
 // import ReactFlow, { Handle } from 'react-flow-renderer';
 
@@ -67,10 +62,6 @@ export default class MainWindow extends React.Component {
       sourceFile: "",
       lineNumber: "", 
     }
-
-    this.updateLineNumber = this.updateLineNumber.bind(this);
-    this.updateSourceFile = this.updateSourceFile.bind(this);
-    this.fileUpdate = this.fileUpdate.bind(this);
   }
 
   componentDidMount() {
@@ -81,12 +72,6 @@ export default class MainWindow extends React.Component {
     //     elements: elementTemp
     //   })
     // });
-
-    ipcRenderer.on('distributeFileData', function (evt, response) {
-      that.setState({
-        fileData: response.fileData
-      })
-    });
 
     ipcRenderer.on('distributeUserProgramExited', function (evt) {
       if (that.state.GDBAttached) {
@@ -105,18 +90,6 @@ export default class MainWindow extends React.Component {
       }
     });
 
-  }
-
-  updateLineNumber(lineNum) {
-    this.setState({
-      lineNumber: lineNum
-    })
-  }
-
-  updateSourceFile(sourceF) {
-    this.setState({
-      sourceFile: sourceF
-    })
   }
 
   async renderRequestStartGDB() {
@@ -179,20 +152,16 @@ export default class MainWindow extends React.Component {
   }
 
 
-  selectExecutable(e) {
-    e.preventDefault();
-    ipcRenderer.invoke('requestSelectExecutable', this.props.projectFolder)
-  }
 
   showFile(e) {
     e.preventDefault();
-    ipcRenderer.invoke('showFile', this.props.executablePath) 
-  }
-
-  fileUpdate(newValue){
-    this.setState({
-      fileData: newValue
-    })
+    ipcRenderer.invoke('showFile', this.props.executablePath)
+    var that = this;
+    ipcRenderer.on('distributeFileData', function (evt, response) {
+      that.setState({
+        fileData: response.fileData
+      })
+    });
   }
   
   render() {
@@ -295,14 +264,9 @@ export default class MainWindow extends React.Component {
       {i: 'c', x: 4, y: 0, w: 1, h: 2}
     ];
 
-
     return (
       <ThemeProvider theme={this.props.theme}>
         <>
-        <div className = "MainWindow">
-          <Aside />
-          <Page1 fileData={this.state.fileData} fileUpdatefunc={this.fileUpdate} />
-          <div style={{height:"100%",width:"100%", overflow:"scroll"}}>
           <MainBody>
           
             
@@ -377,11 +341,15 @@ export default class MainWindow extends React.Component {
                           <p>Current Executable Path: {this.props.executablePath}</p>
                         </div>
 
+                        <Button variant="primary" onClick={(e) => this.showFile(e)}>
+                          Show Source File
+                        </Button>
 
                         <p></p>
 
+                        <Editor source_code ={this.state.fileData}/>
 
-                        <MemGraph updateLineNumber = {this.updateLineNumber} updateSourceFile = {this.updateSourceFile}/>
+                        <MemGraph appState = {this}/>
 
                         <div>
                           <Form>
@@ -419,9 +387,7 @@ export default class MainWindow extends React.Component {
                           <div key="c">c</div>
                         </GridLayout>
                       </Container>
-            </MainBody>
-            </div>
-          </div>
+          </MainBody>
         </>
       </ThemeProvider>
     );

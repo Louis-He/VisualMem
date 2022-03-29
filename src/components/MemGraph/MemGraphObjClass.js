@@ -1,3 +1,4 @@
+import React from 'react';
 import { Handle } from 'react-flow-renderer';
 
 let nodeTypes = {

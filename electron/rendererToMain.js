@@ -140,6 +140,12 @@ global.share.ipcMain.handle('requestSelectExecutable', async (event, ...args) =>
     const mainWindow = windowsManager.getMainWindows()
     if (mainWindow !== null) {
       mainWindow.webContents.send('distributeSelectedExecutable', { 'executablePath': result.filePaths[0] });
+
+      const data = fs.readFileSync(result.filePaths[0], {encoding:'utf-8', flag:'r'});
+      console.log(data);
+      
+
+      mainWindow.webContents.send('distributeFileData', { 'fileData': data });
     }
   }
 })
@@ -149,14 +155,14 @@ global.share.ipcMain.handle('requestCompilation', async (event, ...args) => {
   compilerController.compile();
 })
 
-global.share.ipcMain.handle('showFile', async (event, ...args) => {
+// global.share.ipcMain.handle('showFile', async (event, ...args) => {
 
-  const data = fs.readFileSync(args[0], {encoding:'utf-8', flag:'r'});
-  console.log(data);
+//   const data = fs.readFileSync(args[0], {encoding:'utf-8', flag:'r'});
+//   console.log(data);
   
-  const mainWindow = windowsManager.getMainWindows()
-  if (mainWindow !== null) {
-    mainWindow.webContents.send('distributeFileData', { 'fileData': data });
-  }
+//   const mainWindow = windowsManager.getMainWindows()
+//   if (mainWindow !== null) {
+//     mainWindow.webContents.send('distributeFileData', { 'fileData': data });
+//   }
   
-})
+// })

@@ -119,7 +119,7 @@ global.share.ipcMain.handle('requestSelectProjectFolder', async (event, ...args)
     projectFolder = result.filePaths[0]
   }
 
-  windowsManager.setProjectFolder(projectFolder)
+  windowsManager.setProjectFolder(false, projectFolder)
 
   const mainWindow = windowsManager.getMainWindows()
   if (mainWindow !== null) {
@@ -127,7 +127,7 @@ global.share.ipcMain.handle('requestSelectProjectFolder', async (event, ...args)
   }
 })
 
-global.share.ipcMain.handle('requestSelectExecutable', async (event, ...args) => {
+global.share.ipcMain.handle('requestSelectSourceFile', async (event, ...args) => {
   const result = await global.share.dialog.showOpenDialog(windowsManager.getMainWindows(), {
     defaultPath: args[1]
   })
@@ -135,11 +135,11 @@ global.share.ipcMain.handle('requestSelectExecutable', async (event, ...args) =>
   if (result.canceled) {
     return
   } else {
-    windowsManager.setExecFile(result.filePaths[0])
+    windowsManager.setSourceFile(false, result.filePaths[0])
 
     const mainWindow = windowsManager.getMainWindows()
     if (mainWindow !== null) {
-      mainWindow.webContents.send('distributeSelectedExecutable', { 'executablePath': result.filePaths[0] });
+      mainWindow.webContents.send('distributeSelectedExecutable', { 'executablePath': windowsManager.getExecFile() });
 
       const data = fs.readFileSync(result.filePaths[0], {encoding:'utf-8', flag:'r'});
       console.log(data);
@@ -151,7 +151,7 @@ global.share.ipcMain.handle('requestSelectExecutable', async (event, ...args) =>
 })
 
 global.share.ipcMain.handle('requestCompilation', async (event, ...args) => {
-  windowsManager.setExecFile(result.filePaths[0]);
+  // windowsManager.setExecFile(result.filePaths[0]);
   compilerController.compile();
 })
 

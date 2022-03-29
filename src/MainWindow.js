@@ -6,7 +6,7 @@ import './../node_modules/react-grid-layout/css/styles.css';
 import './../node_modules/react-resizable/css/styles.css';
 import { Container, Button, Form } from 'react-bootstrap';
 import ReactTooltip from "react-tooltip";
-import { CaretRightSquare, XSquare, SkipEndCircle, ArrowRightCircle, Eye, EyeSlash } from 'react-bootstrap-icons';
+import { CaretRightSquare, XSquare, SkipEndCircle, ArrowRightCircle, Eye, EyeSlash, FiletypeExe } from 'react-bootstrap-icons';
 import { ThemeProvider } from "styled-components";
 import { MainBody } from "./components/GlobalStyles";
 import GridLayout from 'react-grid-layout';
@@ -128,7 +128,10 @@ export default class MainWindow extends React.Component {
       })
     }
   }
-  
+
+  async renderRequestCompilation() {
+    await ipcRenderer.invoke('requestCompilation',)
+  }
 
   renderRequestNextLineExecution() {
     ipcRenderer.invoke('requestNextLineGDB', 1, )
@@ -179,9 +182,9 @@ export default class MainWindow extends React.Component {
   }
 
 
-  selectExecutable(e) {
+  selectSourceFile(e) {
     e.preventDefault();
-    ipcRenderer.invoke('requestSelectExecutable', this.props.projectFolder)
+    ipcRenderer.invoke('requestselectSourceFile', this.props.projectFolder)
   }
 
   showFile(e) {
@@ -209,7 +212,7 @@ export default class MainWindow extends React.Component {
           onClick={() => this.renderRequestStartGDB()}
           data-tip data-for="startGDBTip"
           className="btn btn-success btn-sm"
-          style={{ fontSize: "18px", lineHeight: "1", padding: "5px" }}
+          style={{ fontSize: "18px", lineHeight: "1", padding: "5px", marginLeft: "10px" }}
           key="startButton">
           <CaretRightSquare style={{ verticalAlign: 'baseline' }} />
         </Button>,
@@ -349,6 +352,18 @@ export default class MainWindow extends React.Component {
                           {/* <Button onClick={renderRequestOpenConfig}>TEST button</Button>
                           <Button onClick={renderRequestStartGDB}>Start GDB</Button>
                           <Button onClick={renderRequestStopGDB}>Stop GDB</Button> */}
+                          <Button
+                            onClick={() => this.renderRequestCompilation()}
+                            data-tip data-for="startCompilationTip"
+                            className="btn btn-primary btn-sm"
+                            style={{ fontSize: "18px", lineHeight: "1", padding: "5px" }}
+                            key="startButton">
+                            <FiletypeExe style={{ verticalAlign: 'baseline' }} />
+                          </Button>
+                          <ReactTooltip id="startCompilationTip" place="top" effect="solid" key="startCompilationTip">
+                            Compile the program
+                          </ReactTooltip>
+
                           {startGDBButton}
                           {nextLineGDBButton}
                           {continueGDBButton}

@@ -44,7 +44,13 @@ exports.getSettingInitial = function () {
   let rawdata = fs.readFileSync(settingFilePath);
   let setting = JSON.parse(rawdata);
 
-  this.setProjectFolder(setting.project_path)
+  console.log(setting)
+
+  this.setProjectFolder(true, setting.project_path)
+  this.setSourceFile(true, setting.sourceFile)
+
+  const data = fs.readFileSync(setting.sourceFile, {encoding:'utf-8', flag:'r'});
+  l_mainWindow.webContents.send('distributeFileData', { 'fileData': data });
   return setting
 }
 
@@ -58,8 +64,10 @@ exports.initialize = function () {
   l_project_folder = setting.project_path;
 }
 
-exports.setProjectFolder = function (projectFolder) {
+exports.setProjectFolder = function (init_setting, projectFolder) {
   l_project_folder = projectFolder;
+
+  if (init_setting) return;
 
   const settingFilePath = `${path.join(__dirname, '../config/gdb.json')}`
   let rawdata = fs.readFileSync(settingFilePath);
@@ -80,39 +88,41 @@ exports.setProjectFolder = function (projectFolder) {
 };
 
 exports.getExecFile = function () {
-  return l_exec_file
+  return l_project_folder + '/out.exe'
 }
 
-exports.setExecFile = function (execFile) {
-  l_exec_file = execFile;
+// exports.setExecFile = function (execFile) {
+//   l_exec_file = execFile;
 
-  const settingFilePath = `${path.join(__dirname, '../config/gdb.json')}`
-  let rawdata = fs.readFileSync(settingFilePath);
-  let setting = JSON.parse(rawdata);
-  setting.execFile = execFile;
+//   const settingFilePath = `${path.join(__dirname, '../config/gdb.json')}`
+//   let rawdata = fs.readFileSync(settingFilePath);
+//   let setting = JSON.parse(rawdata);
+//   setting.execFile = execFile;
 
-  // convert JSON object to a string
-  const data = JSON.stringify(setting);
+//   // convert JSON object to a string
+//   const data = JSON.stringify(setting);
 
-  // write file to disk
-  fs.writeFile(settingFilePath, data, 'utf8', (err) => {
-    if (err) {
-      console.log(`Error writing file: ${err}`);
-    } else {
-      console.log(`executablePath: ${execFile}`);
-    }
-  });
-}
+//   // write file to disk
+//   fs.writeFile(settingFilePath, data, 'utf8', (err) => {
+//     if (err) {
+//       console.log(`Error writing file: ${err}`);
+//     } else {
+//       console.log(`executablePath: ${execFile}`);
+//     }
+//   });
+// }
 
 exports.getSourceFile = function () {
   return l_source_file
 }
 
-exports.setSourceFile = function (sourceFile) {
+exports.setSourceFile = function (init_setting, sourceFile) {
   l_source_file = sourceFile;
 
-  const sourceFilePath = `${path.join(__dirname, '../config/gdb.json')}`
-  let rawdata = fs.readFileSync(sourceFilePath);
+  if (init_setting) return;
+
+  const settingFilePath = `${path.join(__dirname, '../config/gdb.json')}`
+  let rawdata = fs.readFileSync(settingFilePath);
   let setting = JSON.parse(rawdata);
   setting.sourceFile = sourceFile;
 
@@ -120,7 +130,7 @@ exports.setSourceFile = function (sourceFile) {
   const data = JSON.stringify(setting);
 
   // write file to disk
-  fs.writeFile(sourceFilePath, data, 'utf8', (err) => {
+  fs.writeFile(settingFilePath, data, 'utf8', (err) => {
     if (err) {
       console.log(`Error writing file: ${err}`);
     } else {

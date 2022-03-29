@@ -42,9 +42,9 @@ export default class Aside extends React.Component{
     ipcRenderer.invoke('requestSelectProjectFolder',)
   }
 
-  selectExecutable(e) {
+  selectSource(e) {
     e.preventDefault();
-    ipcRenderer.invoke('requestSelectExecutable', this.props.projectFolder)
+    ipcRenderer.invoke('requestSelectSourceFile', this.props.projectFolder)
   }
 
   render(){
@@ -64,7 +64,7 @@ export default class Aside extends React.Component{
         <SidebarContent>
           <Menu iconShape="circle">
             <MenuItem icon={<AiFillFolderOpen />} onClick={(e) => this.selectProjectFolder(e)}>Select Project Folder</MenuItem>
-            <MenuItem icon={<AiOutlineFile />} onClick={(e) => this.selectExecutable(e)}>Select Executable File</MenuItem>
+            <MenuItem icon={<AiOutlineFile />} onClick={(e) => this.selectSource(e)}>Select Source File</MenuItem>
           </Menu>
           <Menu iconShape="circle">
             <SubMenu

@@ -92,12 +92,12 @@ exports.startRunAndStop = function () {
 }
 
 
-notifyMainWindow = function () {
-  if (l_gdb_instance !== null) {
-    const mainWindow = windowsManager.getMainWindows()
-    mainWindow.webContents.send('distributeGDBUpdate', {});
-  }
-}
+// notifyMainWindow = function () {
+//   if (l_gdb_instance !== null) {
+//     const mainWindow = windowsManager.getMainWindows()
+//     mainWindow.webContents.send('distributeGDBUpdate', {});
+//   }
+// }
 
 exports.nextLineExecute = function () {
   pygdbController.pygdbNextLine();

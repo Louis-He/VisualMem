@@ -16,7 +16,7 @@ exports.saveSourceFile = function (text) {
 
 
 exports.compile = function () {   
-    l_gcc_compilation_child_process = child_process.spawn(gccCompilerExec, ['-g', '"' + windowsManager.getSourceFile() + '"'], {
+    l_gcc_compilation_child_process = child_process.spawn(gccCompilerExec, ['-g', '"' + windowsManager.getSourceFile() + '"', '-o', windowsManager.getProjectFolder()+'/'+'out.exe'], {
         shell: true,
     });
 

@@ -3,7 +3,7 @@ import './css/App.css';
 import './css/nodeStyle.css';
 import './../node_modules/react-reflex/styles.css';
 import './../node_modules/react-grid-layout/css/styles.css';
-import './../node_modules/react-resizable/css/styles.css';
+//import './../node_modules/react-resizable/css/styles.css';
 import { Container, Button, Form } from 'react-bootstrap';
 import ReactTooltip from "react-tooltip";
 import { CaretRightSquare, XSquare, SkipEndCircle, ArrowRightCircle, Eye, EyeSlash, FiletypeExe } from 'react-bootstrap-icons';

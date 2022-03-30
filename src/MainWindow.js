@@ -6,7 +6,7 @@ import './../node_modules/react-grid-layout/css/styles.css';
 import './../node_modules/react-resizable/css/styles.css';
 import { Container, Button, Form } from 'react-bootstrap';
 import ReactTooltip from "react-tooltip";
-import { CaretRightSquare, XSquare, SkipEndCircle, ArrowRightCircle, Eye, EyeSlash, FiletypeExe } from 'react-bootstrap-icons';
+import { CaretRightSquare, XSquare, SkipEndCircle, ArrowDownRightCircle, ArrowRightCircle, Eye, EyeSlash, FiletypeExe } from 'react-bootstrap-icons';
 import { ThemeProvider } from "styled-components";
 import { MainBody } from "./components/GlobalStyles";
 import GridLayout from 'react-grid-layout';
@@ -137,6 +137,10 @@ export default class MainWindow extends React.Component {
     ipcRenderer.invoke('requestNextLineGDB', 1, )
   }
 
+  renderRequestStepExecution() {
+    ipcRenderer.invoke('requestStepGDB', 1, )
+  }
+
   renderRequestContinueExecution() {
     ipcRenderer.invoke('requestContinueGDB',)
   }
@@ -203,6 +207,7 @@ export default class MainWindow extends React.Component {
     let eyeGDBButton = <span></span>
     let eyeSlashGDBButton = <span></span>
     let nextLineGDBButton = <span></span>
+    let stepGDBButton = <span></span>
     let continueGDBButton = <span></span>
     let stopGDBButton = <span></span>
 
@@ -245,6 +250,19 @@ export default class MainWindow extends React.Component {
         </Button>,
         <ReactTooltip id="continueTip" place="top" effect="solid"  key="continueTip">
           Continue Execution until next breakpoint
+        </ReactTooltip>
+      ]
+      stepGDBButton = [
+        <Button
+          onClick={() => this.renderRequestStepExecution()}
+          data-tip data-for="stepTip"
+          className="btn btn-primary btn-sm"
+          style={{ fontSize: "18px", lineHeight: "1", padding: "5px", marginLeft: "10px" }}
+          key="stepButton">
+            <ArrowDownRightCircle style={{ verticalAlign: 'baseline' }} />
+        </Button>,
+        <ReactTooltip id="stepTip" place="top" effect="solid"  key="stepTip">
+          Step in the function
         </ReactTooltip>
       ]
       stopGDBButton = [
@@ -366,6 +384,7 @@ export default class MainWindow extends React.Component {
 
                           {startGDBButton}
                           {nextLineGDBButton}
+                          {stepGDBButton}
                           {continueGDBButton}
                           {stopGDBButton}
                           {eyeGDBButton}

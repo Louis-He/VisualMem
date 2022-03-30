@@ -128,6 +128,10 @@ exports.pygdbNextLine = function () {
     l_pygdb_socket.write("CMD;1;n")
 }
 
+exports.pygdbStepin = function () {
+    l_pygdb_socket.write("CMD;1;s")
+}
+
 exports.pygdbContinue = function () {
     l_pygdb_socket.write("CMD;1;c")
 }

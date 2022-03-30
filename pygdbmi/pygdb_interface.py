@@ -319,7 +319,9 @@ class varSnapshot:
         # get the size of the variable type
         response = gdbcontroller.write('-data-evaluate-expression sizeof(' + arrayType + ')')
         response = response[0]
+
         varSize = int(response['payload']['value'])
+        
 
         # get the address of the variable
         response = gdbcontroller.write('-data-evaluate-expression "&(' + curName + ')"')
@@ -338,7 +340,12 @@ class varSnapshot:
             # increment the address by the variable size to get the next element
             curAddr = self.incrementAddr(headAddr, varSize)
 
-            for i in range(int(arrayLength)-1):
+            try:
+                ArrLen = int(arrayLength)-1
+            except:
+                ArrLen = 1
+
+            for i in range(ArrLen):
                 # get rest of the values
                 response = gdbcontroller.write('-data-evaluate-expression "*(' + arrayType+ ' *)(' + curAddr + ')"')
                 response = response[0]
@@ -428,6 +435,7 @@ class varSnapshot:
 
     def createVarsnapshot(self, gdbcontroller, varDict):
         self.varDict = {}
+        print(varDict)
         for variable in varDict["payload"]["variables"]:
             self.processVariable(gdbcontroller, variable)
 
@@ -470,8 +478,8 @@ class pygdbController:
 
         self.controller = GdbController(
             # /Users/qihan6/Documents/gdb_darwin_hang_fix/build/gdb/gdb
-            command=["/Users/qihan6/Documents/gdb_darwin_hang_fix/build/gdb/gdb", "--nx", "--quiet", "--interpreter=mi3"], 
-            time_to_check_for_additional_output_sec=0.05
+            # command=["/Users/qihan6/Documents/gdb_darwin_hang_fix/build/gdb/gdb", "--nx", "--quiet", "--interpreter=mi3"], 
+            time_to_check_for_additional_output_sec=0.01
         )
         unbufferedPrint(self.execFilePath)
         isSuccessful = self.sendCommandToGDB('-file-exec-and-symbols "' + self.execFilePath + '"', True)
@@ -486,6 +494,11 @@ class pygdbController:
 
     def runNextLine(self, isGetVariables=False) -> bool:
         isSuccessful = self.sendCommandToGDB('-exec-next', True)
+        self.sendBackVarInfo()
+        return isSuccessful
+
+    def runStep(self, isGetVariables=False) -> bool:
+        isSuccessful = self.sendCommandToGDB('-exec-step', True)
         self.sendBackVarInfo()
         return isSuccessful
 
@@ -532,6 +545,8 @@ def processIncomingMessage(pygdb_controller, msg):
     elif msgArr[0] == 'CMD':
         if msgArr[2] == "n":
             pygdb_controller.runNextLine()
+        elif msgArr[2] == "s":
+            pygdb_controller.runStep()
         elif msgArr[2] == "c":
             pygdb_controller.runContinue()
         if msgArr[2] == "end":

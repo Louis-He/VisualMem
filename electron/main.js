@@ -11,7 +11,7 @@ global.share = {
 
 function createWindow () {
   const win = new BrowserWindow({
-    width: 800,
+    width: 1024,
     height: 600,
     title: "VisualMem",
     webPreferences: {

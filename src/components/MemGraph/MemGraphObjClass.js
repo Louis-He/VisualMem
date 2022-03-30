@@ -254,7 +254,7 @@ export default class MemGraphObjClass {
 
             return ({ data }) => {return (
                 <div>
-                  <div className='treeNode'> {data.name} </div>
+                  <div className='treeNode'> {data.value} </div>
                   <div>
                     {sourceArr}
                     <div className={nodeClassName}> </div>

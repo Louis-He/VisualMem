@@ -39,10 +39,10 @@ describe("Basic Test", () => {
     sandbox.restore();
   });
 
-  it("Opens a window", async() => {
-    let windowCount = await app.client.getWindowCount();
-    expect(windowCount).toBe(1);
-  });
+  // it("Opens a window", async() => {
+  //   let windowCount = await app.client.getWindowCount();
+  //   expect(windowCount).toBe(1);
+  // });
 
   // it ("Start GDB", async() => {
   //   GDBManager.startGDB();
@@ -80,5 +80,43 @@ describe("Memgraph Test", () => {
     expect(memgraph.graphObjMap[0].elementMap['0x78017ff7f4'].name).toBe('b');
     expect(memgraph.graphObjMap[0].elementMap['0x78017ff7f4'].type).toBe('int');
     expect(memgraph.graphObjMap[0].elementMap['0x78017ff7f4'].value).toBe('2');
+  });
+
+  it("Single Pointer Test", async() => {
+    let memgraph = new MemGraphClass();
+
+    memgraph.init({'0x8c00dffc88': {'name': 'prev_ptr',
+                  'ptrTarget': false,
+                  'type': 'Node *',
+                  'value': '0x0'}});
+    memgraph.constructGraph()
+
+    expect(memgraph.graphObjMap.length).toBe(1);
+    expect(memgraph.graphObjMap[0].elementMap['0x8c00dffc88'].addr).toBe('0x8c00dffc88');
+    expect(memgraph.graphObjMap[0].elementMap['0x8c00dffc88'].name).toBe('prev_ptr');
+    expect(memgraph.graphObjMap[0].elementMap['0x8c00dffc88'].type).toBe('Node *');
+    expect(memgraph.graphObjMap[0].elementMap['0x8c00dffc88'].value).toBe('0x0');
+    expect(memgraph.graphObjMap[0].elementMap['0x8c00dffc88'].getAfterAddr().size).toBe(0);
+  });
+
+  it("Single Pointer and an integer Test", async() => {
+    let memgraph = new MemGraphClass();
+
+    memgraph.init({'0x8c00dffc88': {'name': 'prev_ptr',
+                  'ptrTarget': true,
+                  'type': 'int *',
+                  'value': '0x78017ff7f4'},
+                  '0x78017ff7f4': {'name': 'b', 'type': 'int', 'value': '2'}});
+    memgraph.constructGraph()
+
+    expect(memgraph.graphObjMap.length).toBe(1);
+    expect(Object.keys(memgraph.graphObjMap[0].elementMap).length).toBe(2);
+    expect(memgraph.graphObjMap[0].elementMap['0x8c00dffc88'].addr).toBe('0x8c00dffc88');
+    expect(memgraph.graphObjMap[0].elementMap['0x8c00dffc88'].name).toBe('prev_ptr');
+    expect(memgraph.graphObjMap[0].elementMap['0x8c00dffc88'].type).toBe('int *');
+    expect(memgraph.graphObjMap[0].elementMap['0x8c00dffc88'].value).toBe('0x78017ff7f4');
+    expect(memgraph.graphObjMap[0].elementMap['0x8c00dffc88'].getAfterAddr().size).toBe(1);
+
+    expect(memgraph.graphObjMap[0].elementMap['0x78017ff7f4'].getPrevAddr().size).toBe(1);
   });
 });

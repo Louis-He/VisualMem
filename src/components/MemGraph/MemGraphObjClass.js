@@ -420,10 +420,7 @@ export default class MemGraphObjClass {
             }
         } else if (ele.isTree) {
             customNodeStyle[ele.addr + "_style"] = this._generateCustomReactflowComponent(allPrevAddrs.length, allAfterAddrs.length, nodeTypes.treeNode);
-            console.log(allPrevAddrs.length)
-            console.log(allAfterAddrs.length)
-            // allPrevAddrs.length.toString() + allAfter...
-            console.log(ele.isVisited)
+            let member = ele.getMembers()[0]
 
             if(!ele.isVisited) {
                 this.memGraphRepresentation.push({ 
@@ -432,7 +429,7 @@ export default class MemGraphObjClass {
                     position: {x: startingX * 120 + 10, y: startingY * 60 + 10}, 
                     data: { 
                         name: ele.name.includes("*") ? " " : ele.name, 
-                        text: ele.getValue()["data"]["value"]
+                        text: ele.getValue()[member]["value"]
                     }, 
                     draggable: true
                 })

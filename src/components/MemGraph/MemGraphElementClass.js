@@ -32,6 +32,7 @@ export default class MemGraphElementClass {
         if(this.isTree) {
             this.linkedMemberLeft   = "linkedMember" in ele && ele.linkedMember.left
             this.linkedMemberRight  = "linkedMember" in ele && ele.linkedMember.right
+            this.members            = "members" in ele && ele.members
             if (this.linkedMemberLeft in ele.value) {
                 this.nextLinkedMemberAddr =  ele.value[this.linkedMemberLeft].value
                 this.addAfterAddr(this.nextLinkedMemberAddr)

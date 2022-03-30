@@ -72,10 +72,11 @@ global.share.ipcMain.handle('requestStartGDB', (event, ...args) => {
 })
 
 global.share.ipcMain.handle('requestNextLineGDB', (event, ...args) => {
-  // let executionLine = args[0]
-
-  // GDBManager.nextLineExecute();
   pygdbController.pygdbNextLine();
+})
+
+global.share.ipcMain.handle('requestStepGDB', (event, ...args) => {
+  pygdbController.pygdbStepin();
 })
 
 global.share.ipcMain.handle('requestContinueGDB', (event, ...args) => {

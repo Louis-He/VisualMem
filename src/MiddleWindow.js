@@ -107,6 +107,10 @@ export default class MainWindow extends React.Component {
     ipcRenderer.invoke('requestNextLineGDB', 1, )
   }
 
+  renderRequestStepExecution() {
+    ipcRenderer.invoke('requestStepGDB',)
+  }
+
   renderRequestContinueExecution() {
     ipcRenderer.invoke('requestContinueGDB',)
   }

@@ -5,7 +5,7 @@ export default class MemGraphElementClass {
         this.visitedFrom = new Set()
         this.height      = -1
         this.depth       = -1
-        this.sourceCount = 0
+        //this.sourceCount = 0
 
         this._prevAddr   = new Set()
         this._afterAddr  = new Set()
@@ -19,6 +19,8 @@ export default class MemGraphElementClass {
         this.isArray     = "isArray" in ele && ele.isArray
         this.is2D        = "is2D"    in ele && ele.is2D // if the array is a 2D array
         this.isTree      = "isTree"  in ele && ele.isTree
+        this.leftChild   = false
+        this.rightChild  = false
 
         if (this.isLL) {
             this.linkedMember     = "linkedMember" in ele && ele.linkedMember
@@ -33,13 +35,16 @@ export default class MemGraphElementClass {
             this.linkedMemberLeft   = "linkedMember" in ele && ele.linkedMember.left
             this.linkedMemberRight  = "linkedMember" in ele && ele.linkedMember.right
             this.members            = "members" in ele && ele.members
+
             if (this.linkedMemberLeft in ele.value) {
                 this.nextLinkedMemberAddr =  ele.value[this.linkedMemberLeft].value
                 this.addAfterAddr(this.nextLinkedMemberAddr)
+                this.leftChild = this.nextLinkedMemberAddr
             }
             if (this.linkedMemberRight in ele.value) {
                 this.nextLinkedMemberAddr = ele.value[this.linkedMemberRight].value
                 this.addAfterAddr(this.nextLinkedMemberAddr)
+                this.rightChild = this.nextLinkedMemberAddr
             }
         }
 

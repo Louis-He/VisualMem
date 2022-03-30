@@ -54,7 +54,7 @@ export default class MemGraphObjClass {
         for (let addr in this.elementMap) {
             this.elementMap[addr].isVisited = false
             this.elementMap[addr].visitedFrom.clear()
-            this.elementMap[addr].sourceCount = 0
+            //this.elementMap[addr].sourceCount = 0
         }
     }
 
@@ -139,7 +139,7 @@ export default class MemGraphObjClass {
      * @param {enum} nodeClassName
      */
     _generateCustomReactflowComponent(prevAddrLength, afterAddrLength, nodeClassName) {
-        var sourceArr = []
+        // var sourceArr = []
         var targetArr = []
         var i = 0
         if (nodeClassName === nodeTypes.normal) {
@@ -216,47 +216,12 @@ export default class MemGraphObjClass {
                         style = {{left: "50%", borderRadius: 0}}/>
                 )
             }
-            if (afterAddrLength !== 0) {
-                sourceArr.push(
-                    <Handle type="source" position="bottom" className={nodeClassName} key="s0" id="s0" 
-                        style = {{left: "30%", borderRadius: 0}}/>
-                )
-            }
-
-            // if we have more than one prevAddr, we need to create a custom reactflow component for each prevAddr
-            if (prevAddrLength > 1) {
-                let startPos = 70;
-                let finalPos = 100;
-                let beginingPos = startPos + (finalPos - startPos) / (prevAddrLength-1) / 2
-
-                for (i = 1; i < prevAddrLength; i++) {
-                    let pos = beginingPos + (finalPos - startPos) * (i-1) / (prevAddrLength-1);
-                    targetArr.push(
-                        <Handle type="target" position="top" className={nodeClassName} key={"t" + i.toString()} id={"t" + i.toString()}
-                            style = {{top: "52%", left: pos.toString()+"%", borderRadius: 0}}/>
-                    )
-                } 
-            }
-
-            if (afterAddrLength > 1) {
-                let startPos = 70;
-                let finalPos = 100;
-                let beginingPos = startPos + (finalPos - startPos) / (afterAddrLength-1) / 2
-
-                for (i = 1; i < afterAddrLength; i++) {
-                    let pos = beginingPos + (finalPos - startPos) * (i-1) / (afterAddrLength-1);
-                    targetArr.push(
-                        <Handle type="source" position="bottom" className={nodeClassName} key={"s" + i.toString()} id={"s" + i.toString()}
-                            style = {{left: pos.toString()+"%", borderRadius: 0}}/>
-                    )
-                } 
-            }
 
             return ({ data }) => {return (
                 <div>
-                  {/* <div className='treeNode'> {data.value} </div> */}
                   <div>
-                    {sourceArr}
+                    <Handle type="source" position="bottom" style = {{left: "30%", borderRadius: 0}} className='treeNode' id='s0'/>
+                    <Handle type="source" position="bottom" style = {{left: "70%", borderRadius: 0}} className='treeNode' id='s1'/>
                     <div className={nodeClassName}>{data.text}</div>
                     {targetArr}
                   </div>
@@ -457,17 +422,33 @@ export default class MemGraphObjClass {
         // this node has a child
         if (srcAddr !== "0x0") {
             if (this.elementMap[ele.addr].isTree) {
-                let sourceCount = ele.sourceCount
+                // let sourceCount = ele.sourceCount
+                let sourceId = ""
+
+                if(this.elementMap[ele.addr].leftChild === srcAddr) {
+                    sourceId = "s0"
+                } 
+                if (this.elementMap[ele.addr].rightChild === srcAddr) {
+                    sourceId = "s1"
+                } 
+
+                console.log(ele.leftChild)
+                console.log(ele.rightChild)
+                console.log("source" + ele.addr)
+                console.log("target" + srcAddr)
+                console.log("sourceID" + sourceId)
+                console.log("targetID" + targetId)
+
                 this.memGraphRepresentation.push({
                     id: ele.addr + srcAddr,
                     source: ele.addr,
                     target: srcAddr,
                     arrowHeadType: 'arrow', 
-                    sourceHandle: 's' + sourceCount,
+                    sourceHandle: sourceId,
                     targetHandle: targetId,
                     style: {strokeWidth: 2},
                 })
-                ele.sourceCount++;
+                // ele.sourceCount++;
             } else {
                 this.memGraphRepresentation.push({
                     id: ele.addr + srcAddr,
@@ -479,8 +460,6 @@ export default class MemGraphObjClass {
                 })
             }
         }
-        console.log(ele.addr)
-        console.log(srcAddr)
 
         var Y_addition = 0
         var ret_startingY = startingY

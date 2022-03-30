@@ -119,4 +119,34 @@ describe("Memgraph Test", () => {
 
     expect(memgraph.graphObjMap[0].elementMap['0x78017ff7f4'].getPrevAddr().size).toBe(1);
   });
+
+  it("Single Linked List Node and its head pointer", async() => {
+    let memgraph = new MemGraphClass();
+
+    memgraph.init({
+      '0x7c25fffce0': {'name': 'head',
+                  'ptrTarget': true,
+                  'type': 'Node *',
+                  'value': '0x7ff7fdad0000'},
+      '0x7ff7fdad0000': {'isLL': true,
+                  'isRefered': false,
+                  'linkedMember': 'next',
+                  'members': ['val'],
+                  'name': '(*((Node*)(0x7ff7fdad0000)))',
+                  'type': 'Node',
+                  'value': {'next': {'type': 'struct node *',
+                                     'value': '0xffff00000004'},
+                            'val': {'type': 'int', 'value': '9460301'}}}
+    })
+    memgraph.constructGraph()
+
+    expect(memgraph.graphObjMap.length).toBe(1);
+    expect(Object.keys(memgraph.graphObjMap[0].elementMap).length).toBe(2);
+    expect(memgraph.graphObjMap[0].elementMap['0x7c25fffce0'].addr).toBe('0x7c25fffce0');
+    expect(memgraph.graphObjMap[0].elementMap['0x7c25fffce0'].getAfterAddr().size).toBe(1);
+    expect(memgraph.graphObjMap[0].elementMap['0x7ff7fdad0000'].getPrevAddr().size).toBe(1);
+    expect(memgraph.graphObjMap[0].elementMap['0x7ff7fdad0000'].isLL).toBe(true);
+    expect(memgraph.graphObjMap[0].elementMap['0x7ff7fdad0000'].value.next.value).toBe('0xffff00000004');
+  });
+  
 });

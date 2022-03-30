@@ -207,6 +207,7 @@ class varSnapshot:
             # unbufferedPrint("=========newVarDict", newVarDict)
             newVarDict["isTree"] = True
             newVarDict["isRefered"] = False
+            newVarDict["members"] = self.typeDict[structTypeName]["members"]
             newVarDict["linkedMember"] = {"left": self.typeDict[structTypeName]["linkedListMember"]["left"], "right": self.typeDict[structTypeName]["linkedListMember"]["right"]}
 
             referredLeftAddr = memberDict[self.typeDict[structTypeName]["linkedListMember"]["left"]]["value"]
@@ -385,8 +386,6 @@ class varSnapshot:
 
         else:
             unbufferedPrint("More than 2 dimensional array detected! Cannot process right now")
-
-        
 
         unbufferedPrint("=============Done Processing array!!!")
 

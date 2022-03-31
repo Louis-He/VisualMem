@@ -394,7 +394,7 @@ export default class MainWindow extends React.Component {
 
                         </div>
 
-                        <div>
+                        {/* <div>
                           <p>Current Selected Folder: {this.props.projectFolder}</p>
                         </div>
 
@@ -409,7 +409,7 @@ export default class MainWindow extends React.Component {
 
                         <div>
                           <p>Current Executable Path: {this.props.executablePath}</p>
-                        </div>
+                        </div> */}
 
 
                         <p></p>
@@ -434,24 +434,24 @@ export default class MainWindow extends React.Component {
                           </Form>
                         </div>
 
-                        <Button variant="primary" onClick={(e) => this.displayVar()}>
+                        {/* <Button variant="primary" onClick={(e) => this.displayVar()}>
                           Display Variables
                         </Button>
                         
-                        {/* <Button variant="primary" onClick={(e) => this.showFile(e)}>
+                        <Button variant="primary" onClick={(e) => this.showFile(e)}>
                           Display File Content
-                        </Button> */}
+                        </Button>
 
-                        {/* <div>
+                        <div>
                           <p> File Data: {this.state.fileData} </p>
-                        </div> */}
+                        </div>
 
                                     
                         <GridLayout className="layout" layout={layout} cols={12} rowHeight={30} width={1200}>
                           <div key="a">a</div>
                           <div key="b">b</div>
                           <div key="c">c</div>
-                        </GridLayout>
+                        </GridLayout> */}
                       </Container>
             </MainBody>
             </div>

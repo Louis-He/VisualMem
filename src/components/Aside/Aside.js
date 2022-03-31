@@ -67,14 +67,14 @@ export default class Aside extends React.Component{
             <MenuItem icon={<AiOutlineFile />} onClick={(e) => this.selectSource(e)}>Select Source File</MenuItem>
           </Menu>
           <Menu iconShape="circle">
-            <SubMenu
+            {/* <SubMenu
               suffix={<span className="badge yellow">3</span>}
               title="Data Structures"
             >
               <MenuItem onClick={() => this.changePage('S1')}> Data struc 1 </MenuItem>
               <MenuItem onClick={() => this.changePage('S2')}> Data struc 2 </MenuItem>
               <MenuItem onClick={() => this.changePage('S3')}> Data struc 3 </MenuItem>
-            </SubMenu>
+            </SubMenu> */}
           </Menu>
         </SidebarContent>
         {/* <SidebarContent>

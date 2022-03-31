@@ -128,14 +128,14 @@ const treeComponent = ({ data }) => {
   return (
     <div>
       <Handle type="target" position="top" style = {{left: "50%", borderRadius: 0}} className='treeNode' id='t0'/>
-      <Handle type="target" position="bottom" style = {{left: "30%", borderRadius: 0}} className='treeNode' id='t1'/>
+      <Handle type="source" position="bottom" style = {{left: "30%", borderRadius: 0}} className='treeNode' id='s0'/>
       <div className='treeNode'> {data.text} </div>
       <Handle 
         type="source"
         position="bottom"
         style = {{left: "70%", borderRadius: 0}}
         className='treeNode'
-        id='s0'
+        id='s1'
       />
     </div>
   )

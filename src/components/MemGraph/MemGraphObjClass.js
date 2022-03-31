@@ -7,7 +7,8 @@ let nodeTypes = {
     linkedListHead: "linkedListHead", 
     linkedListNode: "linkedList", 
     arrayHead: "arrayHead", 
-    arrayNode: "arrayNode"
+    arrayNode: "arrayNode",
+    treeNode: "treeNode"
 }
 
 export default class MemGraphObjClass {
@@ -51,7 +52,9 @@ export default class MemGraphObjClass {
      */
     resetNodesUnvisited() {
         for (let addr in this.elementMap) {
+            this.elementMap[addr].isVisited = false
             this.elementMap[addr].visitedFrom.clear()
+            //this.elementMap[addr].sourceCount = 0
         }
     }
 
@@ -136,6 +139,7 @@ export default class MemGraphObjClass {
      * @param {enum} nodeClassName
      */
     _generateCustomReactflowComponent(prevAddrLength, afterAddrLength, nodeClassName) {
+        // var sourceArr = []
         var targetArr = []
         var i = 0
         if (nodeClassName === nodeTypes.normal) {
@@ -200,6 +204,25 @@ export default class MemGraphObjClass {
                   <div>
                     <Handle type="source" position="right" style = {{top: "35%", borderRadius: 0}} className={nodeClassName} id="s0"/>
                     <div className={nodeClassName}> </div>
+                    {targetArr}
+                  </div>
+                </div>
+            )}
+
+        } else if (nodeClassName === nodeTypes.treeNode) {
+            if (prevAddrLength !== 0) {
+                targetArr.push(
+                    <Handle type="target" position="top" className={nodeClassName} key="t0" id="t0" 
+                        style = {{left: "50%", borderRadius: 0}}/>
+                )
+            }
+
+            return ({ data }) => {return (
+                <div>
+                  <div>
+                    <Handle type="source" position="bottom" style = {{left: "30%", borderRadius: 0}} className='treeNode' id='s0'/>
+                    <Handle type="source" position="bottom" style = {{left: "70%", borderRadius: 0}} className='treeNode' id='s1'/>
+                    <div className={nodeClassName}>{data.text}</div>
                     {targetArr}
                   </div>
                 </div>
@@ -347,7 +370,6 @@ export default class MemGraphObjClass {
             startingX += 1;
             
             for (var i = 1; i < arrayList.length; i++) {
-                // TODO: handle position!!
                 this.memGraphRepresentation.push({ 
                     id: ele.addr+i, 
                     type: 'array', 
@@ -362,7 +384,23 @@ export default class MemGraphObjClass {
                 startingX += 1;
             }
         } else if (ele.isTree) {
-            // do nothing for now
+            customNodeStyle[ele.addr + "_style"] = this._generateCustomReactflowComponent(allPrevAddrs.length, allAfterAddrs.length, nodeTypes.treeNode);
+            let member = ele.getMembers()[0]
+
+            if(!ele.isVisited) {
+                this.memGraphRepresentation.push({ 
+                    id: ele.addr, 
+                    type: ele.addr + "_style", 
+                    position: {x: startingX * 120 + 10, y: startingY * 60 + 10}, 
+                    data: { 
+                        name: ele.name.includes("*") ? " " : ele.name, 
+                        text: ele.getValue()[member]["value"]
+                    }, 
+                    draggable: true
+                })
+                ele.isVisited = true;
+            }
+            
         } else {
             // for normal nodes
             customNodeStyle[ele.addr + allPrevAddrs.length.toString() + "_style"] = this._generateCustomReactflowComponent(allPrevAddrs.length, allAfterAddrs.length, nodeTypes.normal);
@@ -383,14 +421,44 @@ export default class MemGraphObjClass {
         // draw the edge if srcAddr is not null pointer, means that
         // this node has a child
         if (srcAddr !== "0x0") {
-            this.memGraphRepresentation.push({
-                id: ele.addr + srcAddr,
-                source: ele.addr,
-                target: srcAddr,
-                arrowHeadType: 'arrow', 
-                targetHandle: targetId,
-                style: {strokeWidth: 2},
-            })
+            if (this.elementMap[ele.addr].isTree) {
+                // let sourceCount = ele.sourceCount
+                let sourceId = ""
+
+                if(this.elementMap[ele.addr].leftChild === srcAddr) {
+                    sourceId = "s0"
+                } 
+                if (this.elementMap[ele.addr].rightChild === srcAddr) {
+                    sourceId = "s1"
+                } 
+
+                console.log(ele.leftChild)
+                console.log(ele.rightChild)
+                console.log("source" + ele.addr)
+                console.log("target" + srcAddr)
+                console.log("sourceID" + sourceId)
+                console.log("targetID" + targetId)
+
+                this.memGraphRepresentation.push({
+                    id: ele.addr + srcAddr,
+                    source: ele.addr,
+                    target: srcAddr,
+                    arrowHeadType: 'arrow', 
+                    sourceHandle: sourceId,
+                    targetHandle: targetId,
+                    style: {strokeWidth: 2},
+                })
+                // ele.sourceCount++;
+            } else {
+                this.memGraphRepresentation.push({
+                    id: ele.addr + srcAddr,
+                    source: ele.addr,
+                    target: srcAddr,
+                    arrowHeadType: 'arrow', 
+                    targetHandle: targetId,
+                    style: {strokeWidth: 2},
+                })
+            }
         }
 
         var Y_addition = 0
@@ -398,6 +466,8 @@ export default class MemGraphObjClass {
 
         
         this.bubbleSort(allPrevAddrs, allPrevAddrs.length)
+
+        console.log(allPrevAddrs)
 
         i = 0
         for (let prevEleAddr of allPrevAddrs) {

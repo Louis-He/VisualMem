@@ -71,9 +71,9 @@ export default class Aside extends React.Component{
               suffix={<span className="badge yellow">3</span>}
               title="Data Structures"
             >
-              <MenuItem onClick={() => this.changePage('S1')}> Data struc 1 </MenuItem>
+              {/* <MenuItem onClick={() => this.changePage('S1')}> Data struc 1 </MenuItem>
               <MenuItem onClick={() => this.changePage('S2')}> Data struc 2 </MenuItem>
-              <MenuItem onClick={() => this.changePage('S3')}> Data struc 3 </MenuItem>
+              <MenuItem onClick={() => this.changePage('S3')}> Data struc 3 </MenuItem> */}
             </SubMenu>
           </Menu>
         </SidebarContent>

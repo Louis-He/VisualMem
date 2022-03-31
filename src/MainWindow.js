@@ -9,7 +9,7 @@ import ReactTooltip from "react-tooltip";
 import { CaretRightSquare, XSquare, SkipEndCircle, ArrowDownRightCircle, ArrowRightCircle, Eye, EyeSlash, FiletypeExe } from 'react-bootstrap-icons';
 import { ThemeProvider } from "styled-components";
 import { MainBody } from "./components/GlobalStyles";
-import GridLayout from 'react-grid-layout';
+//import GridLayout from 'react-grid-layout';
 //import Editor from './components/RightPanel/Editor.js'
 import Aside from "./components/Aside/Aside"
 import Page1 from "./components/RightPanel/Page1.js"
@@ -310,11 +310,11 @@ export default class MainWindow extends React.Component {
       }
     }
 
-    const layout = [
-      {i: 'a', x: 0, y: 0, w: 1, h: 2, isDraggable: false, isResizable: true},
-      {i: 'b', x: 1, y: 0, w: 3, h: 2, minW: 2, maxW: 4},
-      {i: 'c', x: 4, y: 0, w: 1, h: 2}
-    ];
+    // const layout = [
+    //   {i: 'a', x: 0, y: 0, w: 1, h: 2, isDraggable: false, isResizable: true},
+    //   {i: 'b', x: 1, y: 0, w: 3, h: 2, minW: 2, maxW: 4},
+    //   {i: 'c', x: 4, y: 0, w: 1, h: 2}
+    // ];
 
 
     return (
@@ -394,7 +394,7 @@ export default class MainWindow extends React.Component {
 
                         </div>
 
-                        <div>
+                        {/* <div>
                           <p>Current Selected Folder: {this.props.projectFolder}</p>
                         </div>
 
@@ -409,7 +409,7 @@ export default class MainWindow extends React.Component {
 
                         <div>
                           <p>Current Executable Path: {this.props.executablePath}</p>
-                        </div>
+                        </div> */}
 
 
                         <p></p>
@@ -434,24 +434,24 @@ export default class MainWindow extends React.Component {
                           </Form>
                         </div>
 
-                        <Button variant="primary" onClick={(e) => this.displayVar()}>
+                        {/* <Button variant="primary" onClick={(e) => this.displayVar()}>
                           Display Variables
                         </Button>
                         
-                        {/* <Button variant="primary" onClick={(e) => this.showFile(e)}>
+                        <Button variant="primary" onClick={(e) => this.showFile(e)}>
                           Display File Content
-                        </Button> */}
+                        </Button>
 
-                        {/* <div>
+                        <div>
                           <p> File Data: {this.state.fileData} </p>
-                        </div> */}
+                        </div>
 
                                     
                         <GridLayout className="layout" layout={layout} cols={12} rowHeight={30} width={1200}>
                           <div key="a">a</div>
                           <div key="b">b</div>
                           <div key="c">c</div>
-                        </GridLayout>
+                        </GridLayout> */}
                       </Container>
             </MainBody>
             </div>

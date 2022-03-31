@@ -1,4 +1,22 @@
 .replacement_marker {
     position: absolute;
-    background-color: #FFFF00;
+    background-color: #81817d;
  }
+
+ .breakpoints {
+    background: #F0908A;
+    width: 10px !important;
+    height: 10px !important;
+    left: 5px !important;
+    top: 3px;
+    border-radius: 5px;
+}
+
+.breakpoints-fake {
+    background: #EACBD1;
+    width: 10px !important;
+    height: 10px !important;
+    left: 5px !important;
+    top: 3px;
+    border-radius: 5px;
+}

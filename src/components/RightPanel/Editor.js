@@ -93,6 +93,7 @@ export default class App extends React.Component {
                   editorProps={{
                       $blockScrolling: true
                   }}
+                  markers={[{startRow: this.props.lineNumber, startCol: 0, endRow: this.props.lineNumber+1, endCol: 0, className: 'replacement_marker', type: 'text' }]}
                   setOptions={{
                     enableBasicAutocompletion: true,
                     enableLiveAutocompletion: true,

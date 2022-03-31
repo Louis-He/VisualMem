@@ -3,7 +3,7 @@ import './css/App.css';
 import './css/nodeStyle.css';
 import './../node_modules/react-reflex/styles.css';
 import './../node_modules/react-grid-layout/css/styles.css';
-import './../node_modules/react-resizable/css/styles.css';
+//import './../node_modules/react-resizable/css/styles.css';
 import { Container, Button, Form } from 'react-bootstrap';
 import ReactTooltip from "react-tooltip";
 import { CaretRightSquare, XSquare, SkipEndCircle, ArrowDownRightCircle, ArrowRightCircle, Eye, EyeSlash, FiletypeExe } from 'react-bootstrap-icons';
@@ -322,7 +322,7 @@ export default class MainWindow extends React.Component {
         <>
         <div className = "MainWindow">
           <Aside />
-          <Page1 fileData={this.state.fileData} fileUpdatefunc={this.fileUpdate} />
+          <Page1 fileData={this.state.fileData} fileUpdatefunc={this.fileUpdate} lineNumber={this.lineNumber}/>
           <div style={{height:"100%",width:"100%", overflow:"scroll"}}>
           <MainBody>
           

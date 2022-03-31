@@ -38,7 +38,7 @@ export default class Aside extends React.Component{
         <Container style={{height:"100%",width:"70vh", overflow:"scroll"}}>
           <div>
             <p></p>
-            <Editor fileData ={this.props.fileData} fileUpdatefunc={this.props.fileUpdatefunc}/>
+            <Editor fileData ={this.props.fileData} fileUpdatefunc={this.props.fileUpdatefunc} lineNumber={this.lineNumber}/>
           </div>
         </Container>
       </MainBody>

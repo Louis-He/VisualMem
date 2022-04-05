@@ -27,3 +27,4 @@ yarn-error.log*
 testProg/a.*
 testProg/*.exe
 compile-build/*
+testProg/*.dSYM/

@@ -103,6 +103,7 @@ global.share.ipcMain.handle('sendMsgToGDB', (event, ...args) => {
     // GDBManager.getDetailedLocals()
   } else {
     // GDBManager.execGdbCommand(args[0]);
+    pygdbController.pygdbCustomCommand(args[0]);
   }
 })
 

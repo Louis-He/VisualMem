@@ -479,7 +479,7 @@ class pygdbController:
         self.controller = GdbController(
             # /Users/qihan6/Documents/gdb_darwin_hang_fix/build/gdb/gdb
             # command=["/Users/qihan6/Documents/gdb_darwin_hang_fix/build/gdb/gdb", "--nx", "--quiet", "--interpreter=mi3"], 
-            time_to_check_for_additional_output_sec=0.01
+            time_to_check_for_additional_output_sec=0.02
         )
         unbufferedPrint(self.execFilePath)
         isSuccessful = self.sendCommandToGDB('-file-exec-and-symbols "' + self.execFilePath + '"', True)
@@ -510,6 +510,10 @@ class pygdbController:
     def stopgdb(self):
         self.controller.write("q")
         self.controller = None
+
+    def runCustomGDBCommand(self, command) -> bool:
+        isSuccessful = self.sendCommandToGDB(command, True)
+        return isSuccessful
 
     def getVariables(self):
         response = self.controller.write('-stack-list-variables --simple-values')
@@ -558,6 +562,8 @@ def processIncomingMessage(pygdb_controller, msg):
         if res > 1:
             ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, 0)
             unbufferedPrint('Exception raise failure')
+    elif msgArr[0] == 'CUS':
+        pygdb_controller.runCustomGDBCommand(msgArr[2])
 
 
 def pygdb_interface_entry():

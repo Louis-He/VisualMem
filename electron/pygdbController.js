@@ -145,3 +145,9 @@ exports.pygdbGetLocal = function () {
         l_pygdb_socket.write("GETLOCAL;0;")
     }
 }
+
+exports.pygdbCustomCommand = function (msg) {
+    if (l_pygdb_socket !== null) {
+        l_pygdb_socket.write("CUS;" + msg.length + ";" + msg)
+    }
+}

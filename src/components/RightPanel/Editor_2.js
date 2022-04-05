@@ -39,7 +39,7 @@ export const languageDef = {
 		'-=', '*=', '/=', '%=', '&=', '|=', '^=', '<<=', '>>=', '>>', '->'
 	],
 
-	symbols: /[=><!~?:&|+\-*\/\^%]+/,
+	symbols: /[=><!~?:&|+\-*/^%]+/,
 
 	// escape sequences
 	escapes: /\\(?:[abfnrtv\\"']|x[0-9A-Fa-f]{1,4}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})/,
@@ -49,7 +49,7 @@ export const languageDef = {
 		root: [
       { include: "@tags" },
 			// identifiers and keywords
-			[/\@?[a-zA-Z_]\w*/, {
+			[/@?[a-zA-Z_]\w*/, {
 				cases: {
 					'@namespaceFollows': { token: 'keyword.$0', next: '@namespace' },
 					'@keywords': { token: 'keyword.$0', next: '@qualified' },
@@ -68,7 +68,7 @@ export const languageDef = {
 					'@default': '@brackets'
 				}
 			}],
-			[/[{}()\[\]]/, '@brackets'],
+			[/[{}()[\]]/, '@brackets'],
 			[/[<>](?!@symbols)/, '@brackets'],
 			[/@symbols/, {
 				cases: {
@@ -79,7 +79,7 @@ export const languageDef = {
 
 
 			// numbers
-			[/[0-9_]*\.[0-9_]+([eE][\-+]?\d+)?[fFdD]?/, 'number.float'],
+			[/[0-9_]*\.[0-9_]+([eE][-+]?\d+)?[fFdD]?/, 'number.float'],
 			[/0[xX][0-9a-fA-F_]+/, 'number.hex'],
 			[/0[bB][01_]+/, 'number.hex'], // binary: use same theme style as hex
 			[/[0-9_]+/, 'number'],
@@ -90,8 +90,8 @@ export const languageDef = {
 			// strings
 			[/"([^"\\]|\\.)*$/, 'string.invalid'],  // non-teminated string
 			[/"/, { token: 'string.quote', next: '@string' }],
-			[/\$\@"/, { token: 'string.quote', next: '@litinterpstring' }],
-			[/\@"/, { token: 'string.quote', next: '@litstring' }],
+			[/\$@"/, { token: 'string.quote', next: '@litinterpstring' }],
+			[/@"/, { token: 'string.quote', next: '@litstring' }],
 			[/\$"/, { token: 'string.quote', next: '@interpolatedstring' }],
 
 			// characters
@@ -114,15 +114,15 @@ export const languageDef = {
 		namespace: [
 			{ include: '@whitespace' },
 			[/[A-Z]\w*/, 'namespace'],
-			[/[\.=]/, 'delimiter'],
+			[/[.=]/, 'delimiter'],
 			['', '', '@pop'],
 		],
 
 		comment: [
-			[/[^\/*]+/, 'comment'],
+			[/[^/*]+/, 'comment'],
 			// [/\/\*/,    'comment', '@push' ],    // no nested comments :-(
 			['\\*/', 'comment', '@pop'],
-			[/[\/*]/, 'comment']
+			[/[/*]/, 'comment']
 		],
 
 		string: [

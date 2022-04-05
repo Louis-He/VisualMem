@@ -3,13 +3,13 @@ import './css/App.css';
 import './css/nodeStyle.css';
 import './../node_modules/react-reflex/styles.css';
 import './../node_modules/react-grid-layout/css/styles.css';
-import './../node_modules/react-resizable/css/styles.css';
+//import './../node_modules/react-resizable/css/styles.css';
 import { Container, Button, Form } from 'react-bootstrap';
 import ReactTooltip from "react-tooltip";
 import { CaretRightSquare, XSquare, SkipEndCircle, ArrowDownRightCircle, ArrowRightCircle, Eye, EyeSlash, FiletypeExe } from 'react-bootstrap-icons';
 import { ThemeProvider } from "styled-components";
 import { MainBody } from "./components/GlobalStyles";
-import GridLayout from 'react-grid-layout';
+//import GridLayout from 'react-grid-layout';
 //import Editor from './components/RightPanel/Editor.js'
 import Aside from "./components/Aside/Aside"
 import Page1 from "./components/RightPanel/Page1.js"
@@ -65,7 +65,7 @@ export default class MainWindow extends React.Component {
       elements: [],
       variableDict: {},
       sourceFile: "",
-      lineNumber: "", 
+      lineNumber: 0, 
     }
 
     this.updateLineNumber = this.updateLineNumber.bind(this);
@@ -201,6 +201,13 @@ export default class MainWindow extends React.Component {
       fileData: newValue
     })
   }
+
+  increaseLine = () => {
+    this.setState({
+      lineNumber: this.state.lineNumber + 1
+    })
+    console.log(this.state.lineNumber)
+  }
   
   render() {
     let startGDBButton = <span></span>
@@ -310,11 +317,11 @@ export default class MainWindow extends React.Component {
       }
     }
 
-    const layout = [
-      {i: 'a', x: 0, y: 0, w: 1, h: 2, isDraggable: false, isResizable: true},
-      {i: 'b', x: 1, y: 0, w: 3, h: 2, minW: 2, maxW: 4},
-      {i: 'c', x: 4, y: 0, w: 1, h: 2}
-    ];
+    // const layout = [
+    //   {i: 'a', x: 0, y: 0, w: 1, h: 2, isDraggable: false, isResizable: true},
+    //   {i: 'b', x: 1, y: 0, w: 3, h: 2, minW: 2, maxW: 4},
+    //   {i: 'c', x: 4, y: 0, w: 1, h: 2}
+    // ];
 
 
     return (
@@ -322,7 +329,7 @@ export default class MainWindow extends React.Component {
         <>
         <div className = "MainWindow">
           <Aside />
-          <Page1 fileData={this.state.fileData} fileUpdatefunc={this.fileUpdate} />
+          <Page1 fileData={this.state.fileData} fileUpdatefunc={this.fileUpdate} lineNumber={this.state.lineNumber}/>
           <div style={{height:"100%",width:"100%", overflow:"scroll"}}>
           <MainBody>
           
@@ -394,7 +401,7 @@ export default class MainWindow extends React.Component {
 
                         </div>
 
-                        <div>
+                        {/* <div>
                           <p>Current Selected Folder: {this.props.projectFolder}</p>
                         </div>
 
@@ -409,7 +416,7 @@ export default class MainWindow extends React.Component {
 
                         <div>
                           <p>Current Executable Path: {this.props.executablePath}</p>
-                        </div>
+                        </div> */}
 
 
                         <p></p>
@@ -431,27 +438,29 @@ export default class MainWindow extends React.Component {
                               Send
                             </Button>
 
+                            <Button onClick={this.increaseLine} >IncreaseLine</Button>
+
                           </Form>
                         </div>
 
-                        <Button variant="primary" onClick={(e) => this.displayVar()}>
+                        {/* <Button variant="primary" onClick={(e) => this.displayVar()}>
                           Display Variables
                         </Button>
                         
-                        {/* <Button variant="primary" onClick={(e) => this.showFile(e)}>
+                        <Button variant="primary" onClick={(e) => this.showFile(e)}>
                           Display File Content
-                        </Button> */}
+                        </Button>
 
-                        {/* <div>
+                        <div>
                           <p> File Data: {this.state.fileData} </p>
-                        </div> */}
+                        </div>
 
                                     
                         <GridLayout className="layout" layout={layout} cols={12} rowHeight={30} width={1200}>
                           <div key="a">a</div>
                           <div key="b">b</div>
                           <div key="c">c</div>
-                        </GridLayout>
+                        </GridLayout> */}
                       </Container>
             </MainBody>
             </div>

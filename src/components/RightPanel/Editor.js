@@ -63,7 +63,7 @@ export default Editor
 
 
 
-export default class App extends React.Component {
+export default class Editor extends React.Component {
 
   constructor(props, context) {
       super(props, context);

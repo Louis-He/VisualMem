@@ -65,7 +65,7 @@ export default class MainWindow extends React.Component {
       elements: [],
       variableDict: {},
       sourceFile: "",
-      lineNumber: "", 
+      lineNumber: 0, 
     }
 
     this.updateLineNumber = this.updateLineNumber.bind(this);
@@ -201,6 +201,13 @@ export default class MainWindow extends React.Component {
       fileData: newValue
     })
   }
+
+  increaseLine = () => {
+    this.setState({
+      lineNumber: this.state.lineNumber + 1
+    })
+    console.log(this.state.lineNumber)
+  }
   
   render() {
     let startGDBButton = <span></span>
@@ -322,7 +329,7 @@ export default class MainWindow extends React.Component {
         <>
         <div className = "MainWindow">
           <Aside />
-          <Page1 fileData={this.state.fileData} fileUpdatefunc={this.fileUpdate} lineNumber={this.lineNumber}/>
+          <Page1 fileData={this.state.fileData} fileUpdatefunc={this.fileUpdate} lineNumber={this.state.lineNumber}/>
           <div style={{height:"100%",width:"100%", overflow:"scroll"}}>
           <MainBody>
           
@@ -430,6 +437,8 @@ export default class MainWindow extends React.Component {
                             <Button variant="primary" onClick={(e) => this.sendGDBCommandButton()}>
                               Send
                             </Button>
+
+                            <Button onClick={this.increaseLine} >IncreaseLine</Button>
 
                           </Form>
                         </div>

@@ -28,29 +28,6 @@ function renderRequestsendMsgToGDB(msg) {
   ipcRenderer.invoke('sendMsgToGDB', msg)
 }
 
-// // TODO: need to update
-// const elementsCreator = function ({locals}) {
-
-//   const elementList = [];
-
-//   let ID = 1;
-//   let X = 100;
-//   let Y = 50;
-
-//   // /console.log(locals.length)
-//   if (locals.length < 2) {
-//     return []
-//   }
-//   for (let i = 0; i < 2; i++) {
-//     const element = { id: ID,  type: 'special', position: {x:X, y:Y}, data: { text: "name: " + locals[i][0].name + ", value: " + locals[i][0].value}, style: {opacity: 1}};
-//     ID = ID + 1;
-//     Y = Y + 50;
-//     elementList.push(element);
-//   }
-
-//   return elementList
-// }
-
 // ==== renderer class ====
 export default class MainWindow extends React.Component {
   constructor(props) {
@@ -75,12 +52,6 @@ export default class MainWindow extends React.Component {
 
   componentDidMount() {
     var that = this;
-    // ipcRenderer.on('distributeDetailedLocals', function (evt, locals) {
-    //   const elementTemp = elementsCreator(locals)
-    //   that.setState( {
-    //     elements: elementTemp
-    //   })
-    // });
 
     ipcRenderer.on('distributeFileData', function (evt, response) {
       that.setState({
@@ -109,7 +80,7 @@ export default class MainWindow extends React.Component {
 
   updateLineNumber(lineNum) {
     this.setState({
-      lineNumber: lineNum
+      lineNumber: parseInt(lineNum) - 1
     })
   }
 

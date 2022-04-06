@@ -362,7 +362,8 @@ export default class Editor2 extends React.Component {
     };
     return (
       <MonacoEditor
-        height="98vh"
+        className="monacoEditorWrapper"
+        height="95vh"
         width= "100%"
         language="c"
         theme="vs-dark"

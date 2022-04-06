@@ -19,23 +19,10 @@ export default class Aside extends React.Component{
     }
   }
 
-
   render(){
-    /*
-    const headerStyle = {
-      padding: "24px",
-      textTransform: "uppercase",
-      fontWeight: "bold",
-      letterSpacing: "1px",
-      overflow: "hidden",
-      textOverflow: "ellipsis",
-      whiteSpace: "noWrap"
-    };
-    */
-
     return (
       <MainBody>
-        <Container style={{height:"100%",width:"70vh", overflow:"scroll"}}>
+        <Container style={{width:"70vh"}}>
           <div>
             <p></p>
             <Editor2 fileData ={this.props.fileData} fileUpdatefunc={this.props.fileUpdatefunc} lineNumber={this.props.lineNumber}/>

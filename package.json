@@ -19,6 +19,8 @@
     "fs": "0.0.1-security",
     "immer": ">=9.0.6",
     "mocha-sinon": "^2.1.2",
+    "monaco-editor": "^0.33.0",
+    "monaco-editor-webpack-plugin": "^7.0.1",
     "re-resizable": "^6.9.5",
     "react": "^17.0.2",
     "react-ace": "^9.5.0",
@@ -43,10 +45,10 @@
   },
   "scripts": {
     "start": "electron-forge start",
-    "react-start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "react-start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
+    "eject": "react-app-rewired eject",
     "electron-start": "electron .",
     "package": "electron-forge package",
     "make": "electron-forge make",
@@ -82,7 +84,8 @@
     "@electron-forge/maker-squirrel": "^6.0.0-beta.54",
     "@electron-forge/maker-zip": "^6.0.0-beta.54",
     "electron": "^12.2.2",
-    "electron-rebuild": "^2.3.5"
+    "electron-rebuild": "^2.3.5",
+    "react-app-rewired": "^2.2.1"
   },
   "config": {
     "forge": {

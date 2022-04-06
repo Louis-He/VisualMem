@@ -1,3 +1,4 @@
+from re import I
 import threading
 import socket
 import ctypes
@@ -449,6 +450,7 @@ class pygdbController:
         self.controller = None
         self.lineNumber = ''
         self.sourceFile = ''
+        self.exited = False
 
         self.varSnapshot = varSnapshot()
 
@@ -462,7 +464,12 @@ class pygdbController:
         for res in response:
             if res["message"] == "error":
                 return False
-        
+
+            if res["message"] == "stopped":
+                payload = res["payload"]
+
+                if "reason" in payload and payload["reason"] == "exited-normally":
+                    self.exited = True
         return True
 
     def sendErrMsgtoElectron(self, msg):
@@ -475,6 +482,7 @@ class pygdbController:
     
     def startController(self, execFilePath) -> bool:
         self.initializeController(execFilePath)
+        self.exited = False
 
         self.controller = GdbController(
             # /Users/qihan6/Documents/gdb_darwin_hang_fix/build/gdb/gdb
@@ -494,27 +502,50 @@ class pygdbController:
 
     def runNextLine(self, isGetVariables=False) -> bool:
         isSuccessful = self.sendCommandToGDB('-exec-next', True)
+        if self.exited:
+            self.sendExitNotification()
+            return isSuccessful
+
         self.sendBackVarInfo()
         return isSuccessful
 
     def runStep(self, isGetVariables=False) -> bool:
         isSuccessful = self.sendCommandToGDB('-exec-step', True)
+        if self.exited:
+            self.sendExitNotification()
+            return isSuccessful
+
         self.sendBackVarInfo()
         return isSuccessful
 
     def runContinue(self, isGetVariables=False) -> bool:
         isSuccessful = self.sendCommandToGDB('-exec-continue', True)
+        if self.exited:
+            self.sendExitNotification()
+            return isSuccessful
+
         self.sendBackVarInfo()
         return isSuccessful
 
     def stopgdb(self):
-        self.controller.write("q")
-        self.controller = None
+        if self.controller is not None:
+            self.controller.write("q")
+            self.controller = None
 
     def runCustomGDBCommand(self, command) -> bool:
         isSuccessful = self.sendCommandToGDB(command, True)
+        if self.exited:
+            self.sendExitNotification()
+            return isSuccessful
+
         return isSuccessful
 
+    def addBreakPoint(self, lineNumber):
+        self.sendCommandToGDB('-break-insert ' + lineNumber, True)
+
+    def deleteBreakPoint(self, lineNumber):
+        self.sendCommandToGDB('-break-delete ' + lineNumber, True)
+        
     def getVariables(self):
         response = self.controller.write('-stack-list-variables --simple-values')
         response = response[0]
@@ -530,6 +561,12 @@ class pygdbController:
         parsedStr = "INFO" + '{:8d}'.format(len(varInfoJsonStr)) + varInfoJsonStr
         self.electron_socket.send(parsedStr.encode())
 
+    def sendExitNotification(self):
+        parsedStr = "EXIT" + '{:8d}'.format(0)
+        self.controller = None
+        self.electron_socket.send(parsedStr.encode())
+
+
     def getSourceFileAndLineNumber(self):
         response = self.controller.write('-file-list-exec-source-file')
         self.lineNumber = response[0]['payload']['line']
@@ -538,6 +575,15 @@ class pygdbController:
 
 def processIncomingMessage(pygdb_controller, msg):
     msgArr = msg.split(';')
+
+    # That means two messages are combined in one command, need to split them!
+    remainingMsg = ''
+    if len(msgArr[2]) > int(msgArr[1]):
+        remainingMsg = msgArr[2][int(msgArr[1]):] + ";" + ';'.join(msgArr[3:])
+        msgArr[2] = msgArr[2][:int(msgArr[1])]
+
+    print(remainingMsg)
+
     if msgArr[0] == 'SYN':
         pygdb_controller.electron_socket.send("SYN".encode())
     elif msgArr[0] == 'INI':
@@ -553,8 +599,14 @@ def processIncomingMessage(pygdb_controller, msg):
             pygdb_controller.runStep()
         elif msgArr[2] == "c":
             pygdb_controller.runContinue()
-        if msgArr[2] == "end":
+        elif msgArr[2] == "end":
             pygdb_controller.stopgdb()
+        elif len(msgArr[2]) >= 1:
+            if msgArr[2][0] == "b":
+                pygdb_controller.addBreakPoint(msgArr[2][1:])
+        elif len(msgArr[2]) >= 5:
+            if msgArr[2][0:5] == "clear":
+                pygdb_controller.deleteBreakPoint(msgArr[2][len("clear"):])
     elif msgArr[0] == 'FIN':
         thread_id = threading.get_ident()
         res = ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id,
@@ -564,6 +616,9 @@ def processIncomingMessage(pygdb_controller, msg):
             unbufferedPrint('Exception raise failure')
     elif msgArr[0] == 'CUS':
         pygdb_controller.runCustomGDBCommand(msgArr[2])
+
+    if remainingMsg != '':
+        processIncomingMessage(pygdb_controller, remainingMsg)
 
 
 def pygdb_interface_entry():

@@ -66,6 +66,8 @@ global.share.ipcMain.handle('requestStartGDB', (event, ...args) => {
   
   pygdbController.startController();
 
+  pygdbController.pygdbReproduceBreakpoint();
+
   return true;
   // return ifStartGDB
   // return Promise.resolve(ifStartGDB);
@@ -79,13 +81,31 @@ global.share.ipcMain.handle('requestStepGDB', (event, ...args) => {
   pygdbController.pygdbStepin();
 })
 
+global.share.ipcMain.handle('requestAddBreakpoint', (event, ...args) => {
+  pygdbController.pygdbAddBreakpoint(args[0]);
+})
+
+global.share.ipcMain.handle('requestDeleteBreakpoint', (event, ...args) => {
+  pygdbController.pygdbDeleteBreakpoint(args[0]);
+})
+
+global.share.ipcMain.handle('requestReproduceBreakpoint', (event, ...args) => {
+  pygdbController.pygdbReproduceBreakpoint(args[0]);
+})
+
+global.share.ipcMain.handle('requestCleanupBreakpoint', (event, ...args) => {
+  pygdbController.pygdbCleanupBreakpoint(args[0]);
+})
+
 global.share.ipcMain.handle('requestContinueGDB', (event, ...args) => {
-  // GDBManager.continueExecute();
   pygdbController.pygdbContinue();
 })
 
 global.share.ipcMain.handle('requestStopGDB', (event, ...args) => {
-  // GDBManager.stopGDB();
+  const mainWindow = windowsManager.getMainWindows()
+  if (mainWindow !== null) {
+    mainWindow.webContents.send('distributeEditorUserProgramExited', {});
+  }
   pygdbController.pygdbFIN();
 })
 

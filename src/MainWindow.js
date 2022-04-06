@@ -3,21 +3,15 @@ import './css/App.css';
 import './css/nodeStyle.css';
 import './../node_modules/react-reflex/styles.css';
 import './../node_modules/react-grid-layout/css/styles.css';
-//import './../node_modules/react-resizable/css/styles.css';
 import { Container, Button, Form } from 'react-bootstrap';
 import ReactTooltip from "react-tooltip";
 import { CaretRightSquare, XSquare, SkipEndCircle, ArrowDownRightCircle, ArrowRightCircle, Eye, EyeSlash, FiletypeExe } from 'react-bootstrap-icons';
 import { ThemeProvider } from "styled-components";
 import { MainBody } from "./components/GlobalStyles";
-//import GridLayout from 'react-grid-layout';
-//import Editor from './components/RightPanel/Editor.js'
 import Aside from "./components/Aside/Aside"
 import Page1 from "./components/RightPanel/Page1.js"
 import "./components/Aside/AsideStyle.css"
 import "react-pro-sidebar/dist/css/styles.css";
-//import { Resizable } from "re-resizable";
-
-// import ReactFlow, { Handle } from 'react-flow-renderer';
 
 import MemGraph from './components/MemGraph/MemGraph';
 
@@ -80,7 +74,7 @@ export default class MainWindow extends React.Component {
 
   updateLineNumber(lineNum) {
     this.setState({
-      lineNumber: parseInt(lineNum) - 1
+      lineNumber: parseInt(lineNum)
     })
   }
 
@@ -287,13 +281,6 @@ export default class MainWindow extends React.Component {
         ]
       }
     }
-
-    // const layout = [
-    //   {i: 'a', x: 0, y: 0, w: 1, h: 2, isDraggable: false, isResizable: true},
-    //   {i: 'b', x: 1, y: 0, w: 3, h: 2, minW: 2, maxW: 4},
-    //   {i: 'c', x: 4, y: 0, w: 1, h: 2}
-    // ];
-
 
     return (
       <ThemeProvider theme={this.props.theme}>

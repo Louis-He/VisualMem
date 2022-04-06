@@ -14,6 +14,8 @@ var l_buf_remining_len = 0;
 var l_tmp_recv_buf = "";
 var onMessageReceiveCallbackFunc = null;
 
+var l_breakpoints = []
+
 var isWin = process.platform === "win32";
 var isMac = process.platform === "darwin";
 var isLinux = process.platform === "linux";
@@ -63,6 +65,11 @@ exports.startPygdbSession = function () {
                         l_tmp_recv_buf += realMessage
                         l_buf_remining_len -= realMessage.length
                         onMessageReceiveCallbackFunc = getVariableInfoCallback
+                    } else if (messageType === "EXIT") {
+                        l_attached_controller = false
+                        const mainWindow = windowsManager.getMainWindows()
+                        mainWindow.webContents.send('distributeUserProgramExited', {});
+                        mainWindow.webContents.send('distributeEditorUserProgramExited', {});
                     }
                 }
 
@@ -136,8 +143,51 @@ exports.pygdbContinue = function () {
     l_pygdb_socket.write("CMD;1;c")
 }
 
+exports.pygdbAddBreakpoint = function (lineNum) {
+    let lineNumStr = lineNum.toString()
+    if (l_attached_controller) {
+        l_pygdb_socket.write("CMD;" + (1 + lineNumStr.length) + ";b" + lineNumStr)
+    }
+    
+    l_breakpoints.push(lineNum)
+}
+
+exports.pygdbDeleteBreakpoint = function (lineNum) {
+    let lineNumStr = lineNum.toString()
+    if (l_attached_controller) {
+        l_pygdb_socket.write("CMD;" + (5 + lineNumStr.length) + ";clear" + lineNumStr)
+    }
+    l_breakpoints.splice(l_breakpoints.indexOf(lineNum), 1)
+}
+
+exports.pygdbReproduceBreakpoint = function () {
+    if (!l_attached_controller) {
+        return
+    }
+
+    for (let i = 0; i < l_breakpoints.length; i++) {
+        let lineNum = l_breakpoints[i]
+        let lineNumStr = lineNum.toString()
+        l_pygdb_socket.write("CMD;" + (1 + lineNumStr.length) + ";b" + lineNumStr)
+    }
+}
+
+exports.pygdbCleanupBreakpoint = function () {
+    if (l_attached_controller) {
+        for (let i = 0; i < l_breakpoints.length; i++) {
+            let lineNum = l_breakpoints[i]
+            let lineNumStr = lineNum.toString()
+            l_pygdb_socket.write("CMD;" + (5 + lineNumStr.length) + ";clear" + lineNumStr)
+        }
+    }
+
+    l_breakpoints = []
+}
+
 exports.pygdbFIN = function () {
-    l_pygdb_socket.write("CMD;3;end")
+    if (l_attached_controller) {
+        l_pygdb_socket.write("CMD;3;end")
+    }
 }
 
 exports.pygdbGetLocal = function () {

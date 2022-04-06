@@ -3,6 +3,8 @@ import MonacoEditor from 'react-monaco-editor';
 //import style from "./index.css"
 import "./Editor.css"
 
+const ipcRenderer = window.require("electron").ipcRenderer;
+
 
 // This config defines how the language is displayed in the editor.
 export const languageDef = {
@@ -171,17 +173,6 @@ export const languageDef = {
 	},
 }
 
-// This config defines the editor's behavior.
-// export const configuration = {
-//   comments: {
-//     lineComment: "#",
-//   },
-//   brackets: [
-//     ["{", "}"], ["[", "]"], ["(", ")"],
-//   ],
-// }
-
-
 export default class Editor2 extends React.Component {
   constructor(props) {
     super(props);
@@ -191,13 +182,64 @@ export default class Editor2 extends React.Component {
     this.editor = null;
     this.monaco = null;
     this.decorations = [];
+    this.highlightDecorations = [];
     this.onChange = this.onChange.bind(this);
     this.editorDidMount = this.editorDidMount.bind(this);
+  }
+
+
+  componentDidMount() {
+    var that = this;
+    ipcRenderer.on('distributeEditorUserProgramExited', function (evt) {
+      that.cleanupHighlights();
+    });
+
+    window.addEventListener("resize", this.updateDimensions.bind(this));
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.updateDimensions.bind(this));
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.lineNumber !== this.props.lineNumber) {
+      this.updateHighlightedLine(this.props.lineNumber)
+      this.editor.revealLineInCenter(this.props.lineNumber);
+    }
+
+    if (prevProps.fileData !== this.props.fileData) {
+      this.cleanUpBreakpoint();
+      this.cleanupHighlights();
+    }
+  }
+
+  cleanUpBreakpoint() {
+    let decorations = this.editor.getModel().getAllDecorations()
+    var ids = []
+    for (let decoration of decorations) {
+      if (decoration.options.linesDecorationsClassName === 'breakpoints') {
+        ids.push(decoration.id)
+      }
+    }
+    if (ids && ids.length) {
+      this.editor.getModel().deltaDecorations(ids, [])
+    }
+    
+    ipcRenderer.invoke('requestStopGDB', )
+    ipcRenderer.invoke('requestCleanupBreakpoint', )
+  }
+
+  cleanupHighlights() {
+    this.highlightDecorations = this.editor.deltaDecorations(
+      this.highlightDecorations,
+      []
+    );
   }
 
   editorDidMount(editor, monaco) {
     if (!this.editor) {
       this.editor = editor;
+      this.editor.automaticLayout = true;
       this.monaco = monaco;
       this.editorMousDown();
       this.onMouseMove();
@@ -216,6 +258,16 @@ export default class Editor2 extends React.Component {
     }
   }
 
+  renderRequestAddBreakpoint(lineNum) {
+    ipcRenderer.invoke('requestAddBreakpoint', lineNum, )
+  }
+
+  renderRequestDeleteBreakpoint(lineNum) {
+    ipcRenderer.invoke('requestDeleteBreakpoint', lineNum, )
+  }
+
+  
+
   onChange(newValue, e) {
     //this.props.parent(this.props.data._id, newValue);
     this.props.fileUpdatefunc(newValue);
@@ -223,7 +275,6 @@ export default class Editor2 extends React.Component {
 
   onMouseMove() {
     this.editor.onMouseMove(e => {
-      if (!this.isJsEditor()) return
       this.removeFakeBreakPoint()
       if (e.target.detail && e.target.detail.offsetX && e.target.detail.offsetX >= 0 && e.target.detail.offsetX <= 10) {
         let line = e.target.position.lineNumber
@@ -245,31 +296,43 @@ export default class Editor2 extends React.Component {
     this.editor.trigger('anyString', id)
   }
 
-  insertContent(text) {
-    if (this.editor) {
-      let selection = this.editor.getSelection()
-      let range = new this.monaco.Range(selection.startLineNumber, selection.startColumn, selection.endLineNumber, selection.endColumn)
-      let id = {
-        major: 1,
-        minor: 1
-      }
-      let op = {
-        identifier: id,
-        range: range,
-        text: text,
-        forceMoveMarkers: true
-      }
-      this.editor.executeEdits(this.root, [op])
-      this.editor.focus()
-    }
+  // insertContent(text) {
+  //   if (this.editor) {
+  //     let selection = this.editor.getSelection()
+  //     let range = new this.monaco.Range(selection.startLineNumber, selection.startColumn, selection.endLineNumber, selection.endColumn)
+  //     let id = {
+  //       major: 1,
+  //       minor: 1
+  //     }
+  //     let op = {
+  //       identifier: id,
+  //       range: range,
+  //       text: text,
+  //       forceMoveMarkers: true
+  //     }
+  //     this.editor.executeEdits(this.root, [op])
+  //     this.editor.focus()
+  //   }
+  // }
+
+  updateHighlightedLine(line) {
+    this.highlightDecorations = this.editor.deltaDecorations(
+      this.highlightDecorations,
+      [
+        {
+          range: new this.monaco.Range(line, 1, line, 1),
+          options: { 
+            isWholeLine: true,
+            inlineClassName: 'myInlineDecoration' 
+          }
+        }
+      ]
+    );
   }
 
   editorMousDown() {
     this.editor.onMouseDown(e => {
-      if (!this.isJsEditor()) {
-          return
-      }
-      if (e.target.detail && e.target.detail.offsetX && e.target.detail.offsetX >= 0 && e.target.detail.offsetX <= 10) {
+      if (e.target.detail && e.target.detail.offsetX && e.target.detail.offsetX >= 0 && e.target.detail.offsetX <= 30) {
         let line = e.target.position.lineNumber
         if (this.editor.getModel().getLineContent(line).trim() === '') {
           return
@@ -291,11 +354,6 @@ export default class Editor2 extends React.Component {
     })
   }
 
-  isJsEditor() {
-    //return this.editor.getModel().getLanguageIdentifier().language === 'javascript'
-    return true
-  }
-
   addFakeBreakPoint(line) {
     if (this.hasBreakPoint(line)) return;
     let value = {
@@ -315,6 +373,7 @@ export default class Editor2 extends React.Component {
   async addBreakPoint(line) {
     let model = this.editor.getModel()
     if (!model) return
+    this.renderRequestAddBreakpoint(line)
     let value = {
       range: new this.monaco.Range(line, 1, line, 1),
       options: {
@@ -333,8 +392,9 @@ export default class Editor2 extends React.Component {
     if (line !== undefined) {
       decorations = this.editor.getLineDecorations(line)
     } else {
-      decorations = this.editor.getAllDecorations()
+      decorations = this.editor.getModel().getAllDecorations()
     }
+    this.renderRequestDeleteBreakpoint(line)
     for (let decoration of decorations) {
       if (decoration.options.linesDecorationsClassName === 'breakpoints') {
         ids.push(decoration.id)
@@ -355,26 +415,34 @@ export default class Editor2 extends React.Component {
     return false
   }
 
+
+
+  updateDimensions() {
+    this.editor.layout();
+  }
+
   render() {
-    //const code = this.state.code;
     const options = {
       selectOnLineNumbers: true
     };
     return (
-      <MonacoEditor
-        className="monacoEditorWrapper"
-        height="95vh"
-        width= "100%"
-        language="c"
-        theme="vs-dark"
-        value={this.props.fileData}
-        options={options}
-        onChange={this.onChange}
-        editorDidMount={this.editorDidMount}
-        editorWillMount={this.editorWillMount}
-        borderRadius = "15px"
-        fontSize = "20px"
-      />
+      <div>
+        <MonacoEditor
+          className="monacoEditorWrapper"
+          height="95vh"
+          width= "100%"
+          language="c"
+          theme="vs-dark"
+          value={this.props.fileData}
+          options={options}
+          onChange={this.onChange}
+          editorDidMount={this.editorDidMount}
+          editorWillMount={this.editorWillMount}
+          borderRadius = "15px"
+          fontSize = "20px"
+        />
+      </div>
+      
     );
   }
 }

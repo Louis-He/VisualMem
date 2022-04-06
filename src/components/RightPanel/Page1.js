@@ -1,7 +1,7 @@
 import React from "react";
 import { Container } from 'react-bootstrap';
-import Editor from "./Editor.js"
-//import Editor2 from "./Editor_2"
+// import Editor from "./Editor.js"
+import Editor2 from "./Editor_2"
 import { MainBody } from "./../../components/GlobalStyles";
 
 //const ipcRenderer = window.require("electron").ipcRenderer;
@@ -19,26 +19,13 @@ export default class Aside extends React.Component{
     }
   }
 
-
   render(){
-    /*
-    const headerStyle = {
-      padding: "24px",
-      textTransform: "uppercase",
-      fontWeight: "bold",
-      letterSpacing: "1px",
-      overflow: "hidden",
-      textOverflow: "ellipsis",
-      whiteSpace: "noWrap"
-    };
-    */
-
     return (
       <MainBody>
-        <Container style={{height:"100%",width:"70vh", overflow:"scroll"}}>
+        <Container style={{width:"70vh"}}>
           <div>
             <p></p>
-            <Editor fileData ={this.props.fileData} fileUpdatefunc={this.props.fileUpdatefunc} lineNumber={this.props.lineNumber}/>
+            <Editor2 fileData ={this.props.fileData} fileUpdatefunc={this.props.fileUpdatefunc} lineNumber={this.props.lineNumber}/>
           </div>
         </Container>
       </MainBody>

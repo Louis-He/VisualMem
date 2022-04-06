@@ -3,21 +3,15 @@ import './css/App.css';
 import './css/nodeStyle.css';
 import './../node_modules/react-reflex/styles.css';
 import './../node_modules/react-grid-layout/css/styles.css';
-//import './../node_modules/react-resizable/css/styles.css';
 import { Container, Button, Form } from 'react-bootstrap';
 import ReactTooltip from "react-tooltip";
 import { CaretRightSquare, XSquare, SkipEndCircle, ArrowDownRightCircle, ArrowRightCircle, Eye, EyeSlash, FiletypeExe } from 'react-bootstrap-icons';
 import { ThemeProvider } from "styled-components";
 import { MainBody } from "./components/GlobalStyles";
-//import GridLayout from 'react-grid-layout';
-//import Editor from './components/RightPanel/Editor.js'
 import Aside from "./components/Aside/Aside"
 import Page1 from "./components/RightPanel/Page1.js"
 import "./components/Aside/AsideStyle.css"
 import "react-pro-sidebar/dist/css/styles.css";
-//import { Resizable } from "re-resizable";
-
-// import ReactFlow, { Handle } from 'react-flow-renderer';
 
 import MemGraph from './components/MemGraph/MemGraph';
 
@@ -80,7 +74,7 @@ export default class MainWindow extends React.Component {
 
   updateLineNumber(lineNum) {
     this.setState({
-      lineNumber: parseInt(lineNum) - 1
+      lineNumber: parseInt(lineNum)
     })
   }
 
@@ -288,155 +282,58 @@ export default class MainWindow extends React.Component {
       }
     }
 
-    // const layout = [
-    //   {i: 'a', x: 0, y: 0, w: 1, h: 2, isDraggable: false, isResizable: true},
-    //   {i: 'b', x: 1, y: 0, w: 3, h: 2, minW: 2, maxW: 4},
-    //   {i: 'c', x: 4, y: 0, w: 1, h: 2}
-    // ];
-
-
     return (
       <ThemeProvider theme={this.props.theme}>
-        <>
         <div className = "MainWindow">
           <Aside />
           <Page1 fileData={this.state.fileData} fileUpdatefunc={this.fileUpdate} lineNumber={this.state.lineNumber}/>
-          <div style={{height:"100%",width:"100%", overflow:"scroll"}}>
-          <MainBody>
-          
-            
-          <Container>
-                        {/* <div style={{ height: "200px" }}>
-                        <ReflexContainer orientation="vertical">
+          <div style={{height:"100%",width:"100%", overflowY: "scroll"}}>
+            <MainBody>
+              <Container>
+                <div className="container_ext">
+                  <Button
+                    onClick={() => this.renderRequestCompilation()}
+                    data-tip data-for="startCompilationTip"
+                    className="btn btn-primary btn-sm"
+                    style={{ fontSize: "18px", lineHeight: "1", padding: "5px" }}
+                    key="startButton">
+                    <FiletypeExe style={{ verticalAlign: 'baseline' }} />
+                  </Button>
+                  <ReactTooltip id="startCompilationTip" place="top" effect="solid" key="startCompilationTip">
+                    Compile the program
+                  </ReactTooltip>
 
-                          <ReflexElement>
-                            <div className="pane-content">
-                              <label>
-                                Left Pane (resizable)
+                  {startGDBButton}
+                  {nextLineGDBButton}
+                  {stepGDBButton}
+                  {continueGDBButton}
+                  {stopGDBButton}
+                  {eyeGDBButton}
+                  {eyeSlashGDBButton}
+                </div>
+                <MemGraph updateLineNumber = {this.updateLineNumber} updateSourceFile = {this.updateSourceFile}/>
+                <div>
+                  <Form>
+                    <Form.Group controlId="exampleForm.ControlTextarea1">
+                      <Form.Label>Command Sent to GDB</Form.Label>
+                      <Form.Control as="textarea" rows={3}
+                        value={this.state.GDBCommand}
+                        onKeyDown={(e) => this.onGDBCommandEnterPress(e)}
+                        onChange={(e) => this.GDBCommandLineOnChangeHandler(e)} />
+                    </Form.Group>
 
-                                <div style={{ height: 500, width: 500 }}>
-                                  <ReactFlow elements={this.state.elements} nodeTypes={nodeTypes} />
-                                </div>
+                    <Button variant="primary" onClick={(e) => this.sendGDBCommandButton()}>
+                      Send
+                    </Button>
 
-                              </label>
-                            </div>
-                          </ReflexElement>
+                    <Button onClick={this.increaseLine} >IncreaseLine</Button>
 
-                          <ReflexSplitter/>
-
-                          <ReflexElement
-                            minSize="200"
-                            maxSize="800">
-                            <div className="pane-content">
-                              <label>
-                                Right Pane (resizable)
-                                <br/>
-                                <br/>
-                                minSize = 200px
-                                <br/>
-                                maxSize = 800px
-                              </label>
-                            </div>
-                          </ReflexElement>
-
-                          </ReflexContainer>
-                        </div> */}
-                      
-                      
-                        
-                        <div className="container_ext">
-                          {/* <Button onClick={renderRequestOpenConfig}>TEST button</Button>
-                          <Button onClick={renderRequestStartGDB}>Start GDB</Button>
-                          <Button onClick={renderRequestStopGDB}>Stop GDB</Button> */}
-                          <Button
-                            onClick={() => this.renderRequestCompilation()}
-                            data-tip data-for="startCompilationTip"
-                            className="btn btn-primary btn-sm"
-                            style={{ fontSize: "18px", lineHeight: "1", padding: "5px" }}
-                            key="startButton">
-                            <FiletypeExe style={{ verticalAlign: 'baseline' }} />
-                          </Button>
-                          <ReactTooltip id="startCompilationTip" place="top" effect="solid" key="startCompilationTip">
-                            Compile the program
-                          </ReactTooltip>
-
-                          {startGDBButton}
-                          {nextLineGDBButton}
-                          {stepGDBButton}
-                          {continueGDBButton}
-                          {stopGDBButton}
-                          {eyeGDBButton}
-                          {eyeSlashGDBButton}
-                        </div>
-                        <div>
-
-                        </div>
-
-                        {/* <div>
-                          <p>Current Selected Folder: {this.props.projectFolder}</p>
-                        </div>
-
-                        <div>
-                          <p>Current source file: {this.state.sourceFile}</p>
-                        </div>
-
-                        <div>
-                          <p>Current line number: {this.state.lineNumber}</p>
-                        </div>
-
-
-                        <div>
-                          <p>Current Executable Path: {this.props.executablePath}</p>
-                        </div> */}
-
-
-                        <p></p>
-
-
-                        <MemGraph updateLineNumber = {this.updateLineNumber} updateSourceFile = {this.updateSourceFile}/>
-
-                        <div>
-                          <Form>
-                            <Form.Group controlId="exampleForm.ControlTextarea1">
-                              <Form.Label>Command Sent to GDB</Form.Label>
-                              <Form.Control as="textarea" rows={3}
-                                value={this.state.GDBCommand}
-                                onKeyDown={(e) => this.onGDBCommandEnterPress(e)}
-                                onChange={(e) => this.GDBCommandLineOnChangeHandler(e)} />
-                            </Form.Group>
-
-                            <Button variant="primary" onClick={(e) => this.sendGDBCommandButton()}>
-                              Send
-                            </Button>
-
-                            <Button onClick={this.increaseLine} >IncreaseLine</Button>
-
-                          </Form>
-                        </div>
-
-                        {/* <Button variant="primary" onClick={(e) => this.displayVar()}>
-                          Display Variables
-                        </Button>
-                        
-                        <Button variant="primary" onClick={(e) => this.showFile(e)}>
-                          Display File Content
-                        </Button>
-
-                        <div>
-                          <p> File Data: {this.state.fileData} </p>
-                        </div>
-
-                                    
-                        <GridLayout className="layout" layout={layout} cols={12} rowHeight={30} width={1200}>
-                          <div key="a">a</div>
-                          <div key="b">b</div>
-                          <div key="c">c</div>
-                        </GridLayout> */}
-                      </Container>
+                  </Form>
+                </div>
+              </Container>
             </MainBody>
-            </div>
           </div>
-        </>
+        </div>
       </ThemeProvider>
     );
   }

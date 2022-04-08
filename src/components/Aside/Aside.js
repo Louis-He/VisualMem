@@ -47,6 +47,31 @@ export default class Aside extends React.Component{
     ipcRenderer.invoke('requestSelectSourceFile', this.props.projectFolder)
   }
 
+  // saveFile2(e) {
+  //   e.preventDefault();
+  //   ipcRenderer.send("saveDialog", {
+  //     //baseCode: this.props.fileData,
+  //     data: this.props.fileData,
+  //     fileType: 'c',
+  //     fileName: 'sourse'
+  //   })
+  //   ipcRenderer.once('succeedDialog', event => {
+  //   })
+  //   ipcRenderer.once('defeatedDialog', event => {
+  //   })
+  // }
+
+  saveFile(e){
+    //ipcRenderer.Renderer.send("save-dialog", {"data"});
+    ipcRenderer.send("saveDialog2", {
+      data: this.props.fileData
+    })
+
+    ipcRenderer.on('asynchronous-message', function (evt, message) {
+      console.log(message); // Returns: {'SAVED': 'File Saved'}
+    });
+  }
+
   render(){
     const headerStyle = {
       padding: "24px",
@@ -65,6 +90,7 @@ export default class Aside extends React.Component{
           <Menu iconShape="circle">
             <MenuItem icon={<AiFillFolderOpen />} onClick={(e) => this.selectProjectFolder(e)}>Select Project Folder</MenuItem>
             <MenuItem icon={<AiOutlineFile />} onClick={(e) => this.selectSource(e)}>Select Source File</MenuItem>
+            <MenuItem icon={<AiOutlineFile />} onClick={(e) => this.saveFile(e)}>Save Source File</MenuItem>
           </Menu>
           <Menu iconShape="circle">
             <SubMenu

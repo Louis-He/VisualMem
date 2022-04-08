@@ -285,7 +285,7 @@ export default class MainWindow extends React.Component {
     return (
       <ThemeProvider theme={this.props.theme}>
         <div className = "MainWindow">
-          <Aside />
+          <Aside fileData={this.state.fileData} folder={this.state.projectFolder}/>
           <Page1 fileData={this.state.fileData} fileUpdatefunc={this.fileUpdate} lineNumber={this.state.lineNumber}/>
           <div style={{height:"100%",width:"100%", overflowY: "scroll"}}>
             <MainBody>

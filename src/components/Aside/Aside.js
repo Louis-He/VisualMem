@@ -13,6 +13,8 @@ import { AiOutlineFile, AiFillFolderOpen } from "react-icons/ai";
 //import FileTree from "./../../components/RightPanel/FileTree.js"
 //import dirTree from 'directory-tree';
 //import FileTree from 'react-filetree-electron';
+import {toast} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ipcRenderer = window.require("electron").ipcRenderer;
 
@@ -35,6 +37,18 @@ export default class Aside extends React.Component{
       pageID: inputID
     })
     console.log(this.state.pageID)
+  }
+
+  componentDidMount(){
+    ipcRenderer.on('savedMessage', function (evt, message) {
+      //send message after successfully saved file
+      console.log(message); // Returns: {'SAVED': 'File Saved'}
+      toast.configure();
+      toast.success('File Saved', {
+        position: toast.POSITION.BOTTOM_RIGHT,
+        autoClose: 3000
+      })
+    });
   }
 
   selectProjectFolder(e) {
@@ -67,9 +81,6 @@ export default class Aside extends React.Component{
       data: this.props.fileData
     })
 
-    ipcRenderer.on('asynchronous-message', function (evt, message) {
-      console.log(message); // Returns: {'SAVED': 'File Saved'}
-    });
   }
 
   render(){

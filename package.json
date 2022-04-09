@@ -36,6 +36,7 @@
     "react-reflex": "^4.0.3",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^5.0.0",
+    "react-toastify": "^8.2.0",
     "react-tooltip": "^4.2.21",
     "sinon": "^13.0.1",
     "spectron": "^14.0.0",

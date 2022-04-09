@@ -10,6 +10,7 @@ import {
 } from "react-pro-sidebar";
 import { FaGithub } from "react-icons/fa";
 import { AiOutlineFile, AiFillFolderOpen } from "react-icons/ai";
+import { HiSaveAs } from "react-icons/hi";
 //import FileTree from "./../../components/RightPanel/FileTree.js"
 //import dirTree from 'directory-tree';
 //import FileTree from 'react-filetree-electron';
@@ -40,11 +41,23 @@ export default class Aside extends React.Component{
   }
 
   componentDidMount(){
+
+    //send message after successfully saved file
     ipcRenderer.on('savedMessage', function (evt, message) {
-      //send message after successfully saved file
       console.log(message); // Returns: {'SAVED': 'File Saved'}
       toast.configure();
       toast.success('File Saved', {
+        position: toast.POSITION.BOTTOM_RIGHT,
+        autoClose: 3000
+      })
+    });
+
+
+    ipcRenderer.on('errSaveMassage', function (evt, message) {
+      //send message after successfully saved file
+      console.log(message); // Returns: {'SAVED': 'File Saved'}
+      toast.configure();
+      toast.error('No file selected. Save not success.', {
         position: toast.POSITION.BOTTOM_RIGHT,
         autoClose: 3000
       })
@@ -101,7 +114,7 @@ export default class Aside extends React.Component{
           <Menu iconShape="circle">
             <MenuItem icon={<AiFillFolderOpen />} onClick={(e) => this.selectProjectFolder(e)}>Select Project Folder</MenuItem>
             <MenuItem icon={<AiOutlineFile />} onClick={(e) => this.selectSource(e)}>Select Source File</MenuItem>
-            <MenuItem icon={<AiOutlineFile />} onClick={(e) => this.saveFile(e)}>Save Source File</MenuItem>
+            <MenuItem icon={<HiSaveAs />} onClick={(e) => this.saveFile(e)}>Save Source File</MenuItem>
           </Menu>
           <Menu iconShape="circle">
             <SubMenu

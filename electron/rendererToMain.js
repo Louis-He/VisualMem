@@ -87,6 +87,7 @@ global.share.ipcMain.on('saveDialog2', (event, arg) => {
     }
     else {
       console.log(err);
+      mainWindow.webContents.send('errSaveMassage', {'Error': 'Cannot save file'});
     }
   });
 })

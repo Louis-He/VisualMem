@@ -4,7 +4,7 @@
 }
 
 .arrayNode {
-  background: rgb(60, 118, 226);
+  background: #D3E1EE;
   height: 30px;
   width: 100px;
   text-align: center;
@@ -14,7 +14,7 @@
 }
 
 .arrayNode:hover {
-  background: rgb(31, 90, 201);
+  background: #abbdd6;
 }
 
 .arrayName {
@@ -54,7 +54,7 @@
 
 
 .normalNode {
-  background: rgb(226, 135, 60);
+  background: #E9B792;
   height: 30px;
   width: 100px;
   text-align: center;
@@ -64,11 +64,11 @@
 }
 
 .normalNode:hover {
-  background: rgb(185, 115, 24);
+  background: #FEBA63;
 }
 
 .pointerNode {
-  background: rgb(248, 80, 122);
+  background: #F4B4B9;
   height: 30px;
   width: 30px;
   text-align: center;
@@ -78,11 +78,11 @@
 }
 
 .pointerNode:hover {
-  background: rgb(189, 46, 81);
+  background: #EF91A1;
 }
 
 .linkedListNode {
-  background: rgb(65, 245, 49);
+  background: rgb(201, 218, 191);
   height: 30px;
   width: 100px;
   text-align: center;
@@ -92,11 +92,11 @@
 }
 
 .linkedListNode:hover {
-  background: rgb(31, 156, 6);
+  background: #96a48b;
 }
 
 .treeNode {
-  background: rgb(183, 49, 245);
+  background: #eee5f8;
   height: 30px;
   width: 100px;
   text-align: center;
@@ -106,5 +106,5 @@
 }
 
 .treeNode:hover {
-  background: rgb(156, 6, 149);
+  background: #c9c0d3;
 }

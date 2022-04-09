@@ -80,13 +80,14 @@ global.share.ipcMain.on('saveDialog2', (event, arg) => {
   let filePath = selectedFilePath;
   //console.log("--------",filePath);
   fs.writeFile(filePath, sourseCode, (err) => {
-    console.log("Writing files........")
+    //console.log("Writing files........")
     if(!err){
-      console.log("File Written");
-      mainWindow.webContents.send('asynchronous-message', {'SAVED': 'File Saved'});
+      //console.log("File Written");
+      mainWindow.webContents.send('savedMessage', {'SAVED': 'File Saved'});
     }
     else {
       console.log(err);
+      mainWindow.webContents.send('errSaveMassage', {'Error': 'Cannot save file'});
     }
   });
 })

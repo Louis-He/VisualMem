@@ -311,6 +311,7 @@ export default class MainWindow extends React.Component {
                   {eyeGDBButton}
                   {eyeSlashGDBButton}
                 </div>
+                <p></p>
                 <MemGraph updateLineNumber = {this.updateLineNumber} updateSourceFile = {this.updateSourceFile}/>
                 <div>
                   <Form>
@@ -326,7 +327,6 @@ export default class MainWindow extends React.Component {
                       Send
                     </Button>
 
-                    <Button onClick={this.increaseLine} >IncreaseLine</Button>
 
                   </Form>
                 </div>

@@ -5,6 +5,7 @@ var child_process = require('child_process');
 
 const gccCompilerExec = 'gcc';
 
+var l_errorMessages = "";
 
 exports.saveSourceFile = function (text) {
     try {
@@ -16,6 +17,8 @@ exports.saveSourceFile = function (text) {
 
 
 exports.compile = function () {   
+    l_errorMessages = "";
+
     l_gcc_compilation_child_process = child_process.spawn(gccCompilerExec, ['-g', '"' + windowsManager.getSourceFile() + '"', '-o', windowsManager.getProjectFolder()+'/'+'out.exe'], {
         shell: true,
     });
@@ -26,9 +29,17 @@ exports.compile = function () {
 
     l_gcc_compilation_child_process.stderr.on('data', function(data) {
         console.log('[gcc stderr]' + data);
+        l_errorMessages += data;
     });
 
     l_gcc_compilation_child_process.on('close', function (code) {
         console.log('gcc instance exited with code ' + code)
+        
+        const mainWindow = windowsManager.getMainWindows();
+        if (code === 0) {
+            mainWindow.webContents.send('CompileSuccess', );
+        } else {
+            mainWindow.webContents.send('CompileError', l_errorMessages);
+        }
     });
 }

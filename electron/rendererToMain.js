@@ -6,6 +6,92 @@ const fs = require('fs')
 var windowsManager = require('./windowsManager.js');
 var pygdbController = require('./pygdbController.js')
 var compilerController = require('./compilerController.js')
+var selectedFilePath = "";
+
+global.share.ipcMain.handle('requesSaveFile', async (event, {data}) => {
+//global.share.ipcMain.on('requesSaveFile', async (event, data) => {
+  console.log("data")
+  const mainWindow = windowsManager.getMainWindows()
+  const { filePath, canceled } = await global.share.dialog.showSaveDialog(mainWindow, {
+    defaultPath: "text.txt"
+  });
+
+  if (filePath && !canceled) {
+    const data = new Uint8Array(Buffer.from('Hello Node.js'));
+    fs.writeFile(filePath, data, (err) => {
+      if (err) throw err;
+      console.log('The file has been saved!');
+    });
+  }
+
+})
+
+/*
+const extensionType = {
+  c: [
+    { name: '.c', extensions: ['c'] },
+    { name: '.txt', extensions: ['txt'] },
+  ]
+}
+global.share.ipcMain.on('saveDialog', async(event, arg) => {
+  //console.log(arg.data)
+  const mainWindow = await windowsManager.getMainWindows()
+  global.share.dialog.showSaveDialog(mainWindow, {
+    properties: ['openFile', 'openDirectory'],
+    defaultPath: arg.fileName,
+    filters: [
+      ...extensionType[arg.fileType]
+    ],
+  }, filePath  =>{
+    console.log("------")
+    //let dataBuffer = Buffer.from(arg.baseCode.split('base64,')[1], 'base64')
+    let dataBuffer = arg.data
+    let typeFlag = extensionType[arg.fileType].some(item => {
+      if(filePath) {
+        return item.extensions[0] === filePath.substring(filePath.lastIndexOf('.') + 1)
+      } else {
+        return false
+      }
+    })
+    if(typeFlag){
+      console.log("+++++")
+      fs.writeFileSync(filePath, dataBuffer.toString(), err => {
+        if (err) {
+          mainWindow.webContents.send('defeatedDialog')
+        }
+      })
+      mainWindow.webContents.send('succeedDialog')
+    } else if(filePath !== undefined){
+      console.log("+++++")
+      global.share.dialog.showMessageBox({
+        type: 'error',
+        title: 'system error',
+        message: 'error'
+      })
+    }
+  })
+})
+*/
+
+
+global.share.ipcMain.on('saveDialog2', (event, arg) => {
+  const mainWindow = windowsManager.getMainWindows();
+  let sourceCode = arg.data;
+  let filePath = windowsManager.getSourceFile();
+  //console.log("--------",filePath);
+  fs.writeFile(filePath, sourceCode, (err) => {
+    //console.log("Writing files........")
+    if(!err){
+      //console.log("File Written");
+      mainWindow.webContents.send('savedMessage', {'SAVED': 'File Saved'});
+    }
+    else {
+      console.log(err);
+      mainWindow.webContents.send('errSaveMassage', {'Error': 'Cannot save file'});
+    }
+  });
+})
+
 
 global.share.ipcMain.handle('electronLog', (event, ...args) => {
   console.log(args)
@@ -164,7 +250,9 @@ global.share.ipcMain.handle('requestSelectSourceFile', async (event, ...args) =>
       mainWindow.webContents.send('distributeSelectedExecutable', { 'executablePath': windowsManager.getExecFile() });
 
       const data = fs.readFileSync(result.filePaths[0], {encoding:'utf-8', flag:'r'});
-      console.log(data);
+      //console.log(data);
+      selectedFilePath = result.filePaths[0];
+      //console.log("---------", selectedFilePath);
       
 
       mainWindow.webContents.send('distributeFileData', { 'fileData': data });

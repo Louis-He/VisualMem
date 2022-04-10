@@ -210,12 +210,6 @@ export default class MemGraphObjClass {
             )}
 
         } else if (nodeClassName === nodeTypes.treeNode) {
-            if (prevAddrLength !== 0) {
-                targetArr.push(
-                    <Handle type="target" position="top" className={nodeClassName} key="t0" id="t0" 
-                        style = {{left: "50%", borderRadius: 0}}/>
-                )
-            }
 
             return ({ data }) => {return (
                 <div>
@@ -223,7 +217,7 @@ export default class MemGraphObjClass {
                     <Handle type="source" position="bottom" style = {{left: "30%", borderRadius: 0}} className='treeNode' id='s0'/>
                     <Handle type="source" position="bottom" style = {{left: "70%", borderRadius: 0}} className='treeNode' id='s1'/>
                     <div className={nodeClassName}>{data.text}</div>
-                    {targetArr}
+                    <Handle type="target" position="top" className={nodeClassName} key="t0" id="t0" style = {{left: "50%", borderRadius: 0}}/>
                   </div>
                 </div>
             )}
@@ -333,16 +327,7 @@ export default class MemGraphObjClass {
                     textContent = textContent + member + ":" + memberValue + " "
                 }
             )
-            // this.memGraphRepresentation.push({ 
-            //     id: ele.addr, 
-            //     type: 'linkedList', 
-            //     position: {x: startingX * 120 + 10, y: startingY * 60 + 10}, 
-            //     data: { 
-            //         name: ele.name.includes("*") ? " " : ele.name, 
-            //         text: textContent
-            //     }, 
-            //     draggable: true
-            // })
+
             this.memGraphRepresentation.push({ 
                 id: ele.addr, 
                 type: ele.addr + allPrevAddrs.length.toString() + "_style", 
@@ -384,13 +369,14 @@ export default class MemGraphObjClass {
                 startingX += 1;
             }
         } else if (ele.isTree) {
-            customNodeStyle[ele.addr + "_style"] = this._generateCustomReactflowComponent(allPrevAddrs.length, allAfterAddrs.length, nodeTypes.treeNode);
-            let member = ele.getMembers()[0]
-
             if(!ele.isVisited) {
+                // for tree elements
+                customNodeStyle["tree"] = this._generateCustomReactflowComponent(allPrevAddrs.length, allAfterAddrs.length, nodeTypes.treeNode);
+                let member = ele.getMembers()[0]
+
                 this.memGraphRepresentation.push({ 
                     id: ele.addr, 
-                    type: ele.addr + "_style", 
+                    type: "tree", 
                     position: {x: startingX * 120 + 10, y: startingY * 60 + 10}, 
                     data: { 
                         name: ele.name.includes("*") ? " " : ele.name, 
@@ -422,7 +408,6 @@ export default class MemGraphObjClass {
         // this node has a child
         if (srcAddr !== "0x0") {
             if (this.elementMap[ele.addr].isTree) {
-                // let sourceCount = ele.sourceCount
                 let sourceId = ""
 
                 if(this.elementMap[ele.addr].leftChild === srcAddr) {
@@ -431,13 +416,6 @@ export default class MemGraphObjClass {
                 if (this.elementMap[ele.addr].rightChild === srcAddr) {
                     sourceId = "s1"
                 } 
-
-                console.log(ele.leftChild)
-                console.log(ele.rightChild)
-                console.log("source" + ele.addr)
-                console.log("target" + srcAddr)
-                console.log("sourceID" + sourceId)
-                console.log("targetID" + targetId)
 
                 this.memGraphRepresentation.push({
                     id: ele.addr + srcAddr,
@@ -448,7 +426,6 @@ export default class MemGraphObjClass {
                     targetHandle: targetId,
                     style: {strokeWidth: 2},
                 })
-                // ele.sourceCount++;
             } else {
                 this.memGraphRepresentation.push({
                     id: ele.addr + srcAddr,
@@ -463,7 +440,12 @@ export default class MemGraphObjClass {
 
         var Y_addition = 0
         var ret_startingY = startingY
-
+        
+        // if(ele.isTree) {
+        //     var tree_chain = []
+        //     var prevAddr = this.findTreeChain(ele.addr, tree_chain)
+        //     console.log(prevAddr)
+        // }
         
         this.bubbleSort(allPrevAddrs, allPrevAddrs.length)
 
@@ -505,6 +487,28 @@ export default class MemGraphObjClass {
         var temp = array[before];
         array[before] = array[after];
         array[after] = temp;
+    }
+
+    findTreeChain(ele, tree_chain) {
+        let allPrevAddrs = Array.from(this.elementMap[ele].getPrevAddr())
+        console.log(ele)
+        console.log(allPrevAddrs)
+        console.log(allPrevAddrs.length)
+        console.log(tree_chain)
+
+        if (allPrevAddrs.length === 0) { // base case, return the tree_chain
+            tree_chain.add(ele.addr)
+            return tree_chain
+        } else {
+            for(let i = 0; i<allPrevAddrs.length; i++) {
+                if (this.elementMap[allPrevAddrs[i]].isTree) {
+                    tree_chain.add(ele.addr)
+                    this.findTreeChain(this.elementMap[allPrevAddrs[i]], tree_chain)
+                    break
+                }
+            }
+            return tree_chain
+        }
     }
 
     /**

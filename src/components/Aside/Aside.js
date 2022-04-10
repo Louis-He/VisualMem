@@ -10,7 +10,7 @@ import {
 import { FaGithub } from "react-icons/fa";
 import { AiOutlineFile, AiFillFolderOpen } from "react-icons/ai";
 import { HiSaveAs } from "react-icons/hi";
-import {toast} from 'react-toastify';
+//import {toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const ipcRenderer = window.require("electron").ipcRenderer;

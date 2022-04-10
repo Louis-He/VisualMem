@@ -9,7 +9,6 @@ struct node {
 
 typedef struct node Node;
 
-
 int main() {
     int b = 2;
     int *c;

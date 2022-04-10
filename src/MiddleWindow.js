@@ -66,12 +66,6 @@ export default class MainWindow extends React.Component {
 
   componentDidMount() {
     var that = this;
-    // ipcRenderer.on('distributeDetailedLocals', function (evt, locals) {
-    //   const elementTemp = elementsCreator(locals)
-    //   that.setState( {
-    //     elements: elementTemp
-    //   })
-    // });
 
     ipcRenderer.on('distributeUserProgramExited', function (evt) {
       if (that.state.GDBAttached) {
@@ -314,9 +308,6 @@ export default class MainWindow extends React.Component {
                       
                         
                         <div className="container_ext">
-                          {/* <Button onClick={renderRequestOpenConfig}>TEST button</Button>
-                          <Button onClick={renderRequestStartGDB}>Start GDB</Button>
-                          <Button onClick={renderRequestStopGDB}>Stop GDB</Button> */}
                           {startGDBButton}
                           {nextLineGDBButton}
                           {continueGDBButton}
@@ -375,15 +366,6 @@ export default class MainWindow extends React.Component {
                         <Button variant="primary" onClick={(e) => this.displayVar()}>
                           Display Variables
                         </Button>
-                        
-                        {/* <Button variant="primary" onClick={(e) => this.showFile(e)}>
-                          Display File Content
-                        </Button> */}
-
-                        {/* <div>
-                          <p> File Data: {this.state.fileData} </p>
-                        </div> */}
-
                                     
                         <GridLayout className="layout" layout={layout} cols={12} rowHeight={30} width={1200}>
                           <div key="a">a</div>

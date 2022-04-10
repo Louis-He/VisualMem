@@ -5,5 +5,5 @@ export const MainBody = styled.div`
   color: ${({ theme }) => theme.color};
   border-color: ${({ theme }) => theme.borderColor};
   transition: all 1s linear;
-  min-height: 100vh;
+  min-height: 90vh;
 `

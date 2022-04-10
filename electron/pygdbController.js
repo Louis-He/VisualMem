@@ -4,7 +4,7 @@ var child_process = require('child_process');
 const net  = require('net');
 const port = 4000;
 
-var create_python_session_embedded = false;
+var create_python_session_embedded = true;
 var l_pygdb_child_process = null;
 
 var l_pygdb_socket = null;

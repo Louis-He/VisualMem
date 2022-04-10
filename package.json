@@ -1,8 +1,8 @@
 {
-  "name": "ece496",
-  "author": "Test",
-  "description": "ECE496 test project",
-  "version": "0.1.0",
+  "name": "VisualMem",
+  "author": "Siwei He, Qihan Liu, Xiangcheng Wu @ University of Toronto",
+  "description": "VisualMem: A debugger Visualizer",
+  "version": "1.0.0-beta1",
   "main": "electron/main.js",
   "homepage": "./",
   "private": true,

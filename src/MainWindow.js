@@ -365,7 +365,7 @@ export default class MainWindow extends React.Component {
         <div className = "MainWindow">
           <Aside fileData={this.state.fileData} folder={this.state.projectFolder}/>
           <Page1 winWidth={this.state.winWidth} fileData={this.state.fileData} fileUpdatefunc={this.fileUpdate} lineNumber={this.state.lineNumber}/>
-          <div style={{height:"100%",width:"100%", overflowY: "scroll"}}>
+          <div style={{height:"100%",width:"100%"}}>
             <MainBody>
               <Container>
                 <div className="container_ext">
@@ -386,8 +386,8 @@ export default class MainWindow extends React.Component {
                   {stepGDBButton}
                   {continueGDBButton}
                   {stopGDBButton}
-                  {eyeGDBButton}
-                  {eyeSlashGDBButton}
+                  {/* {eyeGDBButton} */}
+                  {/* {eyeSlashGDBButton} */}
                 </div>
                 <p></p>
                 {RightPanel}

@@ -35,6 +35,34 @@ function createWindow () {
     win.webContents.send('getWindowSize', { 'width': width, 'height': height});
   });
 
+  win.on('enter-full-screen', function () {
+    var size   = win.getSize();
+    var width  = size[0];
+    var height = size[1];
+    win.webContents.send('getWindowSize', { 'width': width, 'height': height});
+  });
+
+  win.on('leave-full-screen', function () {
+    var size   = win.getSize();
+    var width  = size[0];
+    var height = size[1];
+    win.webContents.send('getWindowSize', { 'width': width, 'height': height});
+  });
+
+  win.on('enter-html-full-screen', function () {
+    var size   = win.getSize();
+    var width  = size[0];
+    var height = size[1];
+    win.webContents.send('getWindowSize', { 'width': width, 'height': height});
+  });
+
+  win.on('leave-html-full-screen', function () {
+    var size   = win.getSize();
+    var width  = size[0];
+    var height = size[1];
+    win.webContents.send('getWindowSize', { 'width': width, 'height': height});
+  });
+
 
   if (windowsManager.isDebugMode()) {
     if (windowsManager.isDebugMode()) {

@@ -12,8 +12,8 @@ import { MainBody } from "./../../components/GlobalStyles";
 
 export default class Page1 extends React.Component{
 
-  constructor(){
-    super()
+  constructor(props){
+    super(props)
     this.state = {
       pageID: 'M1'
     }

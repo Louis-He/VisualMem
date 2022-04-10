@@ -151,21 +151,12 @@ export default class MemGraph extends React.Component {
             nodeTypesId: 0,
             element_graph: "",
             memGraph: new MemGraphClass(),
-            winWidth: 1024,
-            winHeight: 600,
         }
     }
 
     componentDidMount () {
         var that = this;
 
-        ipcRenderer.on('getWindowSize', function (evt, windowInfo) {
-          that.setState({
-            winWidth: windowInfo.width,
-            winHeight: windowInfo.height
-          })
-
-        });
         ipcRenderer.on('getVariablesForGraphInitializer', function (evt, message) {
             nodeTypes = {
                 array: arrayComponent,
@@ -206,7 +197,7 @@ export default class MemGraph extends React.Component {
         
         if (this.state.element_graph !== "") {
             return (
-                <div style={{ height: this.state.winHeight-290, width: this.state.winWidth }}>
+                <div style={{ height: this.props.winHeight-330, width: (this.props.winWidth - 270) * 0.45 }}>
                     <ReactFlow elements={this.state.element_graph} nodeTypes={nodeTypes} nodeTypesId={this.state.nodeTypesId} minZoom={0.1} maxZoom={10} translateExtent={[[0, 0], [10000, 5000]]} />
                 </div>
             )

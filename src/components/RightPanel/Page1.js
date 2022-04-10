@@ -10,7 +10,7 @@ import { MainBody } from "./../../components/GlobalStyles";
 
 //const Aside = () => {
 
-export default class Aside extends React.Component{
+export default class Page1 extends React.Component{
 
   constructor(){
     super()
@@ -22,7 +22,7 @@ export default class Aside extends React.Component{
   render(){
     return (
       <MainBody>
-        <Container style={{width:"70vh"}}>
+        <Container style={{width: (this.props.winWidth - 270) * 0.5}}>
           <div>
             <p></p>
             <Editor2 fileData ={this.props.fileData} fileUpdatefunc={this.props.fileUpdatefunc} lineNumber={this.props.lineNumber}/>

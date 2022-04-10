@@ -41,6 +41,8 @@ export default class MainWindow extends React.Component {
       variableDict: {},
       sourceFile: "",
       lineNumber: 0, 
+      winWidth: 1024,
+      winHeight: 600,
     }
 
     this.updateLineNumber = this.updateLineNumber.bind(this);
@@ -50,6 +52,13 @@ export default class MainWindow extends React.Component {
 
   componentDidMount() {
     var that = this;
+
+    ipcRenderer.on('getWindowSize', function (evt, windowInfo) {
+      that.setState({
+        winWidth: windowInfo.width,
+        winHeight: windowInfo.height
+      })
+    });
 
     ipcRenderer.on('distributeFileData', function (evt, response) {
       that.setState({
@@ -321,11 +330,12 @@ export default class MainWindow extends React.Component {
     // or compile error messages
     if (this.state.GDBAttached) {
       RightPanel = <div>
-        <MemGraph updateLineNumber = {this.updateLineNumber} updateSourceFile = {this.updateSourceFile}/>
+        <MemGraph updateLineNumber = {this.updateLineNumber} updateSourceFile = {this.updateSourceFile}
+                  winHeight={this.state.winHeight} winWidth={this.state.winWidth}/>
         <div>
           <Form>
             <Form.Group controlId="exampleForm.ControlTextarea1">
-              <Form.Label>Command Sent to GDB</Form.Label>
+              <Form.Label>Command Send to GDB</Form.Label>
               <Form.Control as="textarea" rows={3}
                 value={this.state.GDBCommand}
                 onKeyDown={(e) => this.onGDBCommandEnterPress(e)}
@@ -335,8 +345,6 @@ export default class MainWindow extends React.Component {
             <Button variant="primary" onClick={(e) => this.sendGDBCommandButton()}>
               Send
             </Button>
-
-
           </Form>
         </div>
       </div>
@@ -356,7 +364,7 @@ export default class MainWindow extends React.Component {
       <ThemeProvider theme={this.props.theme}>
         <div className = "MainWindow">
           <Aside fileData={this.state.fileData} folder={this.state.projectFolder}/>
-          <Page1 fileData={this.state.fileData} fileUpdatefunc={this.fileUpdate} lineNumber={this.state.lineNumber}/>
+          <Page1 winWidth={this.state.winWidth} fileData={this.state.fileData} fileUpdatefunc={this.fileUpdate} lineNumber={this.state.lineNumber}/>
           <div style={{height:"100%",width:"100%", overflowY: "scroll"}}>
             <MainBody>
               <Container>

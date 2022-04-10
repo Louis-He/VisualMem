@@ -1,7 +1,6 @@
 import React from 'react';
 import './css/App.css';
 import './css/nodeStyle.css';
-import './../node_modules/react-reflex/styles.css';
 import './../node_modules/react-grid-layout/css/styles.css';
 import './../node_modules/react-resizable/css/styles.css';
 import { Container, Button, Form } from 'react-bootstrap';

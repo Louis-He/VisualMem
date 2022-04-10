@@ -28,6 +28,14 @@ function createWindow () {
     windowsManager.setMainWindow(null)
   });
 
+  win.on('resize', function () {
+    var size   = win.getSize();
+    var width  = size[0];
+    var height = size[1];
+    win.webContents.send('getWindowSize', { 'width': width, 'height': height});
+  });
+
+
   if (windowsManager.isDebugMode()) {
     if (windowsManager.isDebugMode()) {
       windowsManager.debugLog("Main window start")

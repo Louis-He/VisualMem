@@ -2,14 +2,12 @@
  */
 const path = require('path')
 const fs = require('fs')
-// var GDBManager = require('./gdbEntry.js');
 var windowsManager = require('./windowsManager.js');
 var pygdbController = require('./pygdbController.js')
 var compilerController = require('./compilerController.js')
 var selectedFilePath = "";
 
 global.share.ipcMain.handle('requesSaveFile', async (event, {data}) => {
-//global.share.ipcMain.on('requesSaveFile', async (event, data) => {
   console.log("data")
   const mainWindow = windowsManager.getMainWindows()
   const { filePath, canceled } = await global.share.dialog.showSaveDialog(mainWindow, {

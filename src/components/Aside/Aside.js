@@ -62,6 +62,8 @@ export default class Aside extends React.Component{
         autoClose: 3000
       })
     });
+
+    
   }
 
   selectProjectFolder(e) {

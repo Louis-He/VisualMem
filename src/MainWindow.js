@@ -3,6 +3,7 @@ import './css/App.css';
 import './css/nodeStyle.css';
 import './../node_modules/react-reflex/styles.css';
 import './../node_modules/react-grid-layout/css/styles.css';
+import {toast} from 'react-toastify';
 import { Container, Button, Form } from 'react-bootstrap';
 import ReactTooltip from "react-tooltip";
 import { CaretRightSquare, XSquare, SkipEndCircle, ArrowDownRightCircle, ArrowRightCircle, Eye, EyeSlash, FiletypeExe } from 'react-bootstrap-icons';
@@ -30,6 +31,9 @@ export default class MainWindow extends React.Component {
     this.state = {
       GDBAttached: false,
       displayEle: false,
+
+      isCompileError: false,
+      compileErrorMsg: "",
 
       GDBCommand: "> ",
       fileData: "",
@@ -68,6 +72,33 @@ export default class MainWindow extends React.Component {
       if (that.state.displayEle) {
         that.displayVar()
       }
+    });
+
+    ipcRenderer.on('CompileSuccess', function (evt, message) {
+      toast.configure();
+      toast.success('Compile Successful', {
+        position: toast.POSITION.BOTTOM_RIGHT,
+        autoClose: 3000
+      })
+
+      that.setState({
+        isCompileError: false,
+        compileErrorMsg: "",
+      })
+    });
+
+    ipcRenderer.on('CompileError', function (evt, message) {
+      console.log(message);
+      toast.configure();
+      toast.error('Compile Error', {
+        position: toast.POSITION.BOTTOM_RIGHT,
+        autoClose: 3000
+      })
+
+      that.setState({
+        isCompileError: true,
+        compileErrorMsg: message,
+      })
     });
 
   }
@@ -183,6 +214,10 @@ export default class MainWindow extends React.Component {
     let continueGDBButton = <span></span>
     let stopGDBButton = <span></span>
 
+    let RightPanel = <div></div>
+    
+
+    // Render the buttons
     if (!this.state.GDBAttached) {
       startGDBButton = [
         <Button
@@ -282,6 +317,41 @@ export default class MainWindow extends React.Component {
       }
     }
 
+    // Render the right panel for if it should show memgraph and command window
+    // or compile error messages
+    if (this.state.GDBAttached) {
+      RightPanel = <div>
+        <MemGraph updateLineNumber = {this.updateLineNumber} updateSourceFile = {this.updateSourceFile}/>
+        <div>
+          <Form>
+            <Form.Group controlId="exampleForm.ControlTextarea1">
+              <Form.Label>Command Sent to GDB</Form.Label>
+              <Form.Control as="textarea" rows={3}
+                value={this.state.GDBCommand}
+                onKeyDown={(e) => this.onGDBCommandEnterPress(e)}
+                onChange={(e) => this.GDBCommandLineOnChangeHandler(e)} />
+            </Form.Group>
+
+            <Button variant="primary" onClick={(e) => this.sendGDBCommandButton()}>
+              Send
+            </Button>
+
+
+          </Form>
+        </div>
+      </div>
+    } else {
+      if (this.state.isCompileError) {
+        RightPanel = <p style={{whiteSpace: "break-spaces", fontFamily: 'monospace', fontWeight: 'bold', color: 'red'}}>
+          {this.state.compileErrorMsg}
+        </p>
+      } else {
+        RightPanel = <div>
+          Please start running your program.
+        </div>
+      }
+    }
+
     return (
       <ThemeProvider theme={this.props.theme}>
         <div className = "MainWindow">
@@ -312,24 +382,7 @@ export default class MainWindow extends React.Component {
                   {eyeSlashGDBButton}
                 </div>
                 <p></p>
-                <MemGraph updateLineNumber = {this.updateLineNumber} updateSourceFile = {this.updateSourceFile}/>
-                <div>
-                  <Form>
-                    <Form.Group controlId="exampleForm.ControlTextarea1">
-                      <Form.Label>Command Sent to GDB</Form.Label>
-                      <Form.Control as="textarea" rows={3}
-                        value={this.state.GDBCommand}
-                        onKeyDown={(e) => this.onGDBCommandEnterPress(e)}
-                        onChange={(e) => this.GDBCommandLineOnChangeHandler(e)} />
-                    </Form.Group>
-
-                    <Button variant="primary" onClick={(e) => this.sendGDBCommandButton()}>
-                      Send
-                    </Button>
-
-
-                  </Form>
-                </div>
+                {RightPanel}
               </Container>
             </MainBody>
           </div>

@@ -76,10 +76,10 @@ global.share.ipcMain.on('saveDialog', async(event, arg) => {
 
 global.share.ipcMain.on('saveDialog2', (event, arg) => {
   const mainWindow = windowsManager.getMainWindows();
-  let sourseCode = arg.data;
-  let filePath = selectedFilePath;
+  let sourceCode = arg.data;
+  let filePath = windowsManager.getSourceFile();
   //console.log("--------",filePath);
-  fs.writeFile(filePath, sourseCode, (err) => {
+  fs.writeFile(filePath, sourceCode, (err) => {
     //console.log("Writing files........")
     if(!err){
       //console.log("File Written");

@@ -25,7 +25,11 @@ export default class Page1 extends React.Component{
         <Container style={{width: (this.props.winWidth - 270) * 0.5}}>
           <div>
             <p></p>
-            <Editor2 fileData ={this.props.fileData} fileUpdatefunc={this.props.fileUpdatefunc} lineNumber={this.props.lineNumber}/>
+            <Editor2 
+              fileData ={this.props.fileData} 
+              fileUpdatefunc={this.props.fileUpdatefunc} 
+              lineNumber={this.props.lineNumber}
+              fileChanged={this.props.fileChanged}/>
           </div>
         </Container>
       </MainBody>

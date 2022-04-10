@@ -43,6 +43,7 @@ export default class MainWindow extends React.Component {
       lineNumber: 0, 
       winWidth: 1024,
       winHeight: 600,
+      fileChanged: false,
     }
 
     this.updateLineNumber = this.updateLineNumber.bind(this);
@@ -81,6 +82,30 @@ export default class MainWindow extends React.Component {
       if (that.state.displayEle) {
         that.displayVar()
       }
+    });
+
+    //send message after successfully saved file
+    ipcRenderer.on('savedMessage', function (evt, message) {
+      console.log(message); // Returns: {'SAVED': 'File Saved'}
+      toast.configure();
+      toast.success('File Saved', {
+        position: toast.POSITION.BOTTOM_RIGHT,
+        autoClose: 3000
+      })
+      that.setState({
+        fileChanged: false
+      })
+    });
+
+
+    ipcRenderer.on('errSaveMassage', function (evt, message) {
+      //send message after successfully saved file
+      console.log(message); // Returns: {'SAVED': 'File Saved'}
+      toast.configure();
+      toast.error('No file selected. Save not success.', {
+        position: toast.POSITION.BOTTOM_RIGHT,
+        autoClose: 3000
+      })
     });
 
     ipcRenderer.on('CompileSuccess', function (evt, message) {
@@ -203,7 +228,8 @@ export default class MainWindow extends React.Component {
 
   fileUpdate(newValue){
     this.setState({
-      fileData: newValue
+      fileData: newValue,
+      fileChanged: true
     })
   }
 
@@ -363,8 +389,16 @@ export default class MainWindow extends React.Component {
     return (
       <ThemeProvider theme={this.props.theme}>
         <div className = "MainWindow">
-          <Aside fileData={this.state.fileData} folder={this.state.projectFolder}/>
-          <Page1 winWidth={this.state.winWidth} fileData={this.state.fileData} fileUpdatefunc={this.fileUpdate} lineNumber={this.state.lineNumber}/>
+          <Aside 
+            fileData={this.state.fileData} 
+            folder={this.state.projectFolder}
+            fileChanged={this.state.fileChanged}/>
+          <Page1 
+            winWidth={this.state.winWidth} 
+            fileData={this.state.fileData} 
+            fileUpdatefunc={this.fileUpdate} 
+            lineNumber={this.state.lineNumber}
+            fileChanged={this.state.fileChanged}/>
           <div style={{height:"100%",width:"100%", overflowY: "scroll"}}>
             <MainBody>
               <Container>

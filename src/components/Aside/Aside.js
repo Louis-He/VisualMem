@@ -10,10 +10,11 @@ import {
 import { FaGithub } from "react-icons/fa";
 import { AiOutlineFile, AiFillFolderOpen } from "react-icons/ai";
 import { HiSaveAs } from "react-icons/hi";
-import {toast} from 'react-toastify';
+//import {toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const ipcRenderer = window.require("electron").ipcRenderer;
+
 
 export default class Aside extends React.Component{
 
@@ -34,28 +35,6 @@ export default class Aside extends React.Component{
 
   componentDidMount(){
 
-    //send message after successfully saved file
-    ipcRenderer.on('savedMessage', function (evt, message) {
-      console.log(message); // Returns: {'SAVED': 'File Saved'}
-      toast.configure();
-      toast.success('File Saved', {
-        position: toast.POSITION.BOTTOM_RIGHT,
-        autoClose: 3000
-      })
-    });
-
-
-    ipcRenderer.on('errSaveMassage', function (evt, message) {
-      //send message after successfully saved file
-      console.log(message); // Returns: {'SAVED': 'File Saved'}
-      toast.configure();
-      toast.error('No file selected. Save not success.', {
-        position: toast.POSITION.BOTTOM_RIGHT,
-        autoClose: 3000
-      })
-    });
-
-    
   }
 
   selectProjectFolder(e) {
@@ -98,6 +77,14 @@ export default class Aside extends React.Component{
       textOverflow: "ellipsis",
       whiteSpace: "noWrap"
     };
+    
+    const isChanged = this.props.fileChanged;
+    let button;
+    if(isChanged){
+      button = <MenuItem icon={<HiSaveAs />} onClick={(e) => this.saveFile(e)}>Save Source File</MenuItem>;
+    } else {
+      button = <div></div>
+    }
 
     return (
       <ProSidebar>
@@ -106,7 +93,7 @@ export default class Aside extends React.Component{
           <Menu iconShape="circle">
             <MenuItem icon={<AiFillFolderOpen />} onClick={(e) => this.selectProjectFolder(e)}>Select Project Folder</MenuItem>
             <MenuItem icon={<AiOutlineFile />} onClick={(e) => this.selectSource(e)}>Select Source File</MenuItem>
-            <MenuItem icon={<HiSaveAs />} onClick={(e) => this.saveFile(e)}>Save Source File</MenuItem>
+            {button}
           </Menu>
         </SidebarContent>
         <SidebarFooter style={{ textAlign: "center" }}>

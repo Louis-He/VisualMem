@@ -23,55 +23,7 @@ global.share.ipcMain.handle('requesSaveFile', async (event, {data}) => {
       console.log('The file has been saved!');
     });
   }
-
 })
-
-/*
-const extensionType = {
-  c: [
-    { name: '.c', extensions: ['c'] },
-    { name: '.txt', extensions: ['txt'] },
-  ]
-}
-global.share.ipcMain.on('saveDialog', async(event, arg) => {
-  //console.log(arg.data)
-  const mainWindow = await windowsManager.getMainWindows()
-  global.share.dialog.showSaveDialog(mainWindow, {
-    properties: ['openFile', 'openDirectory'],
-    defaultPath: arg.fileName,
-    filters: [
-      ...extensionType[arg.fileType]
-    ],
-  }, filePath  =>{
-    console.log("------")
-    //let dataBuffer = Buffer.from(arg.baseCode.split('base64,')[1], 'base64')
-    let dataBuffer = arg.data
-    let typeFlag = extensionType[arg.fileType].some(item => {
-      if(filePath) {
-        return item.extensions[0] === filePath.substring(filePath.lastIndexOf('.') + 1)
-      } else {
-        return false
-      }
-    })
-    if(typeFlag){
-      console.log("+++++")
-      fs.writeFileSync(filePath, dataBuffer.toString(), err => {
-        if (err) {
-          mainWindow.webContents.send('defeatedDialog')
-        }
-      })
-      mainWindow.webContents.send('succeedDialog')
-    } else if(filePath !== undefined){
-      console.log("+++++")
-      global.share.dialog.showMessageBox({
-        type: 'error',
-        title: 'system error',
-        message: 'error'
-      })
-    }
-  })
-})
-*/
 
 
 global.share.ipcMain.on('saveDialog2', (event, arg) => {
@@ -144,19 +96,10 @@ global.share.ipcMain.handle('requestSwitchMode', (event, ...args) => {
 })
 
 global.share.ipcMain.handle('requestStartGDB', (event, ...args) => {
-  // let ifStartGDB = GDBManager.startGDB();
-
-  // if (ifStartGDB) {
-  //   GDBManager.startRunAndStop();
-  // }
-  
   pygdbController.startController();
-
   pygdbController.pygdbReproduceBreakpoint();
 
   return true;
-  // return ifStartGDB
-  // return Promise.resolve(ifStartGDB);
 })
 
 global.share.ipcMain.handle('requestNextLineGDB', (event, ...args) => {
@@ -198,17 +141,9 @@ global.share.ipcMain.handle('requestStopGDB', (event, ...args) => {
 global.share.ipcMain.handle('sendMsgToGDB', (event, ...args) => {
   console.log(args[0])
 
-  if (args[0] == "getStack") {
-    // GDBManager.getStack()
-  } else if (args[0] == "getSources") {
-    // GDBManager.getSourceFiles()
-  } else if (args[0] == "getLocals") {
-    // GDBManager.getLocals()
+  if (args[0] == "getLocals") {
     pygdbController.pygdbGetLocal();
-  } else if (args[0] == "getDetailedLocals") {
-    // GDBManager.getDetailedLocals()
   } else {
-    // GDBManager.execGdbCommand(args[0]);
     pygdbController.pygdbCustomCommand(args[0]);
   }
 })
@@ -261,18 +196,5 @@ global.share.ipcMain.handle('requestSelectSourceFile', async (event, ...args) =>
 })
 
 global.share.ipcMain.handle('requestCompilation', async (event, ...args) => {
-  // windowsManager.setExecFile(result.filePaths[0]);
   compilerController.compile();
 })
-
-// global.share.ipcMain.handle('showFile', async (event, ...args) => {
-
-//   const data = fs.readFileSync(args[0], {encoding:'utf-8', flag:'r'});
-//   console.log(data);
-  
-//   const mainWindow = windowsManager.getMainWindows()
-//   if (mainWindow !== null) {
-//     mainWindow.webContents.send('distributeFileData', { 'fileData': data });
-//   }
-  
-// })

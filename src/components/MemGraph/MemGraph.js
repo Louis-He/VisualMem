@@ -183,7 +183,6 @@ export default class MemGraph extends React.Component {
 
             memGraph.constructGraph()
             
-            // var customNodeStyle = {}
             var reactFlowGraph = memGraph.generateReactflowGraph(nodeTypes)
             
             that.setState({

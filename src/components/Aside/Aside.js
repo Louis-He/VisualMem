@@ -10,7 +10,6 @@ import {
 import { FaGithub } from "react-icons/fa";
 import { AiOutlineFile, AiFillFolderOpen } from "react-icons/ai";
 import { HiSaveAs } from "react-icons/hi";
-//import {toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const ipcRenderer = window.require("electron").ipcRenderer;
@@ -46,21 +45,7 @@ export default class Aside extends React.Component{
     e.preventDefault();
     ipcRenderer.invoke('requestSelectSourceFile', this.props.projectFolder)
   }
-
-  // saveFile2(e) {
-  //   e.preventDefault();
-  //   ipcRenderer.send("saveDialog", {
-  //     //baseCode: this.props.fileData,
-  //     data: this.props.fileData,
-  //     fileType: 'c',
-  //     fileName: 'sourse'
-  //   })
-  //   ipcRenderer.once('succeedDialog', event => {
-  //   })
-  //   ipcRenderer.once('defeatedDialog', event => {
-  //   })
-  // }
-
+  
   saveFile(e){
     ipcRenderer.send("saveDialog2", {
       data: this.props.fileData

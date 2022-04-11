@@ -1,8 +1,8 @@
 {
-  "name": "ece496",
-  "author": "Test",
-  "description": "ECE496 test project",
-  "version": "0.1.0",
+  "name": "VisualMem - A Debugger Visualizer",
+  "author": "Siwei He, Qihan Liu, Xiangcheng Wu @ University of Toronto",
+  "description": "VisualMem - A Debugger Visualizer",
+  "version": "1.0.0-beta1",
   "main": "electron/main.js",
   "homepage": "./",
   "private": true,
@@ -84,7 +84,7 @@
     "@electron-forge/maker-rpm": "^6.0.0-beta.54",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.54",
     "@electron-forge/maker-zip": "^6.0.0-beta.54",
-    "electron": "^12.2.2",
+    "electron": "^18.0.1",
     "electron-rebuild": "^2.3.5",
     "react-app-rewired": "^2.2.1"
   },

@@ -6,7 +6,7 @@ import './../node_modules/react-grid-layout/css/styles.css';
 import './../node_modules/react-resizable/css/styles.css';
 import { Container, Button, Form } from 'react-bootstrap';
 import ReactTooltip from "react-tooltip";
-import { Folder2Open, CaretRightSquare, XSquare, SkipEndCircle, ArrowRightCircle, Eye, EyeSlash } from 'react-bootstrap-icons';
+import { CaretRightSquare, XSquare, SkipEndCircle, ArrowRightCircle, Eye, EyeSlash } from 'react-bootstrap-icons';
 import { ThemeProvider } from "styled-components";
 import { MainBody } from "./components/GlobalStyles";
 import GridLayout from 'react-grid-layout';
@@ -22,29 +22,6 @@ const ipcRenderer = window.require("electron").ipcRenderer;
 function renderRequestsendMsgToGDB(msg) {
   ipcRenderer.invoke('sendMsgToGDB', msg)
 }
-
-// // TODO: need to update
-// const elementsCreator = function ({locals}) {
-
-//   const elementList = [];
-
-//   let ID = 1;
-//   let X = 100;
-//   let Y = 50;
-
-//   // /console.log(locals.length)
-//   if (locals.length < 2) {
-//     return []
-//   }
-//   for (let i = 0; i < 2; i++) {
-//     const element = { id: ID,  type: 'special', position: {x:X, y:Y}, data: { text: "name: " + locals[i][0].name + ", value: " + locals[i][0].value}, style: {opacity: 1}};
-//     ID = ID + 1;
-//     Y = Y + 50;
-//     elementList.push(element);
-//   }
-
-//   return elementList
-// }
 
 // ==== renderer class ====
 export default class MainWindow extends React.Component {
@@ -266,113 +243,73 @@ export default class MainWindow extends React.Component {
       <ThemeProvider theme={this.props.theme}>
         <>
           <MainBody>
-          
-            
-          <Container>
-                        {/* <div style={{ height: "200px" }}>
-                        <ReflexContainer orientation="vertical">
+            <Container>
+              <div className="container_ext">
+                {startGDBButton}
+                {nextLineGDBButton}
+                {continueGDBButton}
+                {stopGDBButton}
+                {eyeGDBButton}
+                {eyeSlashGDBButton}
+              </div>
+              <div>
 
-                          <ReflexElement>
-                            <div className="pane-content">
-                              <label>
-                                Left Pane (resizable)
+              </div>
 
-                                <div style={{ height: 500, width: 500 }}>
-                                  <ReactFlow elements={this.state.elements} nodeTypes={nodeTypes} />
-                                </div>
+              <div>
+                <p>Current Selected Folder: {this.props.projectFolder}</p>
+              </div>
 
-                              </label>
-                            </div>
-                          </ReflexElement>
+              <div>
+                <p>Current source file: {this.state.sourceFile}</p>
+              </div>
 
-                          <ReflexSplitter/>
-
-                          <ReflexElement
-                            minSize="200"
-                            maxSize="800">
-                            <div className="pane-content">
-                              <label>
-                                Right Pane (resizable)
-                                <br/>
-                                <br/>
-                                minSize = 200px
-                                <br/>
-                                maxSize = 800px
-                              </label>
-                            </div>
-                          </ReflexElement>
-
-                          </ReflexContainer>
-                        </div> */}
-                      
-                      
-                        
-                        <div className="container_ext">
-                          {startGDBButton}
-                          {nextLineGDBButton}
-                          {continueGDBButton}
-                          {stopGDBButton}
-                          {eyeGDBButton}
-                          {eyeSlashGDBButton}
-                        </div>
-                        <div>
-
-                        </div>
-
-                        <div>
-                          <p>Current Selected Folder: {this.props.projectFolder}</p>
-                        </div>
-
-                        <div>
-                          <p>Current source file: {this.state.sourceFile}</p>
-                        </div>
-
-                        <div>
-                          <p>Current line number: {this.state.lineNumber}</p>
-                        </div>
+              <div>
+                <p>Current line number: {this.state.lineNumber}</p>
+              </div>
 
 
-                        <div>
-                          <p>Current Executable Path: {this.props.executablePath}</p>
-                        </div>
+              <div>
+                <p>Current Executable Path: {this.props.executablePath}</p>
+              </div>
 
-                        <Button variant="primary" onClick={(e) => this.showFile(e)}>
-                          Show Source File
-                        </Button>
+              <Button variant="primary" onClick={(e) => this.showFile(e)}>
+                Show Source File
+              </Button>
 
-                        <p></p>
+              <p></p>
 
-                        <Editor source_code ={this.state.fileData}/>
+              <Editor source_code ={this.state.fileData}/>
 
-                        <MemGraph appState = {this}/>
+              <MemGraph appState = {this}/>
 
-                        <div>
-                          <Form>
-                            <Form.Group controlId="exampleForm.ControlTextarea1">
-                              <Form.Label>Command Sent to GDB</Form.Label>
-                              <Form.Control as="textarea" rows={3}
-                                value={this.state.GDBCommand}
-                                onKeyDown={(e) => this.onGDBCommandEnterPress(e)}
-                                onChange={(e) => this.GDBCommandLineOnChangeHandler(e)} />
-                            </Form.Group>
+              <div>
+                <Form>
+                  <Form.Group controlId="exampleForm.ControlTextarea1">
+                    <Form.Label>Command Sent to GDB</Form.Label>
+                    <Form.Control as="textarea" rows={3}
+                      value={this.state.GDBCommand}
+                      onKeyDown={(e) => this.onGDBCommandEnterPress(e)}
+                      onChange={(e) => this.GDBCommandLineOnChangeHandler(e)} />
+                  </Form.Group>
 
-                            <Button variant="primary" onClick={(e) => this.sendGDBCommandButton()}>
-                              Send
-                            </Button>
+                  <Button variant="primary" onClick={(e) => this.sendGDBCommandButton()}>
+                    Send
+                  </Button>
 
-                          </Form>
-                        </div>
+                </Form>
+              </div>
 
-                        <Button variant="primary" onClick={(e) => this.displayVar()}>
-                          Display Variables
-                        </Button>
-                                    
-                        <GridLayout className="layout" layout={layout} cols={12} rowHeight={30} width={1200}>
-                          <div key="a">a</div>
-                          <div key="b">b</div>
-                          <div key="c">c</div>
-                        </GridLayout>
-                      </Container>
+              <Button variant="primary" onClick={(e) => this.displayVar()}>
+                Display Variables
+              </Button>
+                          
+              <GridLayout className="layout" layout={layout} cols={12} rowHeight={30} width={1200}>
+                <div key="a">a</div>
+                <div key="b">b</div>
+                <div key="c">c</div>
+              </GridLayout>
+            </Container>
           </MainBody>
         </>
       </ThemeProvider>

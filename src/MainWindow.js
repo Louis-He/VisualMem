@@ -6,7 +6,7 @@ import './../node_modules/react-grid-layout/css/styles.css';
 import {toast} from 'react-toastify';
 import { Container, Button, Form } from 'react-bootstrap';
 import ReactTooltip from "react-tooltip";
-import { CaretRightSquare, XSquare, SkipEndCircle, ArrowDownRightCircle, ArrowRightCircle, Eye, EyeSlash, FiletypeExe } from 'react-bootstrap-icons';
+import { CaretRightSquare, XSquare, SkipEndCircle, ArrowDownRightCircle, ArrowRightCircle, FiletypeExe } from 'react-bootstrap-icons';
 import { ThemeProvider } from "styled-components";
 import { MainBody } from "./components/GlobalStyles";
 import Aside from "./components/Aside/Aside"
@@ -242,8 +242,8 @@ export default class MainWindow extends React.Component {
   
   render() {
     let startGDBButton = <span></span>
-    let eyeGDBButton = <span></span>
-    let eyeSlashGDBButton = <span></span>
+    // let eyeGDBButton = <span></span>
+    // let eyeSlashGDBButton = <span></span>
     let nextLineGDBButton = <span></span>
     let stepGDBButton = <span></span>
     let continueGDBButton = <span></span>
@@ -321,35 +321,35 @@ export default class MainWindow extends React.Component {
         </ReactTooltip>
       ]
 
-      if (!this.state.displayEle) {
-        eyeGDBButton = [
-          <Button
-            onClick={() => this.updateProgramVis()}
-            data-tip data-for="showVisGDBTip"
-            className="btn btn-success btn-sm"
-            style={{ fontSize: "18px", lineHeight: "1", padding: "5px", marginLeft: "10px" }}
-            key="showVisGDBButton">
-              <Eye style={{ verticalAlign: 'baseline' }} />
-          </Button>,
-          <ReactTooltip id="showVisGDBTip" place="top" effect="solid"  key="showVisGDBTip">
-            Show Program Visualization
-          </ReactTooltip>
-        ]
-      } else {
-        eyeSlashGDBButton = [
-          <Button
-            onClick={() => this.updateProgramVis()}
-            data-tip data-for="hideVisGDBTip"
-            className="btn btn-secondary btn-sm"
-            style={{ fontSize: "18px", lineHeight: "1", padding: "5px", marginLeft: "10px" }}
-            key="hideVisGDBButton">
-              <EyeSlash style={{ verticalAlign: 'baseline' }} />
-          </Button>,
-          <ReactTooltip id="hideVisGDBTip" place="top" effect="solid"  key="hideVisGDBTip">
-            Hide Program Visualization
-          </ReactTooltip>
-        ]
-      }
+      // if (!this.state.displayEle) {
+      //   eyeGDBButton = [
+      //     <Button
+      //       onClick={() => this.updateProgramVis()}
+      //       data-tip data-for="showVisGDBTip"
+      //       className="btn btn-success btn-sm"
+      //       style={{ fontSize: "18px", lineHeight: "1", padding: "5px", marginLeft: "10px" }}
+      //       key="showVisGDBButton">
+      //         <Eye style={{ verticalAlign: 'baseline' }} />
+      //     </Button>,
+      //     <ReactTooltip id="showVisGDBTip" place="top" effect="solid"  key="showVisGDBTip">
+      //       Show Program Visualization
+      //     </ReactTooltip>
+      //   ]
+      // } else {
+      //   eyeSlashGDBButton = [
+      //     <Button
+      //       onClick={() => this.updateProgramVis()}
+      //       data-tip data-for="hideVisGDBTip"
+      //       className="btn btn-secondary btn-sm"
+      //       style={{ fontSize: "18px", lineHeight: "1", padding: "5px", marginLeft: "10px" }}
+      //       key="hideVisGDBButton">
+      //         <EyeSlash style={{ verticalAlign: 'baseline' }} />
+      //     </Button>,
+      //     <ReactTooltip id="hideVisGDBTip" place="top" effect="solid"  key="hideVisGDBTip">
+      //       Hide Program Visualization
+      //     </ReactTooltip>
+      //   ]
+      // }
     }
 
     // Render the right panel for if it should show memgraph and command window
@@ -420,8 +420,8 @@ export default class MainWindow extends React.Component {
                   {stepGDBButton}
                   {continueGDBButton}
                   {stopGDBButton}
-                  {eyeGDBButton}
-                  {eyeSlashGDBButton}
+                  {/* {eyeGDBButton}
+                  {eyeSlashGDBButton} */}
                 </div>
                 <p></p>
                 {RightPanel}

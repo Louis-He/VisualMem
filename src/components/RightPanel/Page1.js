@@ -1,14 +1,7 @@
 import React from "react";
 import { Container } from 'react-bootstrap';
-// import Editor from "./Editor.js"
 import Editor2 from "./Editor_2"
 import { MainBody } from "./../../components/GlobalStyles";
-
-//const ipcRenderer = window.require("electron").ipcRenderer;
-
-
-
-//const Aside = () => {
 
 export default class Page1 extends React.Component{
 

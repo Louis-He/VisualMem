@@ -544,7 +544,8 @@ class pygdbController:
         self.sendCommandToGDB('-break-insert ' + lineNumber, True)
 
     def deleteBreakPoint(self, lineNumber):
-        self.sendCommandToGDB('-break-delete ' + lineNumber, True)
+        print(lineNumber)
+        self.sendCommandToGDB('clear ' + lineNumber, True)
         
     def getVariables(self):
         response = self.controller.write('-stack-list-variables --simple-values')
@@ -593,6 +594,8 @@ def processIncomingMessage(pygdb_controller, msg):
     elif msgArr[0] == 'GETLOCAL':
         pygdb_controller.getVariables()
     elif msgArr[0] == 'CMD':
+        print(msgArr[2], len(msgArr[2]))
+
         if msgArr[2] == "n":
             pygdb_controller.runNextLine()
         elif msgArr[2] == "s":
@@ -604,9 +607,9 @@ def processIncomingMessage(pygdb_controller, msg):
         elif len(msgArr[2]) >= 1:
             if msgArr[2][0] == "b":
                 pygdb_controller.addBreakPoint(msgArr[2][1:])
-        elif len(msgArr[2]) >= 5:
-            if msgArr[2][0:5] == "clear":
-                pygdb_controller.deleteBreakPoint(msgArr[2][len("clear"):])
+            elif len(msgArr[2]) >= 5:
+                if msgArr[2][:5] == "clear":
+                    pygdb_controller.deleteBreakPoint(msgArr[2][len("clear"):])
     elif msgArr[0] == 'FIN':
         thread_id = threading.get_ident()
         res = ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id,

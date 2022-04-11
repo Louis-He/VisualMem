@@ -28,11 +28,8 @@ global.share.ipcMain.on('saveDialog2', (event, arg) => {
   const mainWindow = windowsManager.getMainWindows();
   let sourceCode = arg.data;
   let filePath = windowsManager.getSourceFile();
-  //console.log("--------",filePath);
   fs.writeFile(filePath, sourceCode, (err) => {
-    //console.log("Writing files........")
     if(!err){
-      //console.log("File Written");
       mainWindow.webContents.send('savedMessage', {'SAVED': 'File Saved'});
     }
     else {
@@ -183,11 +180,8 @@ global.share.ipcMain.handle('requestSelectSourceFile', async (event, ...args) =>
       mainWindow.webContents.send('distributeSelectedExecutable', { 'executablePath': windowsManager.getExecFile() });
 
       const data = fs.readFileSync(result.filePaths[0], {encoding:'utf-8', flag:'r'});
-      //console.log(data);
       selectedFilePath = result.filePaths[0];
-      //console.log("---------", selectedFilePath);
       
-
       mainWindow.webContents.send('distributeFileData', { 'fileData': data });
     }
   }
